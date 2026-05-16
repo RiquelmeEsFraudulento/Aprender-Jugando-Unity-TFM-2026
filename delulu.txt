@@ -1,0 +1,364 @@
+Vale muy bien me gusta, pero ahora vamos a hacerlo aun mejor. Primero vamos con el prompt engineering:
+
+CUANDO DIGA Genera 1 : Generas el prompt/skill que dice el apartado 1, nunca sus contenidos, Genera 2 : Generas el....
+
+
+Apartado 1: prompt del espacio 8000 caracteres y el prompt estandar de entrada.
+
+ Apartado 2: segundo prompt con la skill de normativas como se genera el codigo y su filosofia de encapsulamiento....
+
+Apartado 3: una segunda skill de cosas por hacer de codigo y como forzar a que el alumno rellene el codigo para pasar de escena y como lo haremos con sumo detalle
+
+Apartado 4:  Con la tercera skill para desarrollar por completo la historia del videojuego (Escena 1, Escena 2....Escena 6 con lo que ocurre en cada escena)
+
+Apartado 5:  Cuarta skill con cosas que ya hemos hecho a nivel de codigo
+
+ Apartado 6: Quinta skill centrando las bases para su desarrollo docente y documentacion para el TFM.
+
+
+
+Uso Unity 6000.4.5f1
+
+Vamos voy a describir más lo que vamos a hacer.
+
+Tenemos un personaje que tiene dos espadas. Una que tiene un rapier que puede cambiar de normal, veneno y sangrado. Y luego un lightsaber que tiene lado rojo, azul y gris. Tiene un ataque normal y media vuelta.
+
+Tambien puede dar patadas, una que es como un chut y un martelo
+
+Inspiraciones: Sistema de combate mente colmena con turnos donde varios enemigos te ataquen mas o menos a la vez pero dejando un orden. Donde se tendran que combinar ataques con dodging para poder vencer a los enemigos.
+
+Por hacer:
+
+Sistema de combate mente colmena
+
+  Comportamiento del enemigo:
+
+    con fisicas Unity (no ragdoll)
+
+  Clases enemigas:
+
+
+
+
+
+  Mecanicas no completadas jugador:
+
+    Dodging
+
+
+
+
+Camara tercera persona que te siga
+
+Mecanicas RPG:
+
+  Meterle experiencia por cada vez que derrotes a un enemigo
+
+
+
+Escenas:
+
+  Nota: Las fases de historia son la pantalla en negro con texto blanco que el jugador dando enter pasa de ellas, antes de la escena de batalla se le dice tips y que tiene que implementar para pasarse el nivel
+
+  Nota 2: Hacer que sea imposible de superar el nivel hasta que los exquisitos se hayan cumplido.
+
+  Escena 1: Sala de prueba (donde el testing se hara). Para pasar a la siguiente escena hay que romper un cubo en especifico
+
+  Escena 2.1 Pantalla Texto Intro: Nuestro ninja estaba de vacaciones muy feliz hasta que derrepente empiezan a atacarle aliens de juguete.
+
+  Escena 2.2: Empiezan a venir aliens de juguete. Lock: Necesitas configurar los ataques basicos las patadas con if y else y cosas basicas de inicio de la programacion, como cosas de variables muy faciles.
+
+  Escena 2.3: Pantalla Texto Outro: Cuando lo derrotas el ninja ve que los juguetes derrotados se calman una vez los has derrotado
+
+  Escena 3.1 Pantalla Texto Intro: Sale un texto y una niño llorando te dice que su peluche favorito (el muñeco mas de moda) en ese momento y empieza a llorar diciendo que el muñeco que mas le gusta ha empezado a ir a por sus padres en modo agresivo. De repente empieza a venir todos los del vecindario.
+
+  Escena 3.2: Ordas del asset Mousey de Mixamo. Ya se utilizas Switch para configurar los ataques de las dos espadas. Y crear un struct basico del personaje. Implementan el EsEtiquetaPermitida(), cada color le afecta la espada laser o el rapier
+
+  Escena 3.3 Pantalla Texto Outro: Todos los niños abrazan al ninja por que sus peluches estan sanos y salvos
+
+  Escena 4.1 Pantalla Texto Intro: Una mujer alarmada dice que su figura a tamaño real de la ultima vez que fernando alonso gano en 2013 en el gran premio de españa ha empezado a destrozar su casa. Y empieza a salir Fernando Alonso y el ninja dice COMO TODO ESTE BARRIO TIENE UNA FIGURA DE FERNANDO ALONSO?
+
+  Escena 4.2 : Ordas de Fernando Alonso. Lock: Para poder avanzar necesitas haber configurado la experencia, donde Alien: 1 XP, Mousey: 5 XP, Fernando Alonso: 10 XP, otros que no sean el 15 XP.  y el EsColorVulnerable(), segun el color del mono del piloto sera vunerable a uno o a otro
+
+  Escena 4.3 Pantalla Texto Outro: En ninja empieza a cantar la cancion de Melendi del Nano, y empieza a bailar con Alonsistas la cancion. Hablando delulu que siguen pensando en la 33
+
+  Escena 5.1 Pantalla Texto Intro: El ninja va a comprarse nueva ropa viendo que son las rebajas...diciendo, a que voy a tener la mala suerte y me van a atacar los maniquis, a que me va a salir caro........Y efectivamente le empiezan a atacar los maniquis
+
+  Escena 5.2 : Ordas de maniquis. Lock: Tienen que hacer el switch de cambiar tipo del rapier, se implementara un veneno, un sangrado, y el while de es vunerable a cada tipo de daño. Cada maniqui de cada color es vunerable a cada tipo de daño.
+
+  Escena 5.3 Pantalla Texto Outro: Los empleados de la tienda le abrazan y le regalan tickets para que se compre cosas gratis. El ninja se compra un chandal del Dortmund negra y una camiseta de Lisa de rockstar.
+
+  Escena 6.1 Pantalla Texto Intro: Cuando va al probador ve a un dummy de pruebas de coche que le estaba viendo haciendose pasar por un maniqui. El ninja sale detras de el preocupado sin quererle hacerle daño, el dummy llega a su guarida que estaba en el alcantarilla, pero cuando llega a su guardida contando el voz alta que por fin ha construido una maquina para exparcer el suero de la reveldia por el mundo(que convierte a seres inertes en enemigos de la humanidad).....Aparece el ninja detras de el. El ninja intenta mediar no importando que el es un maniqui. Pero el enloquece volviendose loco diciendo que el no sabe nada, que nunca ha sabido que es el verdadero sufrimiento.....Le ataca
+
+  Escena 6.2 : El dummy le ataca. Tiene mucha vida y es mas rapido que los otros es el boss final. Lock : Para vencerle tiene aplicar 8 golpes aturdimiento (el enemigo se va a IDLE durante 5 segundos), luego/antes 8 goles más confusion (el enemigo cambia el objetivo y va a por un de tag objeto durante 5 segundos) y luego despues de los dos efectos le da un golpe despues de la confusion y es derrotado. Aqui se pedira que use las clausulas en orden correcto dentro de Confusion y Aturdimiendo. (En los ejercicios anteriores ya estabas integradas en la función pero ahora tienen que encontrarle la logica). Configurar que se vea de un color distinto (blanco aturdir, negro confusion y gris (vacio) ninguno), configurar cada tecla (7 no efecto,8 aturdimiento,9 confusion) en el circulo de la UI de los super efectos. Configurar las debilidades del maniqui y que sea derrotado tras tener el efecto de confusion, aturdimiento y un golpe mas.
+
+  Escena 6.3 Pantalla Texto Outro: El maniqui resignado en el suelo sin poder moverse, explica el porque odia a la humanidad. El era un dummy de prueba de impactos de coches, querian ver si la resistencia de las paredes de un laboratorio puede contenerlo, para que si hay un accidente no reventar todo el laboratorio que es peligroso. Iban a hacerlo con una pared del mismo material pero vacilaron al de los crash test. Es lo haces por que eres un gallina, si tienes agallas cumplirias esta cosa protocolaria en una de verdad. El coche fue a toda velocidad con dummy dentro. Pero el material no estaba hecho para el crash y revento. Explica algo de ciencia ficcion para que consiguera que viviera. Todo estaba destruido pero el no sabia que hacia alli. Se atrevio a conocer el mundo. La gente le miraba raro, llamaban a la policia, sacaban fotos, el se puso de incognito que no se viera la cara. Viendo que no podia conectar con ningun humano se dedico a buscar donde estaban los suyos. Cuando estaba hablando a uno en una fabrica en vano por que era inerte. Un trabajador le dice que le aparte y hace el crash test delante de el. Y ve al crash test totalmente reventado. El empieza a entrar en ira y knockea al trabajador. Llega a la conclusion que todos los dummies tiene ese proposito, y que son innertes, entonces por que el es asi? Va a donde estaba y con las ruinas de aquello ve y entiende lo que paso aquel dia, era una cosa inerte hasta ese momento....Aceptando la realidad vio un paper en semi ruina pero legible diciendo como dar consciencia a un ser inerte y darle consciencia. El lo replico, y empezo a crear algo para replicarlo en todo el mundo. Pero....Que el ninja era la primera persona que no le importaba que era un maniqui que lo unico que le importaba es que las cosas inertes dejaran de atacar a las personas que el solo les atacaba por defensa a las otras personas pero que el valora mucho las cosas inertes. Se asegurara que dejen de hacer maniquis tan humanos.....Que los hara con madera recubierta con bambu y con cascos de Fernando Alonso con su misma resistencia. Y reconstrucion y buenos tratos a los nueva especie de dummy. El maniqui se rie diciendo que chorrada. Y el ninja dice: Así tu especie dejara de ser utilizado tan vilmente. Y el sustituto inerte tendra mejores condiciones......El ninja le da un medallon. Sabes, hay cosas inertes que para mi estan vivas. Toma es un regalo. Es.....la cosa más importante que hay en este mundo, vivo o inerte. Es....el ultimo regalo de ella.....Mi esposa....Estaba terminal sabia que le quedaban días, asi que ordeno esto. Un medallon con nuestro nombre grabado y dentro......una foto del dia más feliz de mi vida, el dia de nuestra boda.....El dummy empieza de echar grasa por los ojos y agarrando el medallon. Habiendo gente como tu.....He recuperado la fe en la humanidad....Cogio un fasco que era diferente. Voy a parar la epidemia....Va al exparcidor que creo originalmente para espandirlo mundialmente...Pero cambia a antidoto.....Esto lo que hace es que vuelven al estado inerte, pero dentro de ellos guardan una consciencia.....El dia que la humanidad este preparada con gente más como tu.....Esa consciencia se reactivara......(activa el boton) Y se empieza a ir. El ninja dice que no se vaya, que juntos pueden....el le interrumpe sosteniendo el medallon y con la otra el frasco de otro color...Que el prepare al mundo para ese momento....Que el se va a revivir cuando el ninja fue verdaderamente feliz, con su difunta esposa, el frasco de otro color es darle consciencia positiva a algo inerte. Antes que el ninja se de cuenta desaparece....Pasa el tiempo y ninja coge el periodico con desicha y sufrimiento. La portada de un ninja salva a la humanidad de la locura inerte.....El resignado dice y pasa a la ultima pantalla
+
+  Escena Final: Mensaje: Solo alcanzaremos la paz cuando aceptemos a todos
+
+
+
+Interfaz grafica sencilla (Esquina superior):
+
+  Una barra de vida que sea un rectangulo gris y que por dentro este relleno rojo y que avance y retroceda
+
+  Una barra de experencia que sea un rectangulo gris mas pequeño y que por dentro este relleno dorado y que avance y retroceda
+
+  Un circulo gris que este vacio hasta el boss final, que lo de dentro cambia de color (blanco aturdir y negro confusion)
+
+
+
+TODO relacionado con Desarrollo docente y desarrollo del TFM apartados que necesito:
+
+Enfocado al bloque de programacion TIC I Andalucia
+
+La competencia especifica que vamos a trabajar es:
+
+CE5. Comprender qué es un algoritmo y cómo son implementados en forma de programa, analizando y aplicando los principios de la ingeniería del software, para desarrollar y depurar aplicaciones informáticas y resolver problemas.
+
+Los dias disponibles son
+
+Martes (M):
+02/12, 09/12, 16/12, 13/01, 20/01, 27/01, 03/02, 10/02, 17/02, 24/02, 03/03, 10/03, 17/03, 24/03
+Miércoles (X):
+03/12, 10/12, 17/12, 14/01, 21/01, 28/01, 04/02, 11/02, 18/02, 25/02, 04/03, 11/03, 18/03, 25/03
+
+Cada dia una hora. 28 horas en total entre las dos unidades. Se impartira primero el tema 12 Diseño de software y resolución de problemas  para dar al alumno una idea conceptual y abstracta. Trabajando con algoritmo y patrones sobre el videojuego.
+
+Sus saberes basicos son
+
+TICO.1.E.2.1. Enfoque Top-Down.
+TICO.1.E.2.2. Fragmentación de problemas.
+TICO.1.E.2.3. Patrones.
+TICO.1.E.2.4. Algoritmos.
+TICO.1.E.2.5. Pseudocódigo y diagramas de flujo.
+TICO.1.E.2.6. Depuración.
+
+Su Criterio de Evaluacion es:
+
+5.2. Analizar y resolver problemas de tratamiento de la información, dividiéndolos en sub- problemas y definiendo algoritmos que los resuelvan.
+
+Y luego mas extensamente nos pondremos ahora asi manos a la obra con el proyecto, Unidad 11 Fundamentos de programación
+
+TICO.1.E.1.1. Lenguajes de programación. Tipos. Paradigmas.
+TICO.1.E.1.2. Estructura de un programa informático y elementos básicos del lenguaje.
+TICO.1.E.1.3. Tipos básicos de datos. Constantes y variables. Operadores y expresiones. Facilidades para la entrada y salida de datos de usuario. Comentarios.
+TICO.1.E.1.4. Estructuras de control condicionales e iterativas.
+TICO.1.E.1.5. Estructuras de control y de datos.
+TICO.1.E.1.6. Funciones y bibliotecas de funciones.
+
+Su Criterio de Evaluacion es:
+
+5.1. Conocer y comprender la sintaxis y la semántica de un lenguaje de programación, analizar la estructura de programas sencillos y desarrollar pequeñas aplicaciones.
+
+Lo que quiero desarrollar:
+1. Un cronograma de que se hara en cada sesion de las 28
+
+1. Marco teórico 7-10 páginas
+Este capítulo es el “por qué tiene sentido” tu propuesta. Aquí no haces aún nada práctico, solo justificas con estudios y teoría.
+
+1.1. Videojuegos como recurso educativo 2-3 páginas
+Qué desarrollar
+Explica brevemente cómo han cambiado las visiones sobre los videojuegos:
+críticas clásicas (violencia, adicción, estereotipos),
+beneficios señalados por investigaciones recientes (atención, habilidades espaciales, resolución de problemas, colaboración).
+Resume 2–3 estudios de prestigio: por ejemplo Granic et al. (2014, American Psychologist), meta‑análisis sobre juegos educativos, y Papastergiou (2009) sobre juegos en informática de Bachillerato.
+Cierra la subsección conectándolo con tu caso: “Por tanto, usar videojuegos sencillos para introducir programación en TIC I no es una excentricidad, sino una forma alineada con la literatura actual sobre DGBL(Digital Game-Based Learning).”
+Clasificación por edad en los videojuegos. PEGI.  Que es y no es admisible para el aula (1 pagina solo eso)
+
+1.2. Pros y contras del uso de videojuegos como recurso docente 1,5-2 páginas
+Qué desarrollar
+Haz una tabla mental o texto con dos bloques:
+Beneficios (motivación, feedback inmediato, visualización de conceptos abstractos, trabajo por proyectos, clima emocional más positivo).
+Riesgos (distracción, centrar la atención solo en la parte lúdica, desigualdades entre alumnado con más o menos experiencia en videojuegos, riesgo de abusar de elementos superficiales de gamificación).
+Explica que tú eliges un enfoque controlado y curricular: hacer lo dificil parecer facil gracias a la encapsulacion, un mensaje positivo, alineados con objetivos de TIC I, con tiempos de uso acotados y acompañados de reflexión.
+Enviar un mensaje con los videojuegos.
+1.3. Experiencias previas del uso de videojuegos en docencia en Bachillerato 2-3 páginas
+	A las malas que no encuentre mucho para bachillerato lo hago en general
+
+2.3. Objetivos de la propuesta para TIC I: enseñar programación en aula mediante la creación de un videojuego 1-1,5 páginas
+Qué desarrollar
+Separa objetivo general y objetivos específicos para Bachillerato:
+Objetivo general: que el alumnado comprenda y retenga mejor las estructuras de control básicas de programación mediante el desarrollo de videojuego sencillo, manteniendo los principios de inclusión y accesibilidad.
+Objetivos específicos:
+OBJBACH-1: entender fundamentos de programación.
+OBJBACH-2: mejorar retención de contenidos básicos.
+OBJBACH-3: aumentar la percepción de utilidad de la programación usando contextos cercanos (videojuegos).
+Puedes añadir 2–3 objetivos personales tuyos como docente (mejorar clima de aula, reducir bloqueos, etc.).
+
+2.4. Desarrollo de la propuesta: creación de un proyecto de Unity en el marco de TIC I 5-7 páginas
+	2.4.1. Programación didáctica de TIC I
+º	Qué desarrollar
+	2.4.2. Unidad didáctica
+	Explica que la unidad se sitúa en el Bloque E: Programación del currículo de TIC I andaluz.
+Enumera qué saberes básicos trabajas (fundamentos de programación, tipos de datos, estructuras de control, funciones) y qué criterios de evaluación de TIC I se vinculan.
+Presenta la secuencia didáctica general:
+Explicación teórica breve con ejemplos sencillos en C.
+Visualización del mismo comportamiento en Unity (personaje que se mueve, salta, hace animaciones de Mixamo).
+Ejercicio práctico donde el alumnado completa o modifica fragmentos de código en un “esqueleto” muy guiado.
+Puesta en común y reflexión sobre lo aprendido.
+Qué puedes reutilizar
+El apartado 5.2.1 “Contextualización de la unidad en TIC I” y el cuadro de saberes básicos aplicados a programación en C (Cuadro 3).
+
+
+3. Desarrollo del material docente: Proyecto de Unity como Recurso Educativo en Abierto 7-15 páginas
+Este es el “corazón” del trabajo: describes los recursos abiertos que diseñas para la unidad de programación de TIC I.
+
+3.1. Unity como herramienta de creación de videojuegos y su adaptación al espacio docente en el marco de TIC I
+Explicar que es Unity y no asumir que saben nada: explicar lo del encapsulamiento de complejidad así “Unity es una herramienta profesional, y para su adaptación curricular es necesario simplificarla, y para eso voy a hacer tal tal tal”
+Qué desarrollar
+Describe claramente qué hace tu script esqueleto (SimpleWalk): movimiento, detección de teclas, uso de corutinas, interacción con Animator y CharacterController, etc.
+Explica la idea de encapsulación: el alumnado ve y modifica solo “islas” del código (condicionales, bucles, funciones sencillas) mientras tú ya has preparado toda la parte difícil de Unity (ciclo de vida, componentes, configuración de Animator, etc.).
+Detalla qué partes serán “zona editable” para el alumnado (por ejemplo, un switch para mapear teclas a acciones, la lógica de una cuenta atrás, etc.) y qué partes no deben tocar.
+Explicar muy gráfico con pantallazos
+
+3.2. Desarrollo de la experiencia docente en Unity
+Organiza los ejercicios por escenas, explicando
+Para cada ejercicio, explica:
+qué objetivo curricular trabaja (p.ej. “aplicar estructuras condicionales”),
+qué ve el alumnado en pantalla cuando lo hace bien,
+y qué nivel de dificultad tiene (básico/medio).
+El mensaje que transmite:  Los niños pueden tener peluche, las niñas pueden ser fanaticas de fernando alonso, la paz solo sera conseguido cuando se acepten a todos
+
+La estructura del anexo 8.2 (if, switch, for, while, funciones) y sus descripciones, adaptándolas explícitamente a la lógica del script SimpleWalk y a TIC I.
+
+3.3. Desarrollo de materiales docentes complementarios 
+Qué desarrollar
+Describe cada material abierto que vas a producir:
+Proyecto de Unity con el personaje de Mixamo ya importado, Animator configurado y script esqueleto.
+Documento de enunciados de ejercicios, en formato editable (ODT/Markdown).
+Soluciones comentadas para el profesorado y para autocorrección.
+Vídeos cortos (capturas de pantalla) donde se muestra el comportamiento correcto de cada ejercicio.
+Explica la licencia (por ejemplo, Creative Commons) y cómo otros docentes podrían descargar, adaptar y reutilizar los materiales.
+Qué puedes reutilizar
+El apartado 3.3 “Materiales” (manual, vídeo, adaptabilidad) y el anexo 8.1 “Manual de la práctica Importar personaje 3D desde Mixamo”, pero ajustándolo a la realidad de Bachillerato.
+¿Github? - Subirlo a Github
+
+4. Analizar su puesta en marcha
+Aquí describes “cómo se haría” en el aula: metodología, organización del tiempo, atención a la diversidad.
+4.1. Metodología de aula
+Qué desarrollar
+Explica paso a paso cómo se desarrollaría una sesión tipo:
+Activación inicial (pregunta o mini debate sobre videojuegos).
+Breve explicación teórica (10–15 min).
+Demostración en Unity del comportamiento a conseguir.
+Trabajo en parejas con el código, con apoyos (manual, vídeos).
+Puesta en común y reflexión final (qué hemos aprendido, qué costó más, etc.).
+Describe qué metodologías usas: aprendizaje basado en proyectos, trabajo cooperativo, enseñanza explícita de estrategias de depuración, etc.
+
+4.2. Organización temporal de la unidad
+Qué desarrollar
+Diseña un cronograma concreto de sesiones (por ejemplo, 6–8 sesiones de 1 hora), indicando qué se hace en cada una: vamos el cronograma de las 28 horas que te he pedido antes
+Desarrollar por que pongo la unidad 12 que es mas abstracta antes de la Unidad 11 que es programacion en codigo por la abstracion, y desarrollar que adelanto para que esten mas frescos para que no coincida con toda la carga de examenes finales y se puedan centrar en esto, le doy más horas a este bloque por la importancia que tiene y reduzco en La sociedad de la información y el ordenador, Software y Procesadores de texto
+
+
+4.3. Atención a la diversidad y clima de aula
+Qué desarrollar
+Explica qué ajustes universales planteas: vídeos con subtítulos, manual visual, ritmo flexible, posibilidad de repetir las demostraciones, uso de auriculares, etc.
+Describe ajustes específicos basados en tu marco teórico:
+para alumnado con TDAH (tareas fragmentadas, objetivos claros, recordatorios visuales),
+para alumnado con TEA (anticipación de cambios, secuencias visuales, uso de intereses especiales en los ejemplos).
+Indica cómo evitar que las adaptaciones creen estigma: todos usan los mismos materiales, cada cual los aprovecha a su ritmo.
+
+
+5. Testar su uso (evaluación de la propuesta)
+En este capítulo explicas cómo comprobarías si la unidad funciona, aunque no llegues a aplicarla del todo.
+5.1. Evaluación del aprendizaje del alumnado
+Qué desarrollar
+Define los instrumentos de evaluación de programación:
+rúbrica para los ejercicios (correcta aplicación de condicionales y bucles, legibilidad del código, capacidad de depuración),
+pequeña prueba escrita o tipo test sobre conceptos clave,
+observación del desempeño en Unity (si el personaje hace lo que debe).
+Conecta cada instrumento con los criterios de evaluación de TIC I que seleccionaste en el capítulo 2.
+
+5.2. Evaluación de la motivación y de la experiencia
+Qué desarrollar
+Diseña un cuestionario breve antes y después de la unidad para medir:
+interés por la programación,
+percepción de utilidad,
+sensación de autoeficacia (“me veo capaz de programar cosas sencillas”).
+Añade la idea de una entrevista o grupo de discusión con algunos alumnos para recoger impresiones cualitativas sobre la experiencia con Unity y los videojuegos.
+Explica cómo analizarías los datos de forma sencilla (comparar medias, ver cambios de respuestas, recoger citas representativas).
+
+
+6. Conclusiones
+Aquí cierras el círculo: vuelves a las preguntas del principio y explicas qué aporta tu propuesta.
+6.1. Resumen de aportaciones
+Qué desarrollar
+Recapitula en 1–2 páginas:
+qué problema querías abordar,
+en qué consiste tu propuesta (unidad de programación en TIC I apoyada en un proyecto de Unity encapsulado, ejercicios con Mixamo, materiales REA),
+qué avances supone respecto a una unidad tradicional de programación (motivación, visualización, inclusión).
+Qué puedes reutilizar
+La estructura de 6.1 “Objetivos alcanzados”, traducida al nuevo foco en Bachillerato.
+
+6.2. Respuesta a las problemáticas iniciales
+Qué desarrollar
+Toma las problemáticas de 2.2 (absentismo, bloqueos, desmotivación, bullying) y, una por una, explica cómo tu propuesta intenta responder a cada una:
+materiales accesibles en cualquier momento,
+ejemplos motivadores,
+flujo de trabajo que reduce el tiempo de bloqueo,
+adaptación universal que reduce el estigma.
+Qué puedes reutilizar
+La lógica que usabas en tu capítulo 3 para mostrar cómo cada medida respondía a un problema específico, resumida en tabla o en texto.
+
+
+5.3. Limitaciones y mejora
+
+Comenta de forma honesta posibles limitaciones: tamaño reducido del grupo, poco tiempo de aplicación, dependencia de que el aula de ordenadores funcione bien, etc.
+Explica qué harías para mejorar el test en futuras ediciones: repetir en más grupos, incluir comparación con una unidad tradicional, etc
+Haber sido esto un supuesto y no una aplicacion real
+Que las cinematicas han sido solo texto en una pantalla en negro, que no he desarrollado cinematicas
+Los assets no son tan atractivos para el alumno por que son el open source y por que tienen que tirar en la mayoria de ordenadores.
+La limitacion de 60 paginas del TFM.
+Y otras limitaciones que el TFM no trate que se te ocurra
+
+6.3. Líneas de trabajo futuras
+Qué desarrollar
+Propón extensiones realistas:
+adaptar la misma filosofía a ESO con pseudocódigo o bloques,
+desarrollar videojuegos educativos específicos para otros contenidos (p.ej. lógica digital, bases de datos), hablar de scratch para la ESO
+
+formar a más profesorado del centro en el uso de Unity con plantillas encapsuladas.
+
+Hacer un material de esta calidad para el resto de TIC I.
+
+Usar minecraft en la explicacion de puertas logicas con la redstone para explicar algoritmos.
+
+Crear la segunda parte de esto debido a que la historia esta abierta y en el futuro esta TIC II que lo forman el alumnado previo a TIC I en su gran mayoria
+
+También puedes mencionar la posibilidad de investigación futura más formal (diseños cuasi‑experimentales, comparar grupos, etc.).
+
+Apartado relevantes que ya he hecho que te puede servir para tenerlo en cuenta:
+
+\\subsection{Contexto del centro y de la asignatura TIC I}
+
+\\subsubsection{Caracterización del centro}
+
+El centro hipotético en el que se sitúa esta propuesta es un colegio privado en el que se imparten enseñanzas desde 1.º de ESO hasta 2.º de Bachillerato, además de contar con varios ciclos de Formación Profesional, principalmente vinculados al ámbito de la informática y las telecomunicaciones.\\\\
+
+Existe una comunicación fluida entre los distintos departamentos y una cultura pedagógica muy centrada en trabajar bien los fundamentos, bajo la idea de que unos buenos cimientos permiten construir aprendizajes más complejos con mayor solidez. Por este motivo, aunque la materia de Tecnologías de la Información y la Comunicación I no esté específicamente reservada al profesorado de la especialidad de Informática, se considera esencial que, cuando se aborda el bloque de programación, se haga con un enfoque que facilite la continuidad en estudios posteriores, de modo que el alumnado domine el “ABC” de programar y le resulten familiares los comportamientos básicos de un videojuego.\\\\
+
+\\subsubsection{Perfil del alumnado}
+
+El alumnado del centro es bastante heterogéneo, tanto en lo cultural como en lo personal, y conviven estudiantes de orígenes diversos en un entorno donde se respetan todo tipo de creencias religiosas a pesar de tratarse de un colegio privado. El nivel socioeconómico general puede considerarse medio, lo que en principio evita tener que adaptar de forma sistemática los materiales por falta de recursos, si bien pueden darse casos puntuales en los que, por ejemplo, a mitad de curso a un estudiante se le estropee el ordenador y deba esperar un tiempo hasta disponer de uno nuevo.\\\\
+
+Para paliar este tipo de situaciones, el centro dispone de aulas equipadas con ordenadores con suficiente potencia para ejecutar sin problemas el software que se utiliza tanto en Bachillerato como en los ciclos de FP, las cuales permanecen abiertas en horarios amplios para que el alumnado pueda trabajar en sus proyectos.\\\\
+
+\\subsubsection{Atención a las necesidades educativas especiales}
+
+En este centro la presencia de alumnado con necesidades educativas especiales es superior a la media, y además se dan perfiles muy variados. Por ello, se exige que todas las materias dispongan de adaptaciones previamente pensadas para los tipos de necesidades más frecuentes, ya que resulta habitual que en cada grupo haya al menos un estudiante que requiera algún tipo de respuesta específica.\\\\
+
+Los perfiles más comunes son alumnado con pérdida auditiva o visual parcial, altas capacidades, discapacidad intelectual, TDAH y diferentes grados dentro del espectro autista. A esta realidad se suma un problema detectado de situaciones de bullying hacia aquellos estudiantes cuya adaptación curricular resulta demasiado visible para el resto, lo que obliga a diseñar medidas que no estigmaticen.\\\\
+
+Finalmente, el centro cuenta con un aula específica para alumnado que necesita una atención más individualizada, atendida por profesionales especializados y donde se aplican metodologías como el programa Tratamiento y Educación de Niños con Autismo y Problemas Asociados de Comunicación (TEACCH) o el Análisis de la Conducta Aplicado (ABA), ajustadas a las características de cada caso.
+
+
+\\subsection{Problemáticas detectadas en la enseñanza de TIC I}
+Absentismo y dilación en las entregas
+
+TIC I es una asignatura optativa y, en la jerarquía implícita de prioridades que construye el alumnado de Bachillerato, ocupa frecuentemente una posición subordinada respecto a las materias troncales de modalidad que determinan la nota de acceso a la universidad. Esta jerarquía se traduce en patrones concretos: faltas de asistencia concentradas en los días previos a exámenes de otras materias, entregas de prácticas realizadas en el último minuto y sin la reflexión necesaria, y tendencia a «acumular» sesiones no completadas. El resultado es una secuencia de aprendizaje fragmentada: el alumno que falta la sesión en que se explica el bucle while llega a la sesión siguiente sin los cimientos, genera una duda que bloquea toda la práctica y, en el peor caso, abandona o copia. El diseño de materiales que el alumnado pueda consultar y trabajar de forma autónoma —en el aula, en casa o en otro momento del curso— es una respuesta directa a esta dinámica.
+
+Bloque 3: Desmotivación y escasa percepción de utilidad
+
+Quizás la problemática más difícil de abordar desde el diseño curricular sea la que los propios alumnos expresan con mayor frecuencia: «¿para qué me sirve esto?». La programación en C presentada mediante ejercicios descontextualizados —calcular el factorial de un número, convertir temperaturas, imprimir la tabla de multiplicar— no conecta con los intereses ni con las experiencias cotidianas de un adolescente de dieciséis años. La investigación sobre motivación escolar señala de forma consistente que la percepción de utilidad y relevancia personal del contenido es uno de los predictores más robustos de la motivación intrínseca (Wigfield and Eccles, 2000). Cuando el alumnado ve que el código que acaba de escribir hace que un personaje en 3D realiza una acción y es interactiva, la pregunta por la utilidad se responde sola. Esta conexión entre abstracción y resultado visible es el corazón motivacional de la propuesta.
