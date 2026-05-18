@@ -12,6 +12,7 @@ TagManager:
   - Rapier
   - LightSaber
   - OtherMe
+  - Punio
   layers:
   - Default
   - TransparentFX

@@ -34,4 +34,10 @@ public class PlayerHealth : MonoBehaviour
         vida += cantidad;
         Debug.Log("[Player] Curación: +" + cantidad + " | Vida: " + vida);
     }
+
+    public void TakeDamage(float cantidad)
+    {
+        vida -= cantidad;
+        Debug.Log("[Player] Daño recibido: +" + cantidad + " | Vida: " + vida);
+    }
 }

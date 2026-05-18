@@ -183,7 +183,7 @@ public class Damageable : MonoBehaviour
         InicializarVida();
     }
 
-    void InicializarVida()
+    public void InicializarVida()
     {
         currentHealth = maxHealth;
         DebugInit(
