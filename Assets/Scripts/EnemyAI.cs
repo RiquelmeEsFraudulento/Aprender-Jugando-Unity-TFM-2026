@@ -96,6 +96,8 @@ public class EnemyAI : Damageable
         if (ragdollActivo) return;
         EjecutarEstado();
         ActualizarAnimatorBase();
+        base.AvanzarCooldown();
+        if (estaEnvenenado) base.ProcesarVenenoPorTiempo();
     }
 
     void ActualizarTimers()

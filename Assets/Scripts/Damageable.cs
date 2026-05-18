@@ -160,7 +160,7 @@ public class Damageable : MonoBehaviour
     private float tiempoDesdeUltimoGolpe = 999f; // empieza listo para recibir daño
 
     // ── Veneno ───────────────────────────────────────────────
-    private bool  estaEnvenenado     = false;
+    public bool  estaEnvenenado     = false;
     private float tiempoVeneno       = 0f;
     private float acumuladorVeneno   = 0f;
 
@@ -249,14 +249,14 @@ public class Damageable : MonoBehaviour
     // COOLDOWN
     // ══════════════════════════════════════════════════════════
 
-    void AvanzarCooldown()
+    public void AvanzarCooldown()
     {
         // Acumula tiempo entre frames igual que un timer en C++.
         if (tiempoDesdeUltimoGolpe < cooldownEntreGolpes)
             tiempoDesdeUltimoGolpe += Time.deltaTime;
     }
 
-    void ReiniciarCooldown()
+    public void ReiniciarCooldown()
     {
         tiempoDesdeUltimoGolpe = 0f;
         DebugCooldown(
@@ -323,7 +323,7 @@ public class Damageable : MonoBehaviour
         );
     }
 
-    void ProcesarVenenoPorTiempo()
+    public void ProcesarVenenoPorTiempo()
     {
         tiempoVeneno     += Time.deltaTime;
         acumuladorVeneno += Time.deltaTime;
