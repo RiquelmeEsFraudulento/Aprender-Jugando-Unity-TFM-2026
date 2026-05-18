@@ -1,58 +1,46 @@
-// ============================================================
-// EnemyHitbox.cs  —  COLLIDER DEL PUÑO DEL ENEMIGO
-// ============================================================
-// Pon este script en el GameObject HIJO que tiene el Collider
-// Trigger del puño/arma del enemigo.
-//
-// JERARQUÍA NECESARIA EN EL PREFAB:
-//   EnemyPrefab (Root)  ← tiene EnemyAI.cs
-//   └─ PunioHitbox      ← tiene este script + Collider (Is Trigger = true)
-//
-// CÓMO FUNCIONA:
-//   1. La animación de ataque activa/desactiva el Collider del puño
-//      (en el Animator, en el frame del golpe: Enable/Disable Collider)
-//   2. Cuando el Collider toca al ninja, este script llama a
-//      EnemyAI.GolpearNinja() para aplicar el daño.
-// ============================================================
 using UnityEngine;
 
 public class EnemyHitbox : MonoBehaviour
 {
-    // ── Referencia al EnemyAI padre ───────────────────────────
-    // Se rellena automáticamente en Awake buscando en el padre.
-    private EnemyAI _enemyAI;
-
-    // ── Debug switch ──────────────────────────────────────────
-    private const bool LOG_HITBOX = true;
+    public EnemyAI enemigo;
+    public int dano = 8;
+    public float retrocesoJugador = 2.25f;
+    public float retrocesoEnemigo = 0.9f;
+    public bool activo = false;
 
     void Awake()
     {
-        // Buscamos el EnemyAI en el GameObject padre (el root del prefab)
-        _enemyAI = GetComponentInParent<EnemyAI>();
-
-        if (_enemyAI == null)
-            Debug.LogWarning($"[EnemyHitbox] '{name}' no encontró EnemyAI en el padre. " +
-                              "Comprueba la jerarquía del prefab.");
+        if (enemigo == null) enemigo = GetComponentInParent<EnemyAI>();
+        SetActivo(false);
     }
 
-    // Se llama cuando el Collider Trigger toca otro Collider
-    // Equivale a ComprobarColision() en C++ básico
-    void OnTriggerEnter(Collider otro)
+    public void Enlazar(EnemyAI e)
     {
-        // ¿Es el ninja? (tiene el Tag "Player")
-        if (!otro.CompareTag("Player")) return;
-
-        // Buscamos el componente de vida del ninja
-        PlayerHealth vidaNinja = otro.GetComponent<PlayerHealth>();
-        if (vidaNinja == null) return;
-
-        DebugHitbox($"[Hitbox] '{name}' tocó al ninja");
-
-        // Delegamos el daño al EnemyAI para que aplique la lógica correcta
-        if (_enemyAI != null)
-            _enemyAI.GolpearNinja(vidaNinja);
+        enemigo = e;
     }
 
-    // ── Debug ─────────────────────────────────────────────────
-    void DebugHitbox(string msg) { if (LOG_HITBOX) Debug.Log(msg); }
+    public void SetActivo(bool value)
+    {
+        activo = value;
+        Collider c = GetComponent<Collider>();
+        if (c != null) c.enabled = value;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (!activo) return;
+        if (enemigo == null) return;
+        if (!other.CompareTag("Player")) return;
+        PlayerHealth vidaJugador = other.GetComponent<PlayerHealth>();
+        if (vidaJugador == null) return;
+        Vector3 dir = (other.transform.position - transform.position).normalized;
+        vidaJugador.TakeDamage(dano);
+        Rigidbody rb = other.GetComponent<Rigidbody>();
+        if (rb != null) rb.AddForce((dir + Vector3.up * 0.15f) * retrocesoJugador, ForceMode.Impulse);
+        if (enemigo.controller != null)
+        {
+            Vector3 push = (transform.position - other.transform.position).normalized * retrocesoEnemigo;
+            enemigo.controller.Move(push * Time.deltaTime);
+        }
+    }
 }

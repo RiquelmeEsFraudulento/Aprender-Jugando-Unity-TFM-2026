@@ -20,8 +20,8 @@ public class SimpleWalk : MonoBehaviour
     public Collider LeftKickCollider;
     public RapierHitbox Rapier;
     public WeaponHitbox LightSaber;
-    public WeaponHitbox RightKick;
-    public WeaponHitbox LeftKick;
+    public KickHitbox RightKick;
+    public KickHitbox LeftKick;
 
     private CharacterController controller;
     private Vector3 moveDirection;
@@ -123,7 +123,7 @@ public class SimpleWalk : MonoBehaviour
 
     public void EnableLightSaberHitbox(){ 
         LightSaberCollider.enabled = true;
-        Rapier.Reactivar();
+        LightSaber.Reactivar();
     }
 
     public void EnableLeftKickHitbox(){ 

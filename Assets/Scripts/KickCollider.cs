@@ -7,6 +7,8 @@ public class KickHitbox : MonoBehaviour
     [Header("Damage settings")]
     public int damage = 1;
 
+    
+
     [Tooltip("Root transform of the character that owns this hitbox (player).")]
     public Transform ownerRoot;
 
@@ -16,10 +18,10 @@ public class KickHitbox : MonoBehaviour
     // One hit per enemy per swing
     readonly HashSet<Damageable> alreadyHit = new HashSet<Damageable>();
 
-    void OnEnable()
-    {
-        alreadyHit.Clear();
-    }
+    //void OnEnable()
+    //{
+        //alreadyHit.Clear();
+    //}
 
     void OnTriggerEnter(Collider other)
     {
@@ -44,5 +46,10 @@ public class KickHitbox : MonoBehaviour
         // Finally apply damage
         GameObject source = ownerRoot != null ? ownerRoot.gameObject : gameObject;
         damageable.TakeDamage(damage, damageType, source);
+    }
+
+
+    public void Reactivar(){
+        alreadyHit.Clear();
     }
 }
