@@ -228,7 +228,7 @@ public class Damageable : MonoBehaviour
 
     // ── TakeDamage ───────────────────────────────────────────
     // La hitbox llama DESPUÉS de que CanBeDamagedBy devuelva true.
-    public void TakeDamage(int amount, DamageType damageType, GameObject source)
+    public virtual void TakeDamage(int amount, DamageType damageType, GameObject source)
     {
         if (amount <= 0) return;
 
@@ -447,12 +447,15 @@ public class Damageable : MonoBehaviour
     // MUERTE
     // ══════════════════════════════════════════════════════════
 
-    void Morir()
+    // En Damageable.cs — cambiar de private a protected virtual
+    protected virtual void Morir()
     {
         DebugMuerte($"[Muerte] '{gameObject.name}' ha muerto.");
         onDeath?.Invoke();
         Destroy(gameObject);
     }
+
+
 
     // ══════════════════════════════════════════════════════════
     // HELPERS DE DEBUG — encapsulados por categoría

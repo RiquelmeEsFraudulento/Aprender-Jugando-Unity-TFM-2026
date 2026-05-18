@@ -28,6 +28,7 @@ public class EnemyHitbox : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Toma putiaso");
         if (!activo) return;
         if (enemigo == null) return;
         if (!other.CompareTag("Player")) return;
