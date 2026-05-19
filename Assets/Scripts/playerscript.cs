@@ -290,7 +290,7 @@ public class SimpleWalk : MonoBehaviour
     // ══════════════════════════════════════════════════════════
     public void RecibirDanyo()
     {
-        animator.SetTrigger("Hit");
+        animator.SetTrigger("NinjaHit");
         DamageEvent?.Invoke();
 
         if (damageCoroutine != null) StopCoroutine(damageCoroutine);

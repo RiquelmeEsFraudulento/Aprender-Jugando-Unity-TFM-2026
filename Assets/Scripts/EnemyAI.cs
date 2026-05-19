@@ -498,7 +498,7 @@ public class EnemyScript : MonoBehaviour
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
 
-        playerCombat = FindObjectOfType<SimpleWalk>();
+        playerCombat = FindAnyObjectByType<SimpleWalk>();
         enemyDetection = playerCombat.GetComponentInChildren<EnemyDetection>();
 
         playerCombat.OnHit.AddListener((x) => OnPlayerHit(x));

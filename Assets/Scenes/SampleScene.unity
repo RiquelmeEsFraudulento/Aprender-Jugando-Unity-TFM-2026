@@ -626,7 +626,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &399161738
 Transform:
   m_ObjectHideFlags: 0
@@ -987,6 +987,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
       propertyPath: m_Name
       value: Mousey (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
       propertyPath: m_Controller
@@ -2325,6 +2329,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
       propertyPath: m_Name
       value: Mousey
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
       propertyPath: m_Controller
