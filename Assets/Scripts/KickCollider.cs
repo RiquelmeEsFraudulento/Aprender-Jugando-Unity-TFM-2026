@@ -45,4 +45,8 @@ public class KickHitbox : MonoBehaviour
         GameObject source = ownerRoot != null ? ownerRoot.gameObject : gameObject;
         damageable.TakeDamage(damage, damageType, source);
     }
+
+    public void Reactivar(){
+        alreadyHit.Clear();
+    }
 }

@@ -13,6 +13,7 @@ TagManager:
   - LightSaber
   - OtherMe
   - Punio
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Enemy
   - 
   - 
   - 

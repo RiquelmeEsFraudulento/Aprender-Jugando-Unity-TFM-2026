@@ -498,7 +498,7 @@ public class EnemyScript : MonoBehaviour
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
 
-        playerCombat = FindObjectOfType<SimpleWalk>();
+        playerCombat = FindAnyObjectByType<SimpleWalk>();
         enemyDetection = playerCombat.GetComponentInChildren<EnemyDetection>();
 
         playerCombat.OnHit.AddListener((x) => OnPlayerHit(x));
@@ -720,7 +720,7 @@ public class EnemyScript : MonoBehaviour
     public void HitEvent()
     {
         if(!playerCombat.isCountering && !playerCombat.isAttackingEnemy)
-            playerCombat.RecibirDanyo();
+            playerCombat.DamageEvent();
 
         PrepareAttack(false);
     }

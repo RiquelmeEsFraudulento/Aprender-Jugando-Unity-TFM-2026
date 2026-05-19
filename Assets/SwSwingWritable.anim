@@ -64592,7 +64592,7 @@ AnimationClip:
     m_LoopBlendOrientation: 0
     m_LoopBlendPositionY: 0
     m_LoopBlendPositionXZ: 0
-    m_KeepOriginalOrientation: 0
+    m_KeepOriginalOrientation: 1
     m_KeepOriginalPositionY: 1
     m_KeepOriginalPositionXZ: 0
     m_HeightFromFeet: 0
@@ -127984,13 +127984,6 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0
-    functionName: DisableRapierHitbox
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0
     functionName: DisableLeftKickHitbox
     data: 
     objectReferenceParameter: {fileID: 0}
@@ -127999,6 +127992,13 @@ AnimationClip:
     messageOptions: 0
   - time: 0
     functionName: DisableLightSaberHitbox
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0
+    functionName: DisableRapierHitbox
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
@@ -128018,15 +128018,57 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.5833333
+  - time: 0.7
+    functionName: HitEvent
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.81666666
+    functionName: DisableLightSaberHitbox
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.1
     functionName: EnableLightSaberHitbox
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 2.5666666
-    functionName: DisableRapierHitbox
+  - time: 1.25
+    functionName: HitEvent
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.35
+    functionName: DisableLightSaberHitbox
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 2.3166666
+    functionName: EnableLightSaberHitbox
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 2.4333334
+    functionName: HitEvent
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 2.5333333
+    functionName: DisableLightSaberHitbox
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

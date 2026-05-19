@@ -1,139 +1,230 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
-using System;
-using System.Collections;
 using DG.Tweening;
-//using Cinemachine;
+using Unity.Cinemachine;
 
-[RequireComponent(typeof(CharacterController))]
 public class SimpleWalk : MonoBehaviour
 {
-    // ══════════════════════════════════════════════════════════
-    // MOVIMIENTO
-    // ══════════════════════════════════════════════════════════
-    public float speed = 2f;
-    public Animator animator;
+    private EnemyManager enemyManager;
+    private EnemyDetection enemyDetection;
+    private MovementInput movementInput;
+    private Animator animator;
+    private CinemachineImpulseSource impulseSource;
+    private CharacterController characterController;   // Nuevo: para movimiento en lock-on
 
-    private CharacterController controller;
-    private Vector3 moveDirection;
+    [Header("Target")]
+    private EnemyScript lockedTarget;
 
-    // ══════════════════════════════════════════════════════════
-    // PELOTA (reservada)
-    // ══════════════════════════════════════════════════════════
-    public GameObject ballPrefab;
-    private GameObject currentBall;
-    public Transform ballSpawnPoint;
+    [Header("Combat Settings")]
+    [SerializeField] private float attackCooldown;
 
-    // ══════════════════════════════════════════════════════════
-    // HITBOXES
-    // ══════════════════════════════════════════════════════════
+    [Header("States")]
+    public bool isAttackingEnemy = false;
+    public bool isCountering = false;
+
+    [Header("Public References")]
+    [SerializeField] private Transform punchPosition;
+    //[SerializeField] private ParticleSystemScript punchParticle;
+    [SerializeField] private GameObject lastHitCamera;
+    [SerializeField] private Transform lastHitFocusObject;
+
+    //Coroutines
+    private Coroutine counterCoroutine;
+    private Coroutine attackCoroutine;
+    private Coroutine damageCoroutine;
+
+    [Space]
+    //Events
+    public UnityEvent<EnemyScript> OnTrajectory;
+    public UnityEvent<EnemyScript> OnHit;
+    public UnityEvent<EnemyScript> OnCounterAttack;
+
+    int animationCount = 0;
+    string[] attacks;
+
+    // ─── Nuevo: Lock-On System ─────────────────────────────────
+    [Header("Lock-On System")]
+    [SerializeField] private float detectionRadius = 8f;
+    [SerializeField] private float rotationThreshold = 2f;
+    [SerializeField] private float rotationDuration = 0.15f;
+
+    private Transform lockedEnemy;          // Enemigo fijado (solo Transform)
+    private bool isLockedOn = false;
+    
     public Collider RapierCollider;
     public Collider LightSaberCollider;
     public Collider RightKickCollider;
     public Collider LeftKickCollider;
     public RapierHitbox Rapier;
     public WeaponHitbox LightSaber;
-    public WeaponHitbox RightKick;
-    public WeaponHitbox LeftKick;
+    public KickHitbox RightKick;
+    public KickHitbox LeftKick;
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — Settings (equivalente a CombatScript)
-    // ══════════════════════════════════════════════════════════
-    [Header("Combat Settings")]
-    [SerializeField] private float attackCooldown = 0.6f;
 
-    [Header("Combat State")]
-    public Vector2 moveAxis;
-    public bool isAttackingEnemy = false;
-    public bool isCountering     = false;
 
-    [Header("Combat References")]
-    [SerializeField] private Transform punchPosition;
-    //[SerializeField] private ParticleSystemScript punchParticle;
-    [SerializeField] private GameObject lastHitCamera;
-    [SerializeField] private Transform lastHitFocusObject;
-    [SerializeField] private EnemyDetection enemyDetection;
-
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — Eventos (EnemyScript se suscribe en su Start)
-    // ══════════════════════════════════════════════════════════
-    [Header("Combat Events")]
-    public UnityEvent<EnemyScript> OnHit;
-    public UnityEvent<EnemyScript> OnCounterAttack;
-    public UnityEvent<EnemyScript> OnTrajectory;
-
-    public System.Action DamageEvent;
-
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — Internos
-    // ══════════════════════════════════════════════════════════
-    private EnemyManager   enemyManager;
-    private EnemyScript    lockedTarget;
-    // private CinemachineImpulseSource impulseSource;
-
-    private Coroutine counterCoroutine;
-    private Coroutine attackCoroutine;
-    private Coroutine damageCoroutine;
-
-    private int      animationCount = 0;
-    private string[] attacks;
-
-    // ══════════════════════════════════════════════════════════
-    // START
-    // ══════════════════════════════════════════════════════════
     void Start()
     {
-        controller    = GetComponent<CharacterController>();
-        //impulseSource = GetComponentInChildren<CinemachineImpulseSource>();
-        enemyManager  = FindObjectOfType<EnemyManager>();
-
-        if (animator == null)
-            animator = GetComponent<Animator>();
-
-        // enemyDetection puede asignarse desde Inspector o buscarse aquí
-        if (enemyDetection == null)
-            enemyDetection = GetComponentInChildren<EnemyDetection>();
+        enemyManager = FindAnyObjectByType<EnemyManager>();
+        animator = GetComponent<Animator>();
+        enemyDetection = GetComponentInChildren<EnemyDetection>();
+        movementInput = GetComponent<MovementInput>();
+        impulseSource = GetComponentInChildren<CinemachineImpulseSource>();
+        characterController = GetComponent<CharacterController>();  // Nuevo
     }
 
-    // ══════════════════════════════════════════════════════════
-    // UPDATE
-    // ══════════════════════════════════════════════════════════
     void Update()
     {
+        // ── Lock-On: rotación y movimiento relativos al enemigo fijado ──
+        if (!isLockedOn || lockedEnemy == null)
+            return;
+
+        // Auto‑desfijar si el enemigo muere o se aleja demasiado
+        if (lockedEnemy == null ||
+            Vector3.Distance(transform.position, lockedEnemy.position) > detectionRadius)
+        {
+            UnlockTarget();
+            return;
+        }
+
+        // Movimiento relativo al enemigo fijado
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical   = Input.GetAxisRaw("Vertical");
 
-        moveAxis      = new Vector2(horizontal, vertical);
-        moveDirection = new Vector3(horizontal, 0, vertical).normalized;
+        Vector3 toEnemy = (lockedEnemy.position - transform.position).normalized;
+        Vector3 right   = Vector3.Cross(Vector3.up, toEnemy);
+        Vector3 moveDir = (toEnemy * vertical + right * horizontal).normalized;
 
-        // No permite mover mientras ataca (igual que AttackCoroutine desactivaba MovementInput)
-        if (moveDirection.magnitude >= 0.1f && !isAttackingEnemy)
+        if (moveDir.magnitude >= 0.1f)
         {
-            transform.forward = moveDirection;
-            controller.Move(moveDirection * speed * Time.deltaTime);
+            characterController.Move(moveDir * movementInput.movementSpeed * Time.deltaTime);
+            animator.SetBool("isWalking", true);
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);
         }
 
-        animator.SetBool("isWalking", moveDirection.magnitude > 0f && !isAttackingEnemy);
+        // Rotación suave hacia el enemigo (solo en Y)
+        Vector3 lookDir = new Vector3(toEnemy.x, 0f, toEnemy.z);
+        if (lookDir != Vector3.zero)
+        {
+            float angleDiff = Vector3.Angle(transform.forward, lookDir);
+            if (angleDiff > rotationThreshold)
+            {
+                transform.DOKill();   // Mata cualquier tween anterior
+                transform
+                    .DOLookAt(lockedEnemy.position, rotationDuration,
+                              AxisConstraint.Y, Vector3.up)
+                    .SetEase(Ease.OutSine);
+            }
+        }
+        /*
 
-        // ── Tus ataques originales ────────────────────────────
-        if (Input.GetKeyDown(KeyCode.B))      StartCoroutine(DanceSpin());
-        if (Input.GetKeyDown(KeyCode.J))      StartCoroutine(JumpCountdown());
-        if (Input.GetKeyDown(KeyCode.M))      StartCoroutine(Martelo());
-        if (Input.GetKeyDown(KeyCode.K))      StartCoroutine(Chut());
-        if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();   // ← ahora lanza AttackCheck
-        if (Input.GetKeyDown(KeyCode.Mouse1)) StartCoroutine(SwSwing());
-        if (Input.GetKeyDown(KeyCode.Q))      StartCoroutine(Ra360());
-        if (Input.GetKeyDown(KeyCode.E))      StartCoroutine(Sw360());
-        if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();  // ← ahora lanza CounterCheck
+          // ── Action keys (unchanged) ───────────────────────────────────────────
+        if (Input.GetKeyDown(KeyCode.B))
+            StartCoroutine(DanceSpin());
+
+        if (Input.GetKeyDown(KeyCode.J))
+            StartCoroutine(JumpCountdown());
+
+        if (Input.GetKeyDown(KeyCode.M))
+            StartCoroutine(Martelo());
+
+        if (Input.GetKeyDown(KeyCode.K))
+            StartCoroutine(Chut());
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+            StartCoroutine(RaSwing());
+
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+            StartCoroutine(SwSwing());
+
+        if (Input.GetKeyDown(KeyCode.Q))
+            StartCoroutine(Ra360());
+
+        if (Input.GetKeyDown(KeyCode.E))
+            StartCoroutine(Sw360());
+        */
+        Debug.DrawLine(transform.position, lockedEnemy.position, Color.cyan);
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — AttackCheck (de CombatScript, adaptado)
-    // ══════════════════════════════════════════════════════════
+    /// <summary>Alterna el Lock‑On (llamado por evento de input, p.ej. tecla Tab).</summary>
+    //public void OnLockOn()
+    //{
+        //if (isLockedOn)
+            //UnlockTarget();
+        //else
+            //TryLockOn();
+    //}
+
+    void TryLockOn()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius);
+        Transform bestCandidate = null;
+        float bestDot = -Mathf.Infinity;
+
+        foreach (Collider hit in hits)
+        {
+            if (!hit.CompareTag("Enemy"))
+                continue;
+
+            Vector3 dirToEnemy = (hit.transform.position - transform.position).normalized;
+            float dot = Vector3.Dot(transform.forward, dirToEnemy);
+
+            if (dot > bestDot)
+            {
+                bestDot = dot;
+                bestCandidate = hit.transform;
+            }
+        }
+
+        if (bestCandidate != null)
+        {
+            lockedEnemy = bestCandidate;
+            isLockedOn = true;
+
+            // Desactiva MovementInput para que no interfiera con el movimiento relativo
+            movementInput.enabled = false;
+
+            // Primera rotación instantánea
+            transform.DOKill();
+            transform
+                .DOLookAt(lockedEnemy.position, rotationDuration,
+                          AxisConstraint.Y, Vector3.up)
+                .SetEase(Ease.OutSine);
+        }
+    }
+
+    void UnlockTarget()
+    {
+        isLockedOn = false;
+        lockedEnemy = null;
+        transform.DOKill();
+        movementInput.enabled = true;
+    }
+    // ─── Fin del Lock-On System ───────────────────────────────
+
+    //This function gets called whenever the player inputs the punch action
     void AttackCheck()
     {
-        if (isAttackingEnemy) return;
+        if (isAttackingEnemy)
+            return;
 
+        // ── Si hay Lock‑On, úsalo directamente ─────────────────
+        if (isLockedOn && lockedEnemy != null)
+        {
+            EnemyScript lockedEnemyScript = lockedEnemy.GetComponent<EnemyScript>();
+            if (lockedEnemyScript != null)
+            {
+                lockedTarget = lockedEnemyScript;
+                Attack(lockedTarget, TargetDistance(lockedTarget));
+                return;
+            }
+        }
+        // ────────────────────────────────────────────────────────
+
+        //Check to see if the detection behavior has an enemy set
         if (enemyDetection.CurrentTarget() == null)
         {
             if (enemyManager.AliveEnemyCount() == 0)
@@ -147,106 +238,106 @@ public class SimpleWalk : MonoBehaviour
             }
         }
 
+        //If the player is moving the movement input, use the "directional" detection to determine the enemy
         if (enemyDetection.InputMagnitude() > .2f)
             lockedTarget = enemyDetection.CurrentTarget();
 
-        if (lockedTarget == null)
+        //Extra check to see if the locked target was set
+        if(lockedTarget == null)
             lockedTarget = enemyManager.RandomEnemy();
 
+        //AttackTarget
         Attack(lockedTarget, TargetDistance(lockedTarget));
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — Attack
-    // ══════════════════════════════════════════════════════════
     public void Attack(EnemyScript target, float distance)
     {
-        attacks = new string[] { "TrRaSwing", "TrSwSwing", "TrMartelo", "TrChut" };
+        //Types of attack animation
+        attacks = new string[] { "TrSw360", "TrRa360", "TrRaSwing", "TrMartelo", "TrChut"};
 
+        //Attack nothing in case target is null
         if (target == null)
         {
             AttackType("TrRaSwing", .2f, null, 0);
             return;
         }
 
-        if (distance < 15)
+        if (3 < distance && distance < 15)
         {
             animationCount = (int)Mathf.Repeat((float)animationCount + 1, (float)attacks.Length);
-            string attackString = IsLastHit()
-                ? attacks[UnityEngine.Random.Range(0, attacks.Length)]
-                : attacks[animationCount];
+            string attackString = isLastHit() ? attacks[Random.Range(0, attacks.Length)] : attacks[animationCount];
             AttackType(attackString, attackCooldown, target, .65f);
         }
-        else
+        else if (distance > 3)
+        {
+            AttackType("TrAirKick", attackCooldown, target, .65f);
+        } else
         {
             lockedTarget = null;
             AttackType("TrRaSwing", .2f, null, 0);
         }
 
-        //if (impulseSource != null)
-            //impulseSource.m_ImpulseDefinition.m_AmplitudeGain = Mathf.Max(3, 1 * distance);
+        //Change impulse
+        if (impulseSource != null)
+            impulseSource.GetComponent<CinemachineImpulseSource>().ImpulseDefinition.AmplitudeGain = Mathf.Max(3, 1 * distance);
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — AttackType
-    // ══════════════════════════════════════════════════════════
     void AttackType(string attackTrigger, float cooldown, EnemyScript target, float movementDuration)
     {
         animator.SetTrigger(attackTrigger);
 
-        if (attackCoroutine != null) StopCoroutine(attackCoroutine);
-        attackCoroutine = StartCoroutine(AttackCoroutine(IsLastHit() ? 1.5f : cooldown));
+        if (attackCoroutine != null)
+            StopCoroutine(attackCoroutine);
+        attackCoroutine = StartCoroutine(AttackCoroutine(isLastHit() ? 1.5f : cooldown));
 
-        if (IsLastHit())
+        //Check if last enemy
+        if (isLastHit())
             StartCoroutine(FinalBlowCoroutine());
 
-        if (target == null) return;
+        if (target == null)
+            return;
 
         target.StopMoving();
-        MoveTowardsTarget(target, movementDuration);
+        MoveTorwardsTarget(target, movementDuration);
 
         IEnumerator AttackCoroutine(float duration)
         {
+            movementInput.acceleration = 0;
             isAttackingEnemy = true;
+            movementInput.enabled = false;
             yield return new WaitForSeconds(duration);
             isAttackingEnemy = false;
             yield return new WaitForSeconds(.2f);
-            // Recupera velocidad gradualmente tras el ataque
-            speed = 0f;
-            DOVirtual.Float(0, 2f, .6f, v => speed = v);
+            movementInput.enabled = true;
+            LerpCharacterAcceleration();
         }
 
         IEnumerator FinalBlowCoroutine()
         {
             Time.timeScale = .5f;
-            if (lastHitCamera != null)    lastHitCamera.SetActive(true);
-            if (lastHitFocusObject != null) lastHitFocusObject.position = lockedTarget.transform.position;
+            lastHitCamera.SetActive(true);
+            lastHitFocusObject.position = lockedTarget.transform.position;
             yield return new WaitForSecondsRealtime(2);
-            if (lastHitCamera != null)    lastHitCamera.SetActive(false);
+            lastHitCamera.SetActive(false);
             Time.timeScale = 1f;
         }
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — MoveTowardsTarget (DOTween hacia el enemigo)
-    // ══════════════════════════════════════════════════════════
-    void MoveTowardsTarget(EnemyScript target, float duration)
+    void MoveTorwardsTarget(EnemyScript target, float duration)
     {
-        OnTrajectory?.Invoke(target);
+        OnTrajectory.Invoke(target);
         transform.DOLookAt(target.transform.position, .2f);
         transform.DOMove(TargetOffset(target.transform), duration);
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — CounterCheck (Space)
-    // ══════════════════════════════════════════════════════════
     void CounterCheck()
     {
+        //Initial check
         if (isCountering || isAttackingEnemy || !enemyManager.AnEnemyIsPreparingAttack())
             return;
 
         lockedTarget = ClosestCounterEnemy();
-        OnCounterAttack?.Invoke(lockedTarget);
+        OnCounterAttack.Invoke(lockedTarget);
 
         if (TargetDistance(lockedTarget) > 2)
         {
@@ -259,88 +350,124 @@ public class SimpleWalk : MonoBehaviour
         transform.DOLookAt(lockedTarget.transform.position, .2f);
         transform.DOMove(transform.position + lockedTarget.transform.forward, duration);
 
-        if (counterCoroutine != null) StopCoroutine(counterCoroutine);
+        if (counterCoroutine != null)
+            StopCoroutine(counterCoroutine);
         counterCoroutine = StartCoroutine(CounterCoroutine(duration));
 
-        IEnumerator CounterCoroutine(float dur)
+        IEnumerator CounterCoroutine(float duration)
         {
             isCountering = true;
-            yield return new WaitForSeconds(dur);
+            movementInput.enabled = false;
+            yield return new WaitForSeconds(duration);
             Attack(lockedTarget, TargetDistance(lockedTarget));
             isCountering = false;
         }
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — HitEvent (llamado por Animation Event al golpear)
-    // ══════════════════════════════════════════════════════════
-    public void HitEvent()
+    float TargetDistance(EnemyScript target)
     {
-        if (lockedTarget == null || enemyManager.AliveEnemyCount() == 0) return;
-
-        OnHit?.Invoke(lockedTarget);
-
-        //if (punchParticle != null && punchPosition != null)
-        //    punchParticle.PlayParticleAtPosition(punchPosition.position);
+        if (target == null) 
+            return float.MaxValue;  // or some large distance, or handle differently
+        return Vector3.Distance(transform.position, target.transform.position);
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — RecibirDanyo (EnemyScript llama DamageEvent())
-    // Equivale a CombatScript.DamageEvent()
-    // ══════════════════════════════════════════════════════════
-    public void RecibirDanyo()
+    public Vector3 TargetOffset(Transform target)
     {
-        animator.SetTrigger("Hit");
-        DamageEvent?.Invoke();
+        Vector3 position;
+        position = target.position;
+        return Vector3.MoveTowards(position, transform.position, .95f);
+    }
 
-        if (damageCoroutine != null) StopCoroutine(damageCoroutine);
+    public void HitEvent()
+    {
+        if (lockedTarget == null || enemyManager.AliveEnemyCount() == 0)
+            return;
+
+        OnHit.Invoke(lockedTarget);
+
+        //Polish
+        //punchParticle.PlayParticleAtPosition(punchPosition.position);
+    }
+
+    public void DamageEvent()
+    {
+        animator.SetTrigger("NinjaHit");
+
+        if (damageCoroutine != null)
+            StopCoroutine(damageCoroutine);
         damageCoroutine = StartCoroutine(DamageCoroutine());
 
         IEnumerator DamageCoroutine()
         {
-            speed = 0f;
+            movementInput.enabled = false;
             yield return new WaitForSeconds(.5f);
-            speed = 2f;
-            DOVirtual.Float(0, 2f, .6f, v => speed = v);
+            movementInput.enabled = true;
+            LerpCharacterAcceleration();
         }
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT — Helpers
-    // ══════════════════════════════════════════════════════════
-    float TargetDistance(EnemyScript target)
-        => Vector3.Distance(transform.position, target.transform.position);
-
-    public Vector3 TargetOffset(Transform target)
-        => Vector3.MoveTowards(target.position, transform.position, .95f);
-
     EnemyScript ClosestCounterEnemy()
     {
-        float minDistance = 100f;
-        int finalIndex    = 0;
+        float minDistance = 100;
+        int finalIndex = 0;
 
         for (int i = 0; i < enemyManager.allEnemies.Length; i++)
         {
             EnemyScript enemy = enemyManager.allEnemies[i].enemyScript;
+
             if (enemy.IsPreparingAttack())
             {
-                float d = Vector3.Distance(transform.position, enemy.transform.position);
-                if (d < minDistance) { minDistance = d; finalIndex = i; }
+                if (Vector3.Distance(transform.position, enemy.transform.position) < minDistance)
+                {
+                    minDistance = Vector3.Distance(transform.position, enemy.transform.position);
+                    finalIndex = i;
+                }
             }
         }
 
         return enemyManager.allEnemies[finalIndex].enemyScript;
     }
 
-    bool IsLastHit()
+    void LerpCharacterAcceleration()
     {
-        if (lockedTarget == null) return false;
+        movementInput.acceleration = 0;
+        DOVirtual.Float(0, 1, .6f, ((acceleration)=> movementInput.acceleration = acceleration));
+    }
+
+    bool isLastHit()
+    {
+        if (lockedTarget == null)
+            return false;
+
         return enemyManager.AliveEnemyCount() == 1 && lockedTarget.health <= 1;
     }
 
-    // ══════════════════════════════════════════════════════════
-    // TUS CORUTINAS ORIGINALES (sin cambios de lógica)
-    // ══════════════════════════════════════════════════════════
+    #region Input
+
+    private void OnCounter()
+    {
+        CounterCheck();
+    }
+
+    private void OnAttack()
+    {
+        AttackCheck();
+    }
+
+    // Nuevo: se llama desde el sistema de input (configurar Tab)
+    private void OnLockOn()
+    {
+        if (isLockedOn)
+            UnlockTarget();
+        else
+            TryLockOn();
+    }
+
+
+     // ─────────────────────────────────────────────
+    //  Original Coroutines & Methods (unchanged)
+    // ─────────────────────────────────────────────
+
     IEnumerator DanceSpin()
     {
         for (int i = 0; i < 360; i += 30)
@@ -350,6 +477,50 @@ public class SimpleWalk : MonoBehaviour
         }
     }
 
+    public void EnableRapierHitbox()
+    {
+        RapierCollider.enabled = true;
+        Rapier.Reactivar();
+    }
+
+    public void EnableLightSaberHitbox()
+    {
+        LightSaberCollider.enabled = true;
+        LightSaber.Reactivar();
+    }
+
+    public void EnableLeftKickHitbox()
+    {
+        LeftKickCollider.enabled = true;
+        LeftKick.Reactivar();
+    }
+
+    public void EnableRightKickHitbox()
+    {
+        RightKickCollider.enabled = true;
+        RightKick.Reactivar();
+    }
+
+    public void DisableRapierHitbox()
+    {
+        RapierCollider.enabled = false;
+    }
+
+    public void DisableLightSaberHitbox()
+    {
+        LightSaberCollider.enabled = false;
+    }
+
+    public void DisableLeftKickHitbox()
+    {
+        LeftKickCollider.enabled = false;
+    }
+
+    public void DisableRightKickHitbox()
+    {
+        RightKickCollider.enabled = false;
+    }
+
     IEnumerator JumpCountdown()
     {
         for (int i = 3; i > 0; i--)
@@ -357,25 +528,46 @@ public class SimpleWalk : MonoBehaviour
             Debug.Log(i);
             yield return new WaitForSeconds(1f);
         }
+
         Debug.Log("¡Jump!");
-        controller.Move(Vector3.up * 2f);
+        characterController.Move(Vector3.up * 2f);
     }
 
-    IEnumerator Ra360()    { isAttackingEnemy = true; animator.SetTrigger("TrRa360");   yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
-    IEnumerator Sw360()    { isAttackingEnemy = true; animator.SetTrigger("TrSw360");   yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
-    IEnumerator SwSwing()  { isAttackingEnemy = true; animator.SetTrigger("TrSwSwing"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
-    IEnumerator Martelo()  { isAttackingEnemy = true; animator.SetTrigger("TrMartelo"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
-    IEnumerator Chut()     { isAttackingEnemy = true; animator.SetTrigger("TrChut");    yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
+    IEnumerator RaSwing()
+    {
+        animator.SetTrigger("TrRaSwing");
+        yield return new WaitForSeconds(1.3f);
+    }
 
-    // ══════════════════════════════════════════════════════════
-    // HITBOXES — llamadas desde Animation Events
-    // ══════════════════════════════════════════════════════════
-    public void EnableRapierHitbox()     { RapierCollider.enabled = true;      Rapier.Reactivar(); }
-    public void EnableLightSaberHitbox() { LightSaberCollider.enabled = true;  Rapier.Reactivar(); }
-    public void EnableLeftKickHitbox()   { LeftKickCollider.enabled = true;    Rapier.Reactivar(); }
-    public void EnableRightKickHitbox()  { RightKickCollider.enabled = true;   Rapier.Reactivar(); }
-    public void DisableRapierHitbox()     { RapierCollider.enabled = false; }
-    public void DisableLightSaberHitbox() { LightSaberCollider.enabled = false; }
-    public void DisableLeftKickHitbox()   { LeftKickCollider.enabled = false; }
-    public void DisableRightKickHitbox()  { RightKickCollider.enabled = false; }
+    IEnumerator SwSwing()
+    {
+        animator.SetTrigger("TrSwSwing");
+        yield return new WaitForSeconds(1.3f);
+    }
+
+    IEnumerator Ra360()
+    {
+        animator.SetTrigger("TrRa360");
+        yield return new WaitForSeconds(1.3f);
+    }
+
+    IEnumerator Sw360()
+    {
+        animator.SetTrigger("TrSw360");
+        yield return new WaitForSeconds(1.3f);
+    }
+
+    IEnumerator Martelo()
+    {
+        animator.SetTrigger("TrMartelo");
+        yield return new WaitForSeconds(1.3f);
+    }
+
+    IEnumerator Chut()
+    {
+        animator.SetTrigger("TrChut");
+        yield return new WaitForSeconds(1.3f);
+    }
+
+    #endregion
 }

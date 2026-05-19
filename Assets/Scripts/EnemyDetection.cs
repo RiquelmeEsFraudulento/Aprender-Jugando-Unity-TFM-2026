@@ -4,7 +4,7 @@ using UnityEngine;
 public class EnemyDetection : MonoBehaviour
 {
     [SerializeField] private EnemyManager enemyManager;
-    private SimpleWalk movementInput;
+    private MovementInput movementInput;
     private SimpleWalk combatScript;
 
     public LayerMask layerMask;
@@ -16,7 +16,7 @@ public class EnemyDetection : MonoBehaviour
 
     private void Start()
     {
-        movementInput = GetComponentInParent<SimpleWalk>();
+        movementInput = GetComponentInParent<MovementInput>();
         combatScript = GetComponentInParent<SimpleWalk>();
     }
 
@@ -37,11 +37,14 @@ public class EnemyDetection : MonoBehaviour
 
         RaycastHit info;
 
-        if (Physics.SphereCast(transform.position, 3f, inputDirection, out info, 10,layerMask))
+       if (Physics.SphereCast(transform.position, 3f, inputDirection, out info, 10, layerMask))
+    {
+        EnemyScript enemy = info.collider.GetComponent<EnemyScript>();
+        if (enemy != null && enemy.IsAttackable())
         {
-            if(info.collider.transform.GetComponent<EnemyScript>().IsAttackable())
-                currentTarget = info.collider.transform.GetComponent<EnemyScript>();
+            currentTarget = enemy;
         }
+    }
     }
 
     public EnemyScript CurrentTarget()
