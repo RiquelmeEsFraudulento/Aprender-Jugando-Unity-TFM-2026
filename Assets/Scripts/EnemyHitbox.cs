@@ -20,7 +20,7 @@ public class EnemyHitbox : MonoBehaviour
 {
     // ── Referencia al EnemyAI padre ───────────────────────────
     // Se rellena automáticamente en Awake buscando en el padre.
-    private EnemyAI _enemyAI;
+    private EnemyScript _enemyAI;
 
     // ── Debug switch ──────────────────────────────────────────
     private const bool LOG_HITBOX = true;
@@ -28,10 +28,10 @@ public class EnemyHitbox : MonoBehaviour
     void Awake()
     {
         // Buscamos el EnemyAI en el GameObject padre (el root del prefab)
-        _enemyAI = GetComponentInParent<EnemyAI>();
+        _enemyAI = GetComponentInParent<EnemyScript>();
 
         if (_enemyAI == null)
-            Debug.LogWarning($"[EnemyHitbox] '{name}' no encontró EnemyAI en el padre. " +
+            Debug.LogWarning($"[EnemyHitbox] '{name}' no encontró EnemyScript en el padre. " +
                               "Comprueba la jerarquía del prefab.");
     }
 
