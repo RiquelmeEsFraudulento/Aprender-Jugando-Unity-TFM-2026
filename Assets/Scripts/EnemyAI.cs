@@ -22,17 +22,17 @@ public class EnemyAI : Damageable
     public Renderer[] renderersVisuales;
 
     [Header("Movimiento")]
-    public float velocidadPatrulla = 1.8f;
-    public float velocidadPersecucion = 4.2f;
+    public float velocidadPatrulla = 1.6f;
+    public float velocidadPersecucion = 2.2f;
     public float velocidadHuida = 4.8f;
     public float radioDeteccion = 10f;
-    public float radioAtaque = 2f;
-    public float radioReposicion = 3.5f;
+    public float radioAtaque = 3f;
+    public float radioReposicion = 4.5f;
     public float giroSuave = 12f;
 
     [Header("Combate")]
     public int danoAtaque = 8;
-    public float cooldownAtaque = 1.1f;
+    public float cooldownAtaque = 2f;
 
     // --- PARÁMETROS DE IMPACTO AJUSTADOS PARA SENSACIÓN NATURAL ---
     // Antes: tiempoStunGolpe = 0.22f  →  ahora 0.45f

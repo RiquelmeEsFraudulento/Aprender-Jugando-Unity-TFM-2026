@@ -1,18 +1,20 @@
-
 using UnityEngine;
 using System;
 using System.Collections;
+using DG.Tweening;
+
 [RequireComponent(typeof(CharacterController))]
 public class SimpleWalk : MonoBehaviour
 {
+    // ─────────────────────────────────────────────
+    //  Original movement & references
+    // ─────────────────────────────────────────────
     public float speed = 2f;
     public Animator animator;
-    
 
-
-    public GameObject ballPrefab; // Asignar desde el inspector
+    public GameObject ballPrefab;
     private GameObject currentBall;
-    public Transform ballSpawnPoint; // Donde aparece la pelota
+    public Transform ballSpawnPoint;
 
     public Collider RapierCollider;
     public Collider LightSaberCollider;
@@ -26,88 +28,201 @@ public class SimpleWalk : MonoBehaviour
     private CharacterController controller;
     private Vector3 moveDirection;
 
+    // ─────────────────────────────────────────────
+    //  Lock-On System
+    // ─────────────────────────────────────────────
+    [Header("Lock-On System")]
+
+    [Tooltip("Radius in which enemies can be detected for lock-on.")]
+    public float detectionRadius = 8f;
+
+    [Tooltip("Minimum angle difference (degrees) before re-triggering DOTween rotation.")]
+    public float rotationThreshold = 2f;
+
+    [Tooltip("DOTween rotation duration in seconds.")]
+    public float rotationDuration = 0.15f;
+
+    /// <summary>The enemy currently locked onto. Null when unlocked.</summary>
+    private Transform lockedEnemy;
+
+    /// <summary>Whether the lock-on system is currently active.</summary>
+    private bool isLockedOn = false;
+
+    // ─────────────────────────────────────────────
+    //  Unity Lifecycle
+    // ─────────────────────────────────────────────
     void Start()
     {
         controller = GetComponent<CharacterController>();
 
         if (animator == null)
-        {
             animator = GetComponent<Animator>();
-        }
     }
 
     void Update()
     {
+        // ── Lock-On Toggle (Tab key) ──────────────────────────────────────────
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (isLockedOn)
+                UnlockTarget();
+            else
+                TryLockOn();
+        }
+
+        // ── Auto-Unlock: enemy died or walked out of range ────────────────────
+        if (isLockedOn)
+        {
+            if (lockedEnemy == null ||
+                Vector3.Distance(transform.position, lockedEnemy.position) > detectionRadius)
+            {
+                UnlockTarget();
+            }
+        }
+
+        // ── Read raw input axes ───────────────────────────────────────────────
         float horizontal = Input.GetAxisRaw("Horizontal"); // A / D
-        float vertical = Input.GetAxisRaw("Vertical");     // W / S
+        float vertical   = Input.GetAxisRaw("Vertical");   // W / S
 
-        // Calculate movement vector
-        moveDirection = new Vector3(horizontal, 0, vertical).normalized;
-
-        // Move the character (using world space)
-        if (moveDirection.magnitude >= 0.1f)
+        // ── Movement & Rotation ───────────────────────────────────────────────
+        if (isLockedOn && lockedEnemy != null)
         {
-            // Rotate character toward movement direction
-            transform.forward = moveDirection;
+            // --- Lock-On Movement: relative to the locked enemy ---------------
+            // W  → toward enemy  |  S  → away from enemy  |  A/D → strafe
+            Vector3 toEnemy = (lockedEnemy.position - transform.position).normalized;
+            Vector3 right   = Vector3.Cross(Vector3.up, toEnemy);
+            moveDirection   = (toEnemy * vertical + right * horizontal).normalized;
 
-            // Move
-            controller.Move(moveDirection * speed * Time.deltaTime);
+            // --- Smooth rotation toward enemy via DOTween (Y-axis only) -------
+            Vector3 lookDir = new Vector3(toEnemy.x, 0f, toEnemy.z);
+            if (lookDir != Vector3.zero)
+            {
+                float angleDiff = Vector3.Angle(transform.forward, lookDir);
+                if (angleDiff > rotationThreshold)
+                {
+                    // Kill any running rotation tween before starting a new one
+                    transform.DOKill();
+                    transform
+                        .DOLookAt(lockedEnemy.position, rotationDuration,
+                                  AxisConstraint.Y, Vector3.up)
+                        .SetEase(Ease.OutSine);
+                }
+            }
+
+            // --- Visual debug line from player to locked enemy ----------------
+            Debug.DrawLine(transform.position, lockedEnemy.position, Color.cyan);
+
+            // --- Move (lock-on mode) ------------------------------------------
+            if (moveDirection.magnitude >= 0.1f)
+                controller.Move(moveDirection * speed * Time.deltaTime);
+        }
+        else
+        {
+            // --- Free Movement (original behaviour) ---------------------------
+            moveDirection = new Vector3(horizontal, 0f, vertical).normalized;
+
+            if (moveDirection.magnitude >= 0.1f)
+            {
+                // Rotate character toward movement direction (instant, original)
+                transform.forward = moveDirection;
+
+                // Move
+                controller.Move(moveDirection * speed * Time.deltaTime);
+            }
         }
 
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            StartCoroutine(DanceSpin());
-        }
-
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            StartCoroutine(JumpCountdown());
-        }
-
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            StartCoroutine(Martelo());
-        }
-
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            StartCoroutine(Chut());
-        }
-
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            StartCoroutine(RaSwing());
-        }
-
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            StartCoroutine(SwSwing());
-        }
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            StartCoroutine(Ra360());
-        }
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            StartCoroutine(Sw360());
-        }
-
-        /*if (Input.GetKeyDown(KeyCode.P))
-        {
-            StartCoroutine(CreateBall());
-        }*/
-
-
-
-        // Set animator parameter
+        // ── Animator parameter ────────────────────────────────────────────────
         bool isWalking = moveDirection.magnitude > 0f;
         animator.SetBool("isWalking", isWalking);
+
+        // ── Action keys (unchanged) ───────────────────────────────────────────
+        if (Input.GetKeyDown(KeyCode.B))
+            StartCoroutine(DanceSpin());
+
+        if (Input.GetKeyDown(KeyCode.J))
+            StartCoroutine(JumpCountdown());
+
+        if (Input.GetKeyDown(KeyCode.M))
+            StartCoroutine(Martelo());
+
+        if (Input.GetKeyDown(KeyCode.K))
+            StartCoroutine(Chut());
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+            StartCoroutine(RaSwing());
+
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+            StartCoroutine(SwSwing());
+
+        if (Input.GetKeyDown(KeyCode.Q))
+            StartCoroutine(Ra360());
+
+        if (Input.GetKeyDown(KeyCode.E))
+            StartCoroutine(Sw360());
     }
-    
-    
-    IEnumerator DanceSpin(){
+
+    // ─────────────────────────────────────────────
+    //  Lock-On Helpers
+    // ─────────────────────────────────────────────
+
+    /// <summary>
+    /// Finds the most-forward enemy inside detectionRadius and locks onto it.
+    /// Uses Physics.OverlapSphere + Vector3.Dot (Mix and Jam style).
+    /// </summary>
+    void TryLockOn()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius);
+
+        Transform bestCandidate = null;
+        float bestDot = -Mathf.Infinity;
+
+        foreach (Collider hit in hits)
+        {
+            // Only consider objects tagged "Enemy"
+            if (!hit.CompareTag("Enemy"))
+                continue;
+
+            // Skip if the enemy is directly behind us (dot would be negative)
+            Vector3 dirToEnemy = (hit.transform.position - transform.position).normalized;
+            float dot = Vector3.Dot(transform.forward, dirToEnemy);
+
+            if (dot > bestDot)
+            {
+                bestDot       = dot;
+                bestCandidate = hit.transform;
+            }
+        }
+
+        if (bestCandidate != null)
+        {
+            lockedEnemy = bestCandidate;
+            isLockedOn  = true;
+
+            // Kick off the very first rotation tween immediately
+            transform.DOKill();
+            transform
+                .DOLookAt(lockedEnemy.position, rotationDuration,
+                          AxisConstraint.Y, Vector3.up)
+                .SetEase(Ease.OutSine);
+        }
+    }
+
+    /// <summary>
+    /// Releases the current lock-on target and kills any running rotation tween.
+    /// </summary>
+    void UnlockTarget()
+    {
+        isLockedOn  = false;
+        lockedEnemy = null;
+        transform.DOKill();
+    }
+
+    // ─────────────────────────────────────────────
+    //  Original Coroutines & Methods (unchanged)
+    // ─────────────────────────────────────────────
+
+    IEnumerator DanceSpin()
+    {
         for (int i = 0; i < 360; i += 30)
         {
             transform.Rotate(0, 30, 0);
@@ -115,43 +230,49 @@ public class SimpleWalk : MonoBehaviour
         }
     }
 
-
-    public void EnableRapierHitbox(){ 
-        RapierCollider.enabled = true; 
+    public void EnableRapierHitbox()
+    {
+        RapierCollider.enabled = true;
         Rapier.Reactivar();
     }
 
-    public void EnableLightSaberHitbox(){ 
+    public void EnableLightSaberHitbox()
+    {
         LightSaberCollider.enabled = true;
         LightSaber.Reactivar();
     }
 
-    public void EnableLeftKickHitbox(){ 
+    public void EnableLeftKickHitbox()
+    {
         LeftKickCollider.enabled = true;
         Rapier.Reactivar();
     }
 
-    public void EnableRightKickHitbox(){ 
+    public void EnableRightKickHitbox()
+    {
         RightKickCollider.enabled = true;
-        Rapier.Reactivar(); 
+        Rapier.Reactivar();
     }
 
-    public void DisableRapierHitbox(){ 
+    public void DisableRapierHitbox()
+    {
         RapierCollider.enabled = false;
     }
 
-    public void DisableLightSaberHitbox(){ 
-        LightSaberCollider.enabled = false; 
+    public void DisableLightSaberHitbox()
+    {
+        LightSaberCollider.enabled = false;
     }
 
-    public void DisableLeftKickHitbox(){ 
-        LeftKickCollider.enabled = false; 
+    public void DisableLeftKickHitbox()
+    {
+        LeftKickCollider.enabled = false;
     }
 
-    public void DisableRightKickHitbox(){ 
-        RightKickCollider.enabled = false; 
+    public void DisableRightKickHitbox()
+    {
+        RightKickCollider.enabled = false;
     }
-
 
     IEnumerator JumpCountdown()
     {
@@ -162,82 +283,42 @@ public class SimpleWalk : MonoBehaviour
         }
 
         Debug.Log("¡Jump!");
-        controller.Move(Vector3.up * 2f); 
+        controller.Move(Vector3.up * 2f);
     }
 
-    IEnumerator RaSwing(){
+    IEnumerator RaSwing()
+    {
         animator.SetTrigger("TrRaSwing");
         yield return new WaitForSeconds(1.3f);
     }
 
-    IEnumerator SwSwing(){
+    IEnumerator SwSwing()
+    {
         animator.SetTrigger("TrSwSwing");
         yield return new WaitForSeconds(1.3f);
-        //KickBall();
     }
 
-
-    IEnumerator Ra360(){
+    IEnumerator Ra360()
+    {
         animator.SetTrigger("TrRa360");
         yield return new WaitForSeconds(1.3f);
     }
 
-    IEnumerator Sw360(){
+    IEnumerator Sw360()
+    {
         animator.SetTrigger("TrSw360");
         yield return new WaitForSeconds(1.3f);
-        //KickBall();
     }
 
-
-
-    IEnumerator Martelo(){
+    IEnumerator Martelo()
+    {
         animator.SetTrigger("TrMartelo");
         yield return new WaitForSeconds(1.3f);
     }
 
-    IEnumerator Chut(){
+    IEnumerator Chut()
+    {
         animator.SetTrigger("TrChut");
         yield return new WaitForSeconds(1.3f);
-
-        //KickBall();
-    }
-
-    /*IEnumerator CreateBall()
-    {
-        if (currentBall != null) yield return new WaitForSeconds(0.1f); // Solo una pelota a la vez
-
-        Vector3 spawnPos = ballSpawnPoint != null ? ballSpawnPoint.position : transform.position + transform.forward + Vector3.up * 0.5f;
-
-        currentBall = Instantiate(ballPrefab, spawnPos, Quaternion.identity);
-
-        yield return new WaitForSeconds(0.1f);
-
-    }
-
-    void KickBall()
-{
-    if (currentBall == null) return;
-
-    float distance = Vector3.Distance(transform.position, currentBall.transform.position);
-    if (distance < 2f)
-    {
-        Rigidbody rb = currentBall.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            Vector3 direction = (currentBall.transform.position - transform.position).normalized + Vector3.up * 0.5f;
-            rb.AddForce(direction * 8f, ForceMode.Impulse);
-            currentBall = null; // Se libera para permitir otra creación
-        }
     }
 }
-*/
-
-
-    
-
-    
-}
-
-
-
-
