@@ -483,6 +483,7 @@ public class EnemyScript : Damageable
     private Coroutine DamageCoroutine;
     private Coroutine MovementCoroutine;
     private Coroutine DeathCoroutine;
+    private Coroutine lockTimerCoroutine;
 
     //Events
     public UnityEvent<EnemyScript> OnDamage;
@@ -595,7 +596,20 @@ public class EnemyScript : Damageable
             isLockedTarget = true;
             PrepareAttack(false);
             StopMoving();
+
+            if (lockTimerCoroutine != null) 
+            {
+                StopCoroutine(lockTimerCoroutine);
+            }
+
+            lockTimerCoroutine = StartCoroutine(LockTimer());
         }
+    }
+
+    IEnumerator LockTimer()
+    {
+        yield return new WaitForSeconds(4f);
+        isLockedTarget = false;
     }
 
     void Death()
@@ -635,6 +649,7 @@ public class EnemyScript : Damageable
 
         RetreatCoroutine = StartCoroutine(PrepRetreat());
 
+
         IEnumerator PrepRetreat()
         {
             yield return new WaitForSeconds(1.4f);
@@ -642,11 +657,20 @@ public class EnemyScript : Damageable
             isRetreating = true;
             moveDirection = -Vector3.forward;
             isMoving = true;
-            yield return new WaitUntil(() => Vector3.Distance(transform.position, playerCombat.transform.position) > 4);
+
+            float timer = 0f;
+            while (isRetreating && timer < 5f &&
+                Vector3.Distance(transform.position, playerCombat.transform.position) <= 4f)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            // Forzar fin aunque no haya alcanzado la distancia
             isRetreating = false;
             StopMoving();
 
-            //Free 
+            // Liberar para que el enemigo pueda volver al movimiento libre
             isWaiting = true;
             MovementCoroutine = StartCoroutine(EnemyMovement());
         }
@@ -655,7 +679,9 @@ public class EnemyScript : Damageable
     public void SetAttack()
     {
 
+        if (lockTimerCoroutine != null) StopCoroutine(lockTimerCoroutine);
         isLockedTarget = false;
+
         isWaiting = false;
 
         PrepareAttackCoroutine = StartCoroutine(PrepAttack());
@@ -678,7 +704,7 @@ public class EnemyScript : Damageable
             {
                 PrepareAttack(false);
                 // Opcional: hacer que se retire directamente sin atacar
-                SetRetreat();
+                //SetRetreat();
             }
         }
     }
@@ -755,6 +781,11 @@ public class EnemyScript : Damageable
     public void ReleaseLock()
     {
         isLockedTarget = false;
+        if (lockTimerCoroutine != null)
+        {
+            StopCoroutine(lockTimerCoroutine);
+            lockTimerCoroutine = null;
+        }
     }
 
 

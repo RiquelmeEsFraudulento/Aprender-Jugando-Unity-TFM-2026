@@ -238,7 +238,9 @@ public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
 
         for (int i = 0; i < allEnemies.Count; i++)
         {
-            if (allEnemies[i].enemyAvailability && allEnemies[i].enemyScript != null && allEnemies[i].enemyScript.isActiveAndEnabled)
+            if (allEnemies[i].enemyAvailability && allEnemies[i].enemyScript != null 
+            && allEnemies[i].enemyScript.isActiveAndEnabled
+            && allEnemies[i].enemyScript != exclude)
                 enemyIndexes.Add(i);
         }
 

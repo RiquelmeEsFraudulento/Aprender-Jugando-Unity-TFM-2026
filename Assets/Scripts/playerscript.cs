@@ -31,6 +31,10 @@ public class SimpleWalk : MonoBehaviour
     [Tooltip("DOTween rotation duration in seconds.")]
     public float rotationDuration = 0.15f;
 
+    public float kickRange       = 0.3f;   // Patadas: TrCrescent, TrChut
+    public float lightSaberRange = 4f;     // LightSaber: TrSwSwing, TrSw360
+    public float rapierRange     = 1.2f;   // Rapier: TrRaSwing, TrRa360
+
     /// <summary>The enemy currently locked onto. Null when unlocked.</summary>
     private Transform lockedEnemy;
 
@@ -135,7 +139,7 @@ public class SimpleWalk : MonoBehaviour
 
         // ── Lock-On Toggle (Tab key) ──────────────────────────────────────────
         // Auto-lock si no hay objetivo fijado y hay enemigos vivos
-        if (!isLockedOn && enemyManager.AliveEnemyCount() > 0)
+        if (!isLockedOn && !manualUnlock && enemyManager.AliveEnemyCount() > 0)
         {
             TryLockOn();
         }
@@ -327,13 +331,17 @@ public class SimpleWalk : MonoBehaviour
 
 
     // ══════════════════════════════════════════════════════════
-    // COMBAT — Attack
-    // ══════════════════════════════════════════════════════════
+    // COMBAT — Attack (selección de ataque según distancia y tipo)
+// ───────────────────────────────────────────────────────────────────────────
+
     public void Attack(EnemyScript target, float distance)
     {
-        attackslong = new string[] { "TrRaSwing", "TrSwSwing", "TrRa360", "TrSw360" };
-        attacksnear = new string[] {"TrCrescent", "TrChut" };
+        attackslong  = new string[] { "TrRaSwing", "TrSwSwing", "TrRa360", "TrSw360" };
+        attacksnear  = new string[] { "TrCrescent", "TrChut" };
 
+        string[] kickAttacks       = new string[] { "TrCrescent", "TrChut" };
+        string[] lightSaberAttacks = new string[] { "TrSwSwing", "TrSw360" };
+        string[] rapierAttacks     = new string[] { "TrRaSwing", "TrRa360" };
 
         if (target == null)
         {
@@ -343,24 +351,48 @@ public class SimpleWalk : MonoBehaviour
 
         if (distance < 15)
         {
-            // Elegir el conjunto de ataques según la distancia
-            string[] attackPool = (distance <= 0.3f) ? attacksnear : attackslong;
+            string[] attackPool;
 
-            animationCount = (animationCount + 1) % attackPool.Length; // ciclar dentro del pool
+            if (distance <= kickRange)
+            {
+                // Rango patadas
+                attackPool = kickAttacks;
+            }
+            else if (distance <= lightSaberRange)
+            {
+                // Rango LightSaber — ejecuta aunque no llegue al objetivo exacto
+                attackPool = lightSaberAttacks;
+
+                if (distance > rapierRange)
+                {
+                    Debug.Log("Ataque fuera de rango");
+                }
+            }
+            else if (distance <= rapierRange)
+            {
+                // Rango Rapier
+                attackPool = rapierAttacks;
+            }
+            else
+            {
+                // Distancia entre lightSaberRange y 15 → fallback Rapier
+                attackPool = rapierAttacks;
+            }
+
+            animationCount = (animationCount + 1) % attackPool.Length;
             string attackString = IsLastHit()
                 ? attackPool[UnityEngine.Random.Range(0, attackPool.Length)]
                 : attackPool[animationCount];
 
             AttackType(attackString, attackCooldown, target, .65f);
+              //if (impulseSource != null)
+            //impulseSource.m_ImpulseDefinition.m_AmplitudeGain = Mathf.Max(3, 1 * distance);
         }
         else
         {
             lockedTarget = null;
             AttackType("TrRaSwing", .2f, null, 0);
         }
-
-        //if (impulseSource != null)
-            //impulseSource.m_ImpulseDefinition.m_AmplitudeGain = Mathf.Max(3, 1 * distance);
     }
 
     // ══════════════════════════════════════════════════════════
