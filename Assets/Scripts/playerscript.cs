@@ -331,7 +331,7 @@ public class SimpleWalk : MonoBehaviour
     // ══════════════════════════════════════════════════════════
     public void Attack(EnemyScript target, float distance)
     {
-        attackslong = new string[] { "TrRaSwing", "TrCrescent", "TrChut", "TrSwSwing", "TrRa360", "TrSw360" };
+        attackslong = new string[] { "TrRaSwing", "TrSwSwing", "TrRa360", "TrSw360" };
         attacksnear = new string[] {"TrCrescent", "TrChut" };
 
 
