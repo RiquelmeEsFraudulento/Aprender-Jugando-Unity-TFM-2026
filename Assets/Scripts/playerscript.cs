@@ -100,6 +100,9 @@ public class SimpleWalk : MonoBehaviour
     private string[] attackslong;
     private string[] attacksnear;
 
+    private bool manualUnlock = false;
+
+
     
 
     // ══════════════════════════════════════════════════════════
@@ -118,8 +121,6 @@ public class SimpleWalk : MonoBehaviour
         if (enemyDetection == null)
             enemyDetection = GetComponentInChildren<EnemyDetection>();
 
-        TryLockOn();
-
     }
 
     // ══════════════════════════════════════════════════════════
@@ -133,12 +134,23 @@ public class SimpleWalk : MonoBehaviour
         moveAxis      = new Vector2(horizontal, vertical);
 
         // ── Lock-On Toggle (Tab key) ──────────────────────────────────────────
+        // Auto-lock si no hay objetivo fijado y hay enemigos vivos
+        if (!isLockedOn && enemyManager.AliveEnemyCount() > 0)
+        {
+            TryLockOn();
+        }
+
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             if (isLockedOn)
+            {
                 UnlockTarget();
+            }
             else
+            {
+                manualUnlock = false;
                 TryLockOn();
+            }
         }
 
         // ── Scroll para cambiar objetivo (cuando estamos fijados) ─────
@@ -312,6 +324,8 @@ public class SimpleWalk : MonoBehaviour
         Attack(lockedTarget, distance);
     }
 
+
+
     // ══════════════════════════════════════════════════════════
     // COMBAT — Attack
     // ══════════════════════════════════════════════════════════
@@ -372,6 +386,10 @@ public class SimpleWalk : MonoBehaviour
             isAttackingEnemy = true;
             yield return new WaitForSeconds(duration);
             isAttackingEnemy = false;
+
+            if (lockedTarget != null)
+                lockedTarget.ReleaseLock();
+
             yield return new WaitForSeconds(.2f);
             // Recupera velocidad gradualmente tras el ataque
             speed = 0f;
@@ -442,9 +460,13 @@ public class SimpleWalk : MonoBehaviour
             float dist = lockedTarget != null ? TargetDistance(lockedTarget) : 0f;
             Attack(lockedTarget, dist);
             isCountering = false;
+
+                // ✅ LIBERAR TRAS EL CONTRAATAQUE
+            if (lockedTarget != null)
+                lockedTarget.ReleaseLock();
+            
         }
     }
-
 
     // ══════════════════════════════════════════════════════════
     // COMBAT — HitEvent (llamado por Animation Event al golpear)
@@ -577,6 +599,7 @@ public class SimpleWalk : MonoBehaviour
         isLockedOn  = false;
         lockedEnemy = null;
         transform.DOKill();
+        manualUnlock = true;   // evita que se auto‑enganche
     }
 
     // ══════════════════════════════════════════════════════════

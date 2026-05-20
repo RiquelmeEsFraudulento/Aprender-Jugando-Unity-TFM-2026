@@ -654,6 +654,8 @@ public class EnemyScript : Damageable
 
     public void SetAttack()
     {
+
+        isLockedTarget = false;
         isWaiting = false;
 
         PrepareAttackCoroutine = StartCoroutine(PrepAttack());
@@ -735,6 +737,12 @@ public class EnemyScript : Damageable
                 PrepareAttack(false);
         }
     }
+
+    public void ReleaseLock()
+    {
+        isLockedTarget = false;
+    }
+
 
     private void Attack()
     {
