@@ -8,6 +8,7 @@
 // Puedes expandirlo con eventos, UI, animaciones de daño, etc.
 // ============================================================
 
+using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
@@ -16,6 +17,14 @@ public class PlayerHealth : MonoBehaviour
     public float vida    = 10f;
     public float vidaMax = 20f;
 
+    public float level; // Nivel del jugador, para escalar daño o XP
+    public float XP; // Puntos de experiencia del jugador
+
+    void Start()
+    {
+        level = 1f;
+        XP = 0f;
+    }
     void Update()
     {
         // Clamp: nunca salirse del rango [0, vidaMax].
@@ -39,5 +48,18 @@ public class PlayerHealth : MonoBehaviour
     {
         vida -= cantidad;
         Debug.Log("[Player] Daño recibido: +" + cantidad + " | Vida: " + vida);
+    }
+
+    public void GanarXP(float cantidad)
+    {
+        XP += cantidad;
+        Debug.Log("[Player] XP ganado: +" + cantidad + " | XP total: " + XP);
+        // Aquí podrías añadir lógica para subir de nivel, mejorar stats, etc.
+        if (XP >= level * 10) // Ejemplo: necesitas 10 XP para el nivel 1, 20 XP para el nivel 2, etc.
+        {
+            level += 1f;
+            vidaMax += 2f; // Ejemplo: cada nivel aumenta la vida máxima
+            Debug.Log("[Player] Subió al nivel " + level + "! Vida máxima aumentada a " + vidaMax);
+        }
     }
 }

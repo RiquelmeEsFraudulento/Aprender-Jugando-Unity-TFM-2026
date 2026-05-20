@@ -1,0 +1,39 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements"
+         xmlns:uie="UnityEditor.UIElements"
+         xsi="http://www.w3.org/2001/XMLSchema-instance"
+         engine="UnityEngine.UIElements"
+         editor="UnityEditor.UIElements"
+         noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+         editor-extension-mode="False">
+
+    <Style src="PlayerHUD.uss" />
+
+    <!-- Root container: everything is stacked vertically -->
+    <ui:VisualElement name="hud-root" class="hud-root">
+
+        <!-- ── HEALTH BAR (big grey square) ── -->
+        <ui:VisualElement name="health-container" class="bar-container bar-big">
+            <ui:VisualElement name="health-fill" class="bar-fill health-fill" />
+        </ui:VisualElement>
+
+        <!-- ── XP BAR (medium grey square) ── -->
+        <ui:VisualElement name="xp-container" class="bar-container bar-medium">
+            <ui:VisualElement name="xp-fill" class="bar-fill xp-fill" />
+        </ui:VisualElement>
+
+        <!-- ── LEVEL + STATE ROW ── -->
+        <ui:VisualElement name="bottom-row" class="bottom-row">
+
+            <!-- Level box: small grey square with white number -->
+            <ui:VisualElement name="level-box" class="level-box">
+                <ui:Label name="level-label" text="1" class="level-label" />
+            </ui:VisualElement>
+
+            <!-- State circle: grey by default, black=Sleep, white=Confused -->
+            <ui:VisualElement name="state-circle" class="state-circle state-none" />
+
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+
+</ui:UXML>

@@ -490,6 +490,7 @@ public class EnemyScript : Damageable
     public UnityEvent<EnemyScript> OnStopMoving;
     public UnityEvent<EnemyScript> OnRetreat;
     public int   danyoAtaque        = 10;    // Puntos de daño por golpe
+    public float XPEarned = 5f;
 
     // ── Debug switch ──────────────────────────────────────────
     private const bool LOG_IA = true;
@@ -632,7 +633,7 @@ public class EnemyScript : Damageable
         animator.SetTrigger("Death");
         enemyManager.SetEnemyAvailiability(this, false);
         enemyManager.RemoveEnemy(this);   // <--- NUEVO
-
+        playerCombat.GetComponent<PlayerHealth>().GanarXP(XPEarned);
         DeathCoroutine = StartCoroutine(MuerteCooldown());
 
         IEnumerator MuerteCooldown()

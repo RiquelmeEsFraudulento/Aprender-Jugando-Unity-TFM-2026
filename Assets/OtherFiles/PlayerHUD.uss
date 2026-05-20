@@ -1,0 +1,85 @@
+/* ── Root ── */
+.hud-root {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* ── Shared bar container (grey background square) ── */
+.bar-container {
+    background-color: rgb(80, 80, 80);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.bar-big {
+    width: 320px;
+    height: 36px;
+}
+
+.bar-medium {
+    width: 220px;
+    height: 24px;
+}
+
+/* ── Fill layers ── */
+.bar-fill {
+    height: 100%;
+    width: 100%;   /* controlled at runtime via style.width */
+}
+
+.health-fill {
+    background-color: rgb(200, 30, 30);   /* red */
+}
+
+.xp-fill {
+    background-color: rgb(218, 165, 32);  /* gold */
+}
+
+/* ── Bottom row ── */
+.bottom-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 4px;
+}
+
+/* ── Level box ── */
+.level-box {
+    background-color: rgb(80, 80, 80);
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.level-label {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+/* ── State circle ── */
+.state-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;   /* makes it a circle */
+}
+
+/* States */
+.state-none {
+    background-color: rgb(80, 80, 80);   /* grey = no state / pressing 9 */
+}
+
+.state-sleep {
+    background-color: rgb(10, 10, 10);   /* black = Sleep (key 7) */
+}
+
+.state-confused {
+    background-color: rgb(240, 240, 240); /* white = Confused (key 8) */
+}
