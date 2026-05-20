@@ -150,7 +150,7 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour
 {
     private EnemyScript[] enemies;
-    public EnemyStruct[] allEnemies;
+public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
     private List<int> enemyIndexes;
 
     [Header("Main AI Loop - Settings")]
@@ -161,12 +161,13 @@ public class EnemyManager : MonoBehaviour
     {
         enemies = GetComponentsInChildren<EnemyScript>();
 
-        allEnemies = new EnemyStruct[enemies.Length];
-
-        for (int i = 0; i < allEnemies.Length; i++)
+        allEnemies.Clear();
+        for (int i = 0; i < enemies.Length; i++)
         {
-            allEnemies[i].enemyScript = enemies[i];
-            allEnemies[i].enemyAvailability = true;
+            EnemyStruct entry = new EnemyStruct();
+            entry.enemyScript = enemies[i];
+            entry.enemyAvailability = true;
+            allEnemies.Add(entry);
         }
 
         StartAI();
@@ -215,7 +216,7 @@ public class EnemyManager : MonoBehaviour
     {
         enemyIndexes = new List<int>();
 
-        for (int i = 0; i < allEnemies.Length; i++)
+        for (int i = 0; i < allEnemies.Count; i++)
         {
             if (allEnemies[i].enemyAvailability)
                 enemyIndexes.Add(i);
@@ -235,7 +236,7 @@ public class EnemyManager : MonoBehaviour
     {
         enemyIndexes = new List<int>();
 
-        for (int i = 0; i < allEnemies.Length; i++)
+        for (int i = 0; i < allEnemies.Count; i++)
         {
             if (allEnemies[i].enemyAvailability && allEnemies[i].enemyScript != exclude)
                 enemyIndexes.Add(i);
@@ -254,7 +255,7 @@ public class EnemyManager : MonoBehaviour
     public int AvailableEnemyCount()
     {
         int count = 0;
-        for (int i = 0; i < allEnemies.Length; i++)
+        for (int i = 0; i < allEnemies.Count; i++)
         {
             if (allEnemies[i].enemyAvailability)
                 count++;
@@ -278,25 +279,43 @@ public class EnemyManager : MonoBehaviour
     public int AliveEnemyCount()
     {
         int count = 0;
-        for (int i = 0; i < allEnemies.Length; i++)
+        for (int i = 0; i < allEnemies.Count; i++)
         {
-            if (allEnemies[i].enemyScript.isActiveAndEnabled)
+            // Ahora allEnemies[i].enemyScript puede ser null después de morir, así que comprobamos
+            if (allEnemies[i].enemyScript != null && allEnemies[i].enemyScript.isActiveAndEnabled)
                 count++;
         }
         aliveEnemyCount = count;
         return count;
     }
 
-    public void SetEnemyAvailiability (EnemyScript enemy, bool state)
+    public void SetEnemyAvailiability(EnemyScript enemy, bool state)
     {
-        for (int i = 0; i < allEnemies.Length; i++)
+        for (int i = 0; i < allEnemies.Count; i++)
         {
             if (allEnemies[i].enemyScript == enemy)
-                allEnemies[i].enemyAvailability = state;
+            {
+                EnemyStruct entry = allEnemies[i];
+                entry.enemyAvailability = state;
+                allEnemies[i] = entry;
+                break; // opcional, pero como cada EnemyScript aparece una vez, podemos salir
+            }
         }
 
         if (FindAnyObjectByType<EnemyDetection>().CurrentTarget() == enemy)
             FindAnyObjectByType<EnemyDetection>().SetCurrentTarget(null);
+    }
+
+    public void RemoveEnemy(EnemyScript enemy)
+    {
+        for (int i = allEnemies.Count - 1; i >= 0; i--)
+        {
+            if (allEnemies[i].enemyScript == enemy)
+            {
+                allEnemies.RemoveAt(i);
+                break;
+            }
+        }
     }
 
 

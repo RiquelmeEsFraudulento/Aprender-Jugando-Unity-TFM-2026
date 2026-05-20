@@ -502,7 +502,7 @@ public class EnemyScript : Damageable
         playerCombat = FindAnyObjectByType<SimpleWalk>();
         enemyDetection = playerCombat.GetComponentInChildren<EnemyDetection>();
 
-        playerCombat.OnHit.AddListener((x) => OnPlayerHit(x));
+        //playerCombat.OnHit.AddListener((x) => OnPlayerHit(x));
         playerCombat.OnCounterAttack.AddListener((x) => OnPlayerCounter(x));
         playerCombat.OnTrajectory.AddListener((x) => OnPlayerTrajectory(x));
 
@@ -617,18 +617,16 @@ public class EnemyScript : Damageable
         characterController.enabled = false;
         animator.SetTrigger("Death");
         enemyManager.SetEnemyAvailiability(this, false);
-        base.DebugMuerte($"[Muerte] '{gameObject.name}' ha muerto.");
+        enemyManager.RemoveEnemy(this);   // <--- NUEVO
 
         DeathCoroutine = StartCoroutine(MuerteCooldown());
 
         IEnumerator MuerteCooldown()
         {
             yield return new WaitForSeconds(1.4f);
-
+            onDeath?.Invoke();
+            Destroy(gameObject);
         }
-
-        onDeath?.Invoke();
-        Destroy(gameObject);
     }
 
     public void SetRetreat()

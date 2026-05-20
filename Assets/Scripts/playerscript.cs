@@ -97,7 +97,8 @@ public class SimpleWalk : MonoBehaviour
 
     private int      animationCount = 0;
     private string[] attacks;
-
+    private string[] attackslong;
+    private string[] attacksnear;
 
     
 
@@ -116,6 +117,9 @@ public class SimpleWalk : MonoBehaviour
         // enemyDetection puede asignarse desde Inspector o buscarse aquí
         if (enemyDetection == null)
             enemyDetection = GetComponentInChildren<EnemyDetection>();
+
+        TryLockOn();
+
     }
 
     // ══════════════════════════════════════════════════════════
@@ -135,6 +139,25 @@ public class SimpleWalk : MonoBehaviour
                 UnlockTarget();
             else
                 TryLockOn();
+        }
+
+        // ── Scroll para cambiar objetivo (cuando estamos fijados) ─────
+        if (isLockedOn && Mathf.Abs(Input.mouseScrollDelta.y) > 0.1f)
+        {
+            int direction = Input.mouseScrollDelta.y > 0 ? 1 : -1; // arriba=1 (derecha), abajo=-1 (izquierda)
+            CycleLockTarget(direction);
+        }
+
+        if (isLockedOn)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                CycleLockTarget(1);  // E = siguiente objetivo (derecha)
+            }
+            else if (Input.GetKeyDown(KeyCode.Q))
+            {
+                CycleLockTarget(-1); // Q = objetivo anterior (izquierda)
+            }
         }
 
         // ── Auto-Unlock: enemy died or walked out of range ────────────────────
@@ -202,9 +225,60 @@ public class SimpleWalk : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K))      StartCoroutine(Chut());
         if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();   // ← ahora lanza AttackCheck
         if (Input.GetKeyDown(KeyCode.Mouse1)) StartCoroutine(SwSwing());
-        if (Input.GetKeyDown(KeyCode.Q))      StartCoroutine(Ra360());
-        if (Input.GetKeyDown(KeyCode.E))      StartCoroutine(Sw360());
+        if (Input.GetKeyDown(KeyCode.R))      StartCoroutine(Ra360());
+        if (Input.GetKeyDown(KeyCode.F))      StartCoroutine(Sw360());
         if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();  // ← ahora lanza CounterCheck
+    }
+
+
+    /// <summary>
+/// Cambia el enemigo fijado al más cercano a la derecha (direction=1) o izquierda (-1).
+/// </summary>
+    void CycleLockTarget(int direction)
+    {
+        if (lockedEnemy == null) return;
+
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius);
+        Transform current = lockedEnemy;
+        float currentAngle = AngleToTarget(current);
+
+        Transform best = null;
+        float bestDiff = Mathf.Infinity;
+
+        foreach (Collider hit in hits)
+        {
+            if (!hit.CompareTag("Enemy") || hit.transform == current) continue;
+
+            float angle = AngleToTarget(hit.transform);
+            float diff = Mathf.DeltaAngle(currentAngle, angle);
+
+            // direction=1 → diff positiva pequeña (derecha), direction=-1 → diff negativa pequeña (izquierda)
+            if (direction > 0 && diff > 0 && diff < bestDiff)
+            {
+                bestDiff = diff;
+                best = hit.transform;
+            }
+            else if (direction < 0 && diff < 0 && -diff < bestDiff)
+            {
+                bestDiff = -diff;
+                best = hit.transform;
+            }
+        }
+
+        if (best != null)
+        {
+            lockedEnemy = best;
+            // Forzar rotación inmediata hacia el nuevo objetivo
+            transform.DOKill();
+            transform.DOLookAt(lockedEnemy.position, rotationDuration, AxisConstraint.Y, Vector3.up)
+                    .SetEase(Ease.OutSine);
+        }
+    }
+
+    float AngleToTarget(Transform target)
+    {
+        Vector3 dir = (target.position - transform.position).normalized;
+        return Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
     }
 
     // ══════════════════════════════════════════════════════════
@@ -243,7 +317,9 @@ public class SimpleWalk : MonoBehaviour
     // ══════════════════════════════════════════════════════════
     public void Attack(EnemyScript target, float distance)
     {
-        attacks = new string[] { "TrRaSwing", "TrCrescent", "TrChut" };
+        attackslong = new string[] { "TrRaSwing", "TrCrescent", "TrChut", "TrSwSwing", "TrRa360", "TrSw360" };
+        attacksnear = new string[] {"TrCrescent", "TrChut" };
+
 
         if (target == null)
         {
@@ -253,10 +329,14 @@ public class SimpleWalk : MonoBehaviour
 
         if (distance < 15)
         {
-            animationCount = (int)Mathf.Repeat((float)animationCount + 1, (float)attacks.Length);
+            // Elegir el conjunto de ataques según la distancia
+            string[] attackPool = (distance <= 0.3f) ? attacksnear : attackslong;
+
+            animationCount = (animationCount + 1) % attackPool.Length; // ciclar dentro del pool
             string attackString = IsLastHit()
-                ? attacks[UnityEngine.Random.Range(0, attacks.Length)]
-                : attacks[animationCount];
+                ? attackPool[UnityEngine.Random.Range(0, attackPool.Length)]
+                : attackPool[animationCount];
+
             AttackType(attackString, attackCooldown, target, .65f);
         }
         else
@@ -330,6 +410,13 @@ public class SimpleWalk : MonoBehaviour
 
         lockedTarget = ClosestCounterEnemy();
         if (lockedTarget == null) return;   // ← important
+
+            // ───── NUEVO: activar lock-on hacia el enemigo que contraatacamos ─────
+        lockedEnemy = lockedTarget.transform;
+        isLockedOn = true;
+        transform.DOKill();
+        transform.DOLookAt(lockedEnemy.position, rotationDuration, AxisConstraint.Y, Vector3.up)
+                .SetEase(Ease.OutSine);
 
         OnCounterAttack?.Invoke(lockedTarget);
 
@@ -414,7 +501,7 @@ public class SimpleWalk : MonoBehaviour
         float minDistance = 100f;
         int finalIndex = -1;
 
-        for (int i = 0; i < enemyManager.allEnemies.Length; i++)
+        for (int i = 0; i < enemyManager.allEnemies.Count; i++)
         {
             EnemyScript enemy = enemyManager.allEnemies[i].enemyScript;
             if (enemy != null && enemy.IsPreparingAttack())
