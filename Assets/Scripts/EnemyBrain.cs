@@ -218,7 +218,7 @@ public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
 
         for (int i = 0; i < allEnemies.Count; i++)
         {
-            if (allEnemies[i].enemyAvailability)
+            if (allEnemies[i].enemyAvailability && allEnemies[i].enemyScript != null && allEnemies[i].enemyScript.isActiveAndEnabled)
                 enemyIndexes.Add(i);
         }
 
@@ -238,7 +238,7 @@ public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
 
         for (int i = 0; i < allEnemies.Count; i++)
         {
-            if (allEnemies[i].enemyAvailability && allEnemies[i].enemyScript != exclude)
+            if (allEnemies[i].enemyAvailability && allEnemies[i].enemyScript != null && allEnemies[i].enemyScript.isActiveAndEnabled)
                 enemyIndexes.Add(i);
         }
 
@@ -257,7 +257,7 @@ public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
         int count = 0;
         for (int i = 0; i < allEnemies.Count; i++)
         {
-            if (allEnemies[i].enemyAvailability)
+            if (allEnemies[i].enemyAvailability && allEnemies[i].enemyScript != null && allEnemies[i].enemyScript.isActiveAndEnabled)
                 count++;
         }
         return count;
@@ -267,7 +267,7 @@ public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
     {
         foreach (EnemyStruct enemyStruct in allEnemies)
         {
-            if (enemyStruct.enemyScript.IsPreparingAttack())
+            if (enemyStruct.enemyScript != null && enemyStruct.enemyScript.isActiveAndEnabled && enemyStruct.enemyAvailability && enemyStruct.enemyScript.IsPreparingAttack())
             {
                 return true;
             }

@@ -663,9 +663,23 @@ public class EnemyScript : Damageable
         IEnumerator PrepAttack()
         {
             PrepareAttack(true);
-            yield return new WaitForSeconds(.2f);
+            yield return new WaitForSeconds(0.2f);
             moveDirection = Vector3.forward;
             isMoving = true;
+
+            // Timeout de seguridad: si en 3 segundos no ha llegado al jugador, cancelar
+            float timer = 0f;
+            while (isPreparingAttack && timer < 3f)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+            if (isPreparingAttack)  // sigue en preparación -> abortar
+            {
+                PrepareAttack(false);
+                // Opcional: hacer que se retire directamente sin atacar
+                SetRetreat();
+            }
         }
     }
 
@@ -777,12 +791,13 @@ public class EnemyScript : Damageable
         {
             if (RetreatCoroutine != null)
                 StopCoroutine(RetreatCoroutine);
+            isRetreating = false;  // <--- IMPORTANTE
         }
 
         if (PrepareAttackCoroutine != null)
             StopCoroutine(PrepareAttackCoroutine);
 
-        if(DamageCoroutine != null)
+        if (DamageCoroutine != null)
             StopCoroutine(DamageCoroutine);
 
         if (MovementCoroutine != null)
