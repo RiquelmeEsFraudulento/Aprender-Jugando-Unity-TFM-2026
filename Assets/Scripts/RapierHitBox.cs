@@ -197,7 +197,7 @@ public class RapierHitbox : MonoBehaviour
 
         GameObject fuente = ownerRoot != null ? ownerRoot.gameObject : gameObject;
         damageable.TakeDamage(damage, damageType, fuente);
-
+        // Aqui quiero agregar el onPlayerHit del EnemyScript
         Debug.Log("Ha sido dañado");
 
     }

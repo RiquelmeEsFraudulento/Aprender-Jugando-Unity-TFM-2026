@@ -112,6 +112,7 @@ public class Damageable : MonoBehaviour
 //     no afectan a la lógica en tiempo de ejecución.
 // ============================================================
 
+using System.Buffers.Text;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -160,7 +161,7 @@ public class Damageable : MonoBehaviour
     private float tiempoDesdeUltimoGolpe = 999f; // empieza listo para recibir daño
 
     // ── Veneno ───────────────────────────────────────────────
-    private bool  estaEnvenenado     = false;
+    public bool  estaEnvenenado     = false;
     private float tiempoVeneno       = 0f;
     private float acumuladorVeneno   = 0f;
 
@@ -222,13 +223,14 @@ public class Damageable : MonoBehaviour
         if (EstaEnCooldown())          return false;
         if (!EsEtiquetaPermitida(weaponTag)) return false;
         if (weaponTag == "LightSaber" && !EsColorVulnerable(tipo)) return false;
+        if (weaponTag == "Rapier" && !EsColorVulnerable(tipo)) return false;
 
         return true;
     }
 
     // ── TakeDamage ───────────────────────────────────────────
     // La hitbox llama DESPUÉS de que CanBeDamagedBy devuelva true.
-    public void TakeDamage(int amount, DamageType damageType, GameObject source)
+    public virtual void TakeDamage(int amount, DamageType damageType, GameObject source)
     {
         if (amount <= 0) return;
 
@@ -249,14 +251,14 @@ public class Damageable : MonoBehaviour
     // COOLDOWN
     // ══════════════════════════════════════════════════════════
 
-    void AvanzarCooldown()
+    public void AvanzarCooldown()
     {
         // Acumula tiempo entre frames igual que un timer en C++.
         if (tiempoDesdeUltimoGolpe < cooldownEntreGolpes)
             tiempoDesdeUltimoGolpe += Time.deltaTime;
     }
 
-    void ReiniciarCooldown()
+    public void ReiniciarCooldown()
     {
         tiempoDesdeUltimoGolpe = 0f;
         DebugCooldown(
@@ -264,7 +266,7 @@ public class Damageable : MonoBehaviour
         );
     }
 
-    bool EstaEnCooldown()
+    public bool EstaEnCooldown()
     {
         bool enCooldown = tiempoDesdeUltimoGolpe < cooldownEntreGolpes;
         if (enCooldown)
@@ -312,7 +314,7 @@ public class Damageable : MonoBehaviour
     // VENENO
     // ══════════════════════════════════════════════════════════
 
-    void ActivarVeneno()
+    public void ActivarVeneno()
     {
         estaEnvenenado  = true;
         tiempoVeneno    = 0f;
@@ -323,7 +325,7 @@ public class Damageable : MonoBehaviour
         );
     }
 
-    void ProcesarVenenoPorTiempo()
+    public void ProcesarVenenoPorTiempo()
     {
         tiempoVeneno     += Time.deltaTime;
         acumuladorVeneno += Time.deltaTime;
@@ -447,7 +449,7 @@ public class Damageable : MonoBehaviour
     // MUERTE
     // ══════════════════════════════════════════════════════════
 
-    void Morir()
+    public virtual void Morir()
     {
         DebugMuerte($"[Muerte] '{gameObject.name}' ha muerto.");
         onDeath?.Invoke();
@@ -465,7 +467,7 @@ public class Damageable : MonoBehaviour
     void DebugDanio    (string msg) { if (LOG_DANIO)    Debug.Log(msg); }
     void DebugVeneno   (string msg) { if (LOG_VENENO)   Debug.Log(msg); }
     void DebugSangrado (string msg) { if (LOG_SANGRADO) Debug.Log(msg); }
-    void DebugMuerte   (string msg) { if (LOG_MUERTE)   Debug.Log(msg); }
+    public void DebugMuerte   (string msg) { if (LOG_MUERTE)   Debug.Log(msg); }
 
     // Convierte cualquier array a string legible para los logs.
     // En C++: template<typename T> std::string formatArray(T* arr, int size)

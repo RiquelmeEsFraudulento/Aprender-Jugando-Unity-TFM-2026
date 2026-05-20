@@ -355,6 +355,7 @@ MonoBehaviour:
   onDeath:
     m_PersistentCalls:
       m_Calls: []
+  estaEnvenenado: 0
 --- !u!65 &122208064
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1020,6 +1021,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 672067121}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 672067124}
   m_SourcePrefab: {fileID: 100100000, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
 --- !u!4 &672067117 stripped
 Transform:
@@ -1078,8 +1082,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  maxHealth: 10
+  currentHealth: 10
+  cooldownEntreGolpes: 0.25
+  vulnerableTypes: 000000000100000002000000030000000400000005000000
+  allowedWeaponTags:
+  - LightSaber
+  - Rapier
+  - Kick
+  onHit:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  estaEnvenenado: 0
   characterController: {fileID: 672067121}
-  health: 3
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0
@@ -1096,6 +1114,27 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   danyoAtaque: 10
+--- !u!65 &672067124
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672067120}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1.05, z: 1}
+  m_Center: {x: 0, y: 0.62, z: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1273,6 +1312,7 @@ MonoBehaviour:
   onDeath:
     m_PersistentCalls:
       m_Calls: []
+  estaEnvenenado: 0
 --- !u!65 &771052536
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2215,7 +2255,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: c47cc1c30fbca7e4d8845c0fc5e17ca5, type: 3}
-      insertIndex: -1
+      insertIndex: 0
       addedObject: {fileID: 1560405374}
     - targetCorrespondingSourceObject: {fileID: -6874584590210671055, guid: c47cc1c30fbca7e4d8845c0fc5e17ca5, type: 3}
       insertIndex: -1
@@ -2362,6 +2402,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1475440925}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1475440927}
   m_SourcePrefab: {fileID: 100100000, guid: 403c19489c4720042a98c881c1e48efb, type: 3}
 --- !u!1001 &1130913880
 PrefabInstance:
@@ -2829,8 +2872,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  maxHealth: 10
+  currentHealth: 10
+  cooldownEntreGolpes: 0.25
+  vulnerableTypes: 000000000100000002000000030000000400000005000000
+  allowedWeaponTags:
+  - LightSaber
+  - Rapier
+  - Kick
+  onHit:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  estaEnvenenado: 0
   characterController: {fileID: 1475440925}
-  health: 3
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0
@@ -2873,9 +2930,30 @@ CharacterController:
   m_Height: 1.33
   m_Radius: 0.36
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_StepOffset: 0.15
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.62, z: 0}
+--- !u!65 &1475440927
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1475440919}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1.05, z: 1}
   m_Center: {x: 0, y: 0.62, z: 0}
 --- !u!1 &1560405373
 GameObject:
@@ -2943,10 +3021,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2a6d61c8837d6d46bfadf60a512c66e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  enemyManager: {fileID: 0}
+  enemyManager: {fileID: 813690292}
   layerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   inputDirection: {x: 0, y: 0, z: 0}
   currentTarget: {fileID: 0}
   cam: {fileID: 0}
@@ -3247,6 +3325,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 2
   animator: {fileID: 1966723363}
+  detectionRadius: 8
+  rotationThreshold: 2
+  rotationDuration: 0.15
   ballPrefab: {fileID: 6415272138833605108, guid: 4a25b28ee80131b429153997f1a191e3, type: 3}
   ballSpawnPoint: {fileID: 971567196}
   RapierCollider: {fileID: 1792116290}
@@ -3255,8 +3336,8 @@ MonoBehaviour:
   LeftKickCollider: {fileID: 1274718642}
   Rapier: {fileID: 1792116289}
   LightSaber: {fileID: 1453422277}
-  RightKick: {fileID: 318243095}
-  LeftKick: {fileID: 1274718640}
+  RightKick: {fileID: 318243098}
+  LeftKick: {fileID: 1274718643}
   attackCooldown: 0.6
   moveAxis: {x: 0, y: 0}
   isAttackingEnemy: 0
@@ -3264,7 +3345,7 @@ MonoBehaviour:
   punchPosition: {fileID: 0}
   lastHitCamera: {fileID: 0}
   lastHitFocusObject: {fileID: 0}
-  enemyDetection: {fileID: 0}
+  enemyDetection: {fileID: 1560405376}
   OnHit:
     m_PersistentCalls:
       m_Calls: []
@@ -3442,6 +3523,7 @@ MonoBehaviour:
   onDeath:
     m_PersistentCalls:
       m_Calls: []
+  estaEnvenenado: 0
 --- !u!65 &2034082249
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3566,6 +3648,7 @@ MonoBehaviour:
   onDeath:
     m_PersistentCalls:
       m_Calls: []
+  estaEnvenenado: 0
 --- !u!65 &2044250950
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3626,8 +3709,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  maxHealth: 10
+  currentHealth: 10
+  cooldownEntreGolpes: 0.25
+  vulnerableTypes: 
+  allowedWeaponTags: []
+  onHit:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  estaEnvenenado: 0
   characterController: {fileID: 2044250955}
-  health: 3
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0

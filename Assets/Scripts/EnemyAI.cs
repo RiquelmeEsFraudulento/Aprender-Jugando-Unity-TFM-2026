@@ -453,7 +453,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
 
-public class EnemyScript : MonoBehaviour
+public class EnemyScript : Damageable
 {
     //Declarations
     private Animator animator;
@@ -463,7 +463,7 @@ public class EnemyScript : MonoBehaviour
     public CharacterController characterController;
 
     [Header("Stats")]
-    public int health = 3;
+    //public int health = 3;
     private float moveSpeed = 1;
     private Vector3 moveDirection;
 
@@ -482,6 +482,7 @@ public class EnemyScript : MonoBehaviour
     private Coroutine RetreatCoroutine;
     private Coroutine DamageCoroutine;
     private Coroutine MovementCoroutine;
+    private Coroutine DeathCoroutine;
 
     //Events
     public UnityEvent<EnemyScript> OnDamage;
@@ -494,7 +495,7 @@ public class EnemyScript : MonoBehaviour
     void Start()
     {
         enemyManager = GetComponentInParent<EnemyManager>();
-
+        base.InicializarVida();
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
 
@@ -539,6 +540,9 @@ public class EnemyScript : MonoBehaviour
 
         //Only moves if the direction is set
         MoveEnemy(moveDirection);
+
+        base.AvanzarCooldown();
+        if (estaEnvenenado) ProcesarVenenoPorTiempo();
     }
 
     //Listened event from Player Animation
@@ -553,9 +557,9 @@ public class EnemyScript : MonoBehaviour
             isLockedTarget = false;
             OnDamage.Invoke(this);
 
-            health--;
+            currentHealth--;
 
-            if (health <= 0)
+            if (currentHealth <= 0)
             {
                 Death();
                 return;
@@ -602,6 +606,29 @@ public class EnemyScript : MonoBehaviour
         characterController.enabled = false;
         animator.SetTrigger("Death");
         enemyManager.SetEnemyAvailiability(this, false);
+    }
+
+
+    public override void Morir()
+    {
+        StopEnemyCoroutines();
+
+        this.enabled = false;
+        characterController.enabled = false;
+        animator.SetTrigger("Death");
+        enemyManager.SetEnemyAvailiability(this, false);
+        base.DebugMuerte($"[Muerte] '{gameObject.name}' ha muerto.");
+
+        DeathCoroutine = StartCoroutine(MuerteCooldown());
+
+        IEnumerator MuerteCooldown()
+        {
+            yield return new WaitForSeconds(1.4f);
+
+        }
+
+        onDeath?.Invoke();
+        Destroy(gameObject);
     }
 
     public void SetRetreat()
@@ -720,7 +747,10 @@ public class EnemyScript : MonoBehaviour
     public void HitEvent()
     {
         if(!playerCombat.isCountering && !playerCombat.isAttackingEnemy)
-            playerCombat.RecibirDanyo();
+        {
+            GolpearNinja(playerCombat.GetComponent<PlayerHealth>());
+            playerCombat.RecibirDanyo();        
+        }
 
         PrepareAttack(false);
     }
@@ -757,7 +787,7 @@ public class EnemyScript : MonoBehaviour
 
     public bool IsAttackable()
     {
-        return health > 0;
+        return currentHealth > 0;
     }
 
     public bool IsPreparingAttack()
@@ -790,6 +820,36 @@ public class EnemyScript : MonoBehaviour
         DebugIA($"[IA] '{name}' golpeó al ninja: -{danyoAtaque}");
     }
 
+
+    public override void TakeDamage(int amount, DamageType damageType, GameObject source){
+        // --- Daño base, cooldown, veneno/sangrado ---
+        base.TakeDamage(amount, damageType, source);
+
+        // --- Si ha muerto, la clase base ya disparó Morir() y onDeath.
+        //     No hacemos nada más aquí para no interferir con la secuencia de muerte.
+        if (currentHealth <= 0)
+            return;
+
+        // --- REACCIÓN DE IMPACTO (antes en OnPlayerHit) ---
+        StopEnemyCoroutines();
+        DamageCoroutine = StartCoroutine(HitCoroutine());
+
+        enemyDetection.SetCurrentTarget(null);
+        isLockedTarget = false;
+        OnDamage.Invoke(this);      // Evento público de daño
+
+        animator.SetTrigger("Hit");
+        transform.DOMove(transform.position - (transform.forward / 2), .3f).SetDelay(.1f);
+        StopMoving();
+
+        // La corrutina de aturdimiento se mantiene igual que en OnPlayerHit
+        IEnumerator HitCoroutine()
+        {
+            isStunned = true;
+            yield return new WaitForSeconds(.5f);
+            isStunned = false;
+        }
+    }    
     void DebugIA(string msg) { if (LOG_IA) Debug.Log(msg); }
 
     #endregion

@@ -18,6 +18,26 @@ public class SimpleWalk : MonoBehaviour
     private Vector3 moveDirection;
 
     // ══════════════════════════════════════════════════════════
+    // LOCK-ON SYSTEM
+    // ══════════════════════════════════════════════════════════
+    [Header("Lock-On System")]
+
+    [Tooltip("Radius in which enemies can be detected for lock-on.")]
+    public float detectionRadius = 8f;
+
+    [Tooltip("Minimum angle difference (degrees) before re-triggering DOTween rotation.")]
+    public float rotationThreshold = 2f;
+
+    [Tooltip("DOTween rotation duration in seconds.")]
+    public float rotationDuration = 0.15f;
+
+    /// <summary>The enemy currently locked onto. Null when unlocked.</summary>
+    private Transform lockedEnemy;
+
+    /// <summary>Whether the lock-on system is currently active.</summary>
+    private bool isLockedOn = false;
+
+    // ══════════════════════════════════════════════════════════
     // PELOTA (reservada)
     // ══════════════════════════════════════════════════════════
     public GameObject ballPrefab;
@@ -33,8 +53,8 @@ public class SimpleWalk : MonoBehaviour
     public Collider LeftKickCollider;
     public RapierHitbox Rapier;
     public WeaponHitbox LightSaber;
-    public WeaponHitbox RightKick;
-    public WeaponHitbox LeftKick;
+    public KickHitbox RightKick;
+    public KickHitbox LeftKick;
 
     // ══════════════════════════════════════════════════════════
     // COMBAT — Settings (equivalente a CombatScript)
@@ -78,6 +98,9 @@ public class SimpleWalk : MonoBehaviour
     private int      animationCount = 0;
     private string[] attacks;
 
+
+    
+
     // ══════════════════════════════════════════════════════════
     // START
     // ══════════════════════════════════════════════════════════
@@ -85,7 +108,7 @@ public class SimpleWalk : MonoBehaviour
     {
         controller    = GetComponent<CharacterController>();
         //impulseSource = GetComponentInChildren<CinemachineImpulseSource>();
-        enemyManager  = FindObjectOfType<EnemyManager>();
+        enemyManager  = FindAnyObjectByType<EnemyManager>();
 
         if (animator == null)
             animator = GetComponent<Animator>();
@@ -104,13 +127,70 @@ public class SimpleWalk : MonoBehaviour
         float vertical   = Input.GetAxisRaw("Vertical");
 
         moveAxis      = new Vector2(horizontal, vertical);
-        moveDirection = new Vector3(horizontal, 0, vertical).normalized;
 
-        // No permite mover mientras ataca (igual que AttackCoroutine desactivaba MovementInput)
-        if (moveDirection.magnitude >= 0.1f && !isAttackingEnemy)
+        // ── Lock-On Toggle (Tab key) ──────────────────────────────────────────
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            transform.forward = moveDirection;
-            controller.Move(moveDirection * speed * Time.deltaTime);
+            if (isLockedOn)
+                UnlockTarget();
+            else
+                TryLockOn();
+        }
+
+        // ── Auto-Unlock: enemy died or walked out of range ────────────────────
+        if (isLockedOn)
+        {
+            if (lockedEnemy == null ||
+                Vector3.Distance(transform.position, lockedEnemy.position) > detectionRadius)
+            {
+                UnlockTarget();
+            }
+        }
+
+        // ── Movement & Rotation ───────────────────────────────────────────────
+        if (isLockedOn && lockedEnemy != null && !isAttackingEnemy)
+        {
+            // --- Lock-On Movement: relative to the locked enemy ---------------
+            Vector3 toEnemy = (lockedEnemy.position - transform.position).normalized;
+            Vector3 right   = Vector3.Cross(Vector3.up, toEnemy);
+            moveDirection   = (toEnemy * vertical + right * horizontal).normalized;
+
+            // --- Smooth rotation toward enemy via DOTween (Y-axis only) -------
+            Vector3 lookDir = new Vector3(toEnemy.x, 0f, toEnemy.z);
+            if (lookDir != Vector3.zero)
+            {
+                float angleDiff = Vector3.Angle(transform.forward, lookDir);
+                if (angleDiff > rotationThreshold)
+                {
+                    // Kill any running rotation tween before starting a new one
+                    transform.DOKill();
+                    transform
+                        .DOLookAt(lockedEnemy.position, rotationDuration,
+                                  AxisConstraint.Y, Vector3.up)
+                        .SetEase(Ease.OutSine);
+                }
+            }
+
+            // --- Visual debug line from player to locked enemy ----------------
+            Debug.DrawLine(transform.position, lockedEnemy.position, Color.cyan);
+
+            // --- Move (lock-on mode) ------------------------------------------
+            if (moveDirection.magnitude >= 0.1f)
+                controller.Move(moveDirection * speed * Time.deltaTime);
+        }
+        else
+        {
+            // --- Free Movement (original behaviour) ---------------------------
+            moveDirection = new Vector3(horizontal, 0f, vertical).normalized;
+
+            if (moveDirection.magnitude >= 0.1f && !isAttackingEnemy)
+            {
+                // Rotate character toward movement direction (instant, original)
+                transform.forward = moveDirection;
+
+                // Move
+                controller.Move(moveDirection * speed * Time.deltaTime);
+            }
         }
 
         animator.SetBool("isWalking", moveDirection.magnitude > 0f && !isAttackingEnemy);
@@ -118,7 +198,7 @@ public class SimpleWalk : MonoBehaviour
         // ── Tus ataques originales ────────────────────────────
         if (Input.GetKeyDown(KeyCode.B))      StartCoroutine(DanceSpin());
         if (Input.GetKeyDown(KeyCode.J))      StartCoroutine(JumpCountdown());
-        if (Input.GetKeyDown(KeyCode.M))      StartCoroutine(Martelo());
+        if (Input.GetKeyDown(KeyCode.M))      StartCoroutine(Crescent());
         if (Input.GetKeyDown(KeyCode.K))      StartCoroutine(Chut());
         if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();   // ← ahora lanza AttackCheck
         if (Input.GetKeyDown(KeyCode.Mouse1)) StartCoroutine(SwSwing());
@@ -130,6 +210,7 @@ public class SimpleWalk : MonoBehaviour
     // ══════════════════════════════════════════════════════════
     // COMBAT — AttackCheck (de CombatScript, adaptado)
     // ══════════════════════════════════════════════════════════
+    // In AttackCheck()
     void AttackCheck()
     {
         if (isAttackingEnemy) return;
@@ -153,7 +234,8 @@ public class SimpleWalk : MonoBehaviour
         if (lockedTarget == null)
             lockedTarget = enemyManager.RandomEnemy();
 
-        Attack(lockedTarget, TargetDistance(lockedTarget));
+        float distance = lockedTarget != null ? TargetDistance(lockedTarget) : 0f;
+        Attack(lockedTarget, distance);
     }
 
     // ══════════════════════════════════════════════════════════
@@ -161,7 +243,7 @@ public class SimpleWalk : MonoBehaviour
     // ══════════════════════════════════════════════════════════
     public void Attack(EnemyScript target, float distance)
     {
-        attacks = new string[] { "TrRaSwing", "TrSwSwing", "TrMartelo", "TrChut" };
+        attacks = new string[] { "TrRaSwing", "TrCrescent", "TrChut" };
 
         if (target == null)
         {
@@ -240,17 +322,21 @@ public class SimpleWalk : MonoBehaviour
     // ══════════════════════════════════════════════════════════
     // COMBAT — CounterCheck (Space)
     // ══════════════════════════════════════════════════════════
+    // In CounterCheck()
     void CounterCheck()
     {
         if (isCountering || isAttackingEnemy || !enemyManager.AnEnemyIsPreparingAttack())
             return;
 
         lockedTarget = ClosestCounterEnemy();
+        if (lockedTarget == null) return;   // ← important
+
         OnCounterAttack?.Invoke(lockedTarget);
 
-        if (TargetDistance(lockedTarget) > 2)
+        if (lockedTarget == null || TargetDistance(lockedTarget) > 2)
         {
-            Attack(lockedTarget, TargetDistance(lockedTarget));
+            float dist = lockedTarget != null ? TargetDistance(lockedTarget) : 0f;
+            Attack(lockedTarget, dist);
             return;
         }
 
@@ -266,10 +352,12 @@ public class SimpleWalk : MonoBehaviour
         {
             isCountering = true;
             yield return new WaitForSeconds(dur);
-            Attack(lockedTarget, TargetDistance(lockedTarget));
+            float dist = lockedTarget != null ? TargetDistance(lockedTarget) : 0f;
+            Attack(lockedTarget, dist);
             isCountering = false;
         }
     }
+
 
     // ══════════════════════════════════════════════════════════
     // COMBAT — HitEvent (llamado por Animation Event al golpear)
@@ -296,6 +384,8 @@ public class SimpleWalk : MonoBehaviour
         if (damageCoroutine != null) StopCoroutine(damageCoroutine);
         damageCoroutine = StartCoroutine(DamageCoroutine());
 
+
+
         IEnumerator DamageCoroutine()
         {
             speed = 0f;
@@ -309,33 +399,97 @@ public class SimpleWalk : MonoBehaviour
     // COMBAT — Helpers
     // ══════════════════════════════════════════════════════════
     float TargetDistance(EnemyScript target)
-        => Vector3.Distance(transform.position, target.transform.position);
-
+    {
+        if (target == null) 
+            return float.MaxValue;  // or some large distance, or handle differently
+        return Vector3.Distance(transform.position, target.transform.position);
+    }
     public Vector3 TargetOffset(Transform target)
         => Vector3.MoveTowards(target.position, transform.position, .95f);
 
+    // ClosestCounterEnemy() as shown above
+    // ClosestCounterEnemy() as shown above
     EnemyScript ClosestCounterEnemy()
     {
         float minDistance = 100f;
-        int finalIndex    = 0;
+        int finalIndex = -1;
 
         for (int i = 0; i < enemyManager.allEnemies.Length; i++)
         {
             EnemyScript enemy = enemyManager.allEnemies[i].enemyScript;
-            if (enemy.IsPreparingAttack())
+            if (enemy != null && enemy.IsPreparingAttack())
             {
                 float d = Vector3.Distance(transform.position, enemy.transform.position);
-                if (d < minDistance) { minDistance = d; finalIndex = i; }
+                if (d < minDistance) 
+                { 
+                    minDistance = d; 
+                    finalIndex = i; 
+                }
             }
         }
 
-        return enemyManager.allEnemies[finalIndex].enemyScript;
+        return finalIndex >= 0 ? enemyManager.allEnemies[finalIndex].enemyScript : null;
     }
-
     bool IsLastHit()
     {
         if (lockedTarget == null) return false;
-        return enemyManager.AliveEnemyCount() == 1 && lockedTarget.health <= 1;
+        return enemyManager.AliveEnemyCount() == 1 && lockedTarget.currentHealth <= 1;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // LOCK-ON — Métodos
+    // ══════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Finds the most-forward enemy inside detectionRadius and locks onto it.
+    /// Uses Physics.OverlapSphere + Vector3.Dot (Mix and Jam style).
+    /// </summary>
+    void TryLockOn()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius);
+
+        Transform bestCandidate = null;
+        float bestDot = -Mathf.Infinity;
+
+        foreach (Collider hit in hits)
+        {
+            // Only consider objects tagged "Enemy"
+            if (!hit.CompareTag("Enemy"))
+                continue;
+
+            // Skip if the enemy is directly behind us (dot would be negative)
+            Vector3 dirToEnemy = (hit.transform.position - transform.position).normalized;
+            float dot = Vector3.Dot(transform.forward, dirToEnemy);
+
+            if (dot > bestDot)
+            {
+                bestDot       = dot;
+                bestCandidate = hit.transform;
+            }
+        }
+
+        if (bestCandidate != null)
+        {
+            lockedEnemy = bestCandidate;
+            isLockedOn  = true;
+
+            // Kick off the very first rotation tween immediately
+            transform.DOKill();
+            transform
+                .DOLookAt(lockedEnemy.position, rotationDuration,
+                          AxisConstraint.Y, Vector3.up)
+                .SetEase(Ease.OutSine);
+        }
+    }
+
+    /// <summary>
+    /// Releases the current lock-on target and kills any running rotation tween.
+    /// </summary>
+    void UnlockTarget()
+    {
+        isLockedOn  = false;
+        lockedEnemy = null;
+        transform.DOKill();
     }
 
     // ══════════════════════════════════════════════════════════
@@ -364,16 +518,16 @@ public class SimpleWalk : MonoBehaviour
     IEnumerator Ra360()    { isAttackingEnemy = true; animator.SetTrigger("TrRa360");   yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator Sw360()    { isAttackingEnemy = true; animator.SetTrigger("TrSw360");   yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator SwSwing()  { isAttackingEnemy = true; animator.SetTrigger("TrSwSwing"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
-    IEnumerator Martelo()  { isAttackingEnemy = true; animator.SetTrigger("TrMartelo"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
+    IEnumerator Crescent()  { isAttackingEnemy = true; animator.SetTrigger("TrCrescent"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator Chut()     { isAttackingEnemy = true; animator.SetTrigger("TrChut");    yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
 
     // ══════════════════════════════════════════════════════════
     // HITBOXES — llamadas desde Animation Events
     // ══════════════════════════════════════════════════════════
     public void EnableRapierHitbox()     { RapierCollider.enabled = true;      Rapier.Reactivar(); }
-    public void EnableLightSaberHitbox() { LightSaberCollider.enabled = true;  Rapier.Reactivar(); }
-    public void EnableLeftKickHitbox()   { LeftKickCollider.enabled = true;    Rapier.Reactivar(); }
-    public void EnableRightKickHitbox()  { RightKickCollider.enabled = true;   Rapier.Reactivar(); }
+    public void EnableLightSaberHitbox() { LightSaberCollider.enabled = true;  LightSaber.Reactivar(); }
+    public void EnableLeftKickHitbox()   { LeftKickCollider.enabled = true;    LeftKick.Reactivar(); }
+    public void EnableRightKickHitbox()  { RightKickCollider.enabled = true;   RightKick.Reactivar(); }
     public void DisableRapierHitbox()     { RapierCollider.enabled = false; }
     public void DisableLightSaberHitbox() { LightSaberCollider.enabled = false; }
     public void DisableLeftKickHitbox()   { LeftKickCollider.enabled = false; }

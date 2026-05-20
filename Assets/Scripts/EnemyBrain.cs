@@ -295,8 +295,8 @@ public class EnemyManager : MonoBehaviour
                 allEnemies[i].enemyAvailability = state;
         }
 
-        if (FindObjectOfType<EnemyDetection>().CurrentTarget() == enemy)
-            FindObjectOfType<EnemyDetection>().SetCurrentTarget(null);
+        if (FindAnyObjectByType<EnemyDetection>().CurrentTarget() == enemy)
+            FindAnyObjectByType<EnemyDetection>().SetCurrentTarget(null);
     }
 
 
