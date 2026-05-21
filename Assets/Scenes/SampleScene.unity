@@ -418,6 +418,8 @@ MonoBehaviour:
   - LightSaber
   - Kick
   - Rapier
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -425,6 +427,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
 --- !u!65 &122208064
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1262,6 +1266,8 @@ MonoBehaviour:
   - LightSaber
   - Rapier
   - Kick
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -1269,6 +1275,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
   characterController: {fileID: 632895265}
   isPreparingAttack: 0
   isMoving: 0
@@ -1589,6 +1597,8 @@ MonoBehaviour:
   - LightSaber
   - Rapier
   - Kick
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -1596,6 +1606,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
   characterController: {fileID: 652239573}
   isPreparingAttack: 0
   isMoving: 0
@@ -1779,6 +1791,8 @@ MonoBehaviour:
   - LightSaber
   - Rapier
   - Kick
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -1786,6 +1800,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
   characterController: {fileID: 672067121}
   isPreparingAttack: 0
   isMoving: 0
@@ -1996,6 +2012,8 @@ MonoBehaviour:
   - LightSaber
   - Kick
   - Rapier
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -2003,6 +2021,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
 --- !u!65 &771052536
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3157,7 +3177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3709,6 +3729,8 @@ MonoBehaviour:
   - LightSaber
   - Rapier
   - Kick
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -3716,6 +3738,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
   characterController: {fileID: 1475440925}
   isPreparingAttack: 0
   isMoving: 0
@@ -4049,6 +4073,8 @@ MonoBehaviour:
   - LightSaber
   - Rapier
   - Kick
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -4056,6 +4082,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
   characterController: {fileID: 1654715474}
   isPreparingAttack: 0
   isMoving: 0
@@ -4465,6 +4493,7 @@ MonoBehaviour:
   OnTrajectory:
     m_PersistentCalls:
       m_Calls: []
+  estadoSeleccionado: 0
 --- !u!95 &1966723363 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: c47cc1c30fbca7e4d8845c0fc5e17ca5, type: 3}
@@ -4629,6 +4658,8 @@ MonoBehaviour:
   - LightSaber
   - Kick
   - Rapier
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -4636,6 +4667,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
 --- !u!65 &2034082249
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4754,6 +4787,8 @@ MonoBehaviour:
   - LightSaber
   - Rapier
   - Kick
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -4761,6 +4796,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
 --- !u!65 &2044250950
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4826,6 +4863,8 @@ MonoBehaviour:
   cooldownEntreGolpes: 0.25
   vulnerableTypes: 
   allowedWeaponTags: []
+  puedeSerAfectadoSueno: 0
+  puedeSerAfectadoconfuso: 0
   onHit:
     m_PersistentCalls:
       m_Calls: []
@@ -4833,6 +4872,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   estaEnvenenado: 0
+  estadoEspecial: 0
+  golpesRecibidosParaEstado: 0
   characterController: {fileID: 2044250955}
   isPreparingAttack: 0
   isMoving: 0
@@ -4929,6 +4970,10 @@ PrefabInstance:
       value: Dummy
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 76092dcfb963e5b4c98252da24fa754a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3407094179604459225, guid: 76092dcfb963e5b4c98252da24fa754a, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
