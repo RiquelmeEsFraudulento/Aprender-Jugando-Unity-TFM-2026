@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: defb75c12e2d1b540bbdf5aee1696072
+guid: 34821c3e0bb2ae74ebd5cd7175df2626
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,11 +31,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: DummyAndar
+      name: DummyMuerte
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 79
+      lastFrame: 154
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
