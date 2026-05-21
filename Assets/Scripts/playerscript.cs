@@ -86,6 +86,12 @@ public class SimpleWalk : MonoBehaviour
     public UnityEvent<EnemyScript> OnCounterAttack;
     public UnityEvent<EnemyScript> OnTrajectory;
 
+
+    
+    [Header("Estado especial seleccionado")]
+    [Tooltip("7 = Sleep, 8 = Confused, 9 = None. Los hitboxes aplican este estado al llegar a 8 golpes.")]
+    public Damageable.EstadoEspecial estadoSeleccionado = Damageable.EstadoEspecial.None;
+
     public System.Action DamageEvent;
 
     // ══════════════════════════════════════════════════════════
@@ -230,6 +236,22 @@ public class SimpleWalk : MonoBehaviour
                 // Move
                 controller.Move(moveDirection * speed * Time.deltaTime);
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            estadoSeleccionado = Damageable.EstadoEspecial.Sleep;
+            Debug.Log("[Estado] Modo seleccionado: SLEEP (se aplicará al enemigo tras 8 golpes)");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            estadoSeleccionado = Damageable.EstadoEspecial.Confused;
+            Debug.Log("[Estado] Modo seleccionado: CONFUSED (se aplicará al enemigo tras 8 golpes)");
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            estadoSeleccionado = Damageable.EstadoEspecial.None;
+            Debug.Log("[Estado] Modo seleccionado: NONE (sin efecto de estado)");
         }
 
         animator.SetBool("isWalking", moveDirection.magnitude > 0f && !isAttackingEnemy);
@@ -655,6 +677,21 @@ public class SimpleWalk : MonoBehaviour
         }
         Debug.Log("¡Jump!");
         controller.Move(Vector3.up * 2f);
+    }
+
+
+    // ══════════════════════════════════════════════════════════
+    // ESTADOS SLEEP / CONFUSED — Debug keys 7 / 8 / 9
+    // ══════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Aplica un estado especial al enemigo actualmente locked-on.
+    /// Teclas: 7 = Sleep, 8 = Confused.
+    /// </summary>
+
+    public Damageable.EstadoEspecial GetEstadoSeleccionado()
+    {
+        return estadoSeleccionado;
     }
 
     IEnumerator Ra360()    { isAttackingEnemy = true; animator.SetTrigger("TrRa360");   yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }

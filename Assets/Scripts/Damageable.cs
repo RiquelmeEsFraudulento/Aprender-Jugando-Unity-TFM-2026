@@ -120,8 +120,6 @@ public class Damageable : MonoBehaviour
 {
     // ══════════════════════════════════════════════════════════
     // DEBUG SWITCHES
-    // Pon en false la categoría que quieras silenciar.
-    // En producción ponlos todos a false sin tocar nada más.
     // ══════════════════════════════════════════════════════════
     private const bool LOG_INIT      = true;
     private const bool LOG_COOLDOWN  = true;
@@ -129,6 +127,7 @@ public class Damageable : MonoBehaviour
     private const bool LOG_VENENO    = true;
     private const bool LOG_SANGRADO  = true;
     private const bool LOG_MUERTE    = true;
+    private const bool LOG_ESTADO    = true;
 
     // ══════════════════════════════════════════════════════════
     // INSPECTOR
@@ -149,6 +148,13 @@ public class Damageable : MonoBehaviour
     [Tooltip("Vacío = cualquier arma puede dañar. Ej: Rapier, LightSaber, Kick")]
     public string[] allowedWeaponTags;
 
+    [Header("Susceptibilidad a estados")]
+    [Tooltip("Si false, este enemigo NUNCA caerá dormido.")]
+    public bool puedeSerAfectadoSueno = false;
+
+    [Tooltip("Si false, este enemigo NUNCA caerá confuso.")]
+    public bool puedeSerAfectadoconfuso = false;
+
     [Header("Eventos Unity")]
     public UnityEvent onHit;
     public UnityEvent onDeath;
@@ -158,7 +164,7 @@ public class Damageable : MonoBehaviour
     // ══════════════════════════════════════════════════════════
 
     // ── Cooldown ─────────────────────────────────────────────
-    private float tiempoDesdeUltimoGolpe = 999f; // empieza listo para recibir daño
+    private float tiempoDesdeUltimoGolpe = 999f;
 
     // ── Veneno ───────────────────────────────────────────────
     public bool  estaEnvenenado     = false;
@@ -175,6 +181,20 @@ public class Damageable : MonoBehaviour
     private const int GOLPES_PARA_EXPLOTAR   = 5;
     private const int DANIO_EXPLOSION_BLEED  = 3;
 
+    // ── Estados SLEEP / CONFUSED ─────────────────────────────
+    public enum EstadoEspecial { None, Sleep, Confused }
+
+    [SerializeField] private EstadoEspecial estadoEspecial = EstadoEspecial.None;
+
+    private float timerEstadoEspecial = 0f;
+    private const float DURACION_SLEEP    = 5f;
+    private const float DURACION_CONFUSED = 4f;
+
+    // ── Contador de golpes para estados ──────────────────────
+    // Los hitboxes acumulan aquí. Al llegar a 8, aplican el estado.
+    [HideInInspector] public int golpesRecibidosParaEstado = 0;
+    private const int GOLPES_PARA_ESTADO = 8;
+
     // ══════════════════════════════════════════════════════════
     // INICIALIZACIÓN
     // ══════════════════════════════════════════════════════════
@@ -187,33 +207,33 @@ public class Damageable : MonoBehaviour
     public void InicializarVida()
     {
         currentHealth = maxHealth;
+        estadoEspecial = EstadoEspecial.None;
+        timerEstadoEspecial = 0f;
+        golpesRecibidosParaEstado = 0;
         DebugInit(
             $"[Init] '{gameObject.name}' | Vida: {currentHealth}/{maxHealth}" +
             $" | Cooldown: {cooldownEntreGolpes}s" +
             $" | Tags: [{FormatArray(allowedWeaponTags)}]" +
-            $" | Tipos: [{FormatArray(vulnerableTypes)}]"
+            $" | Tipos: [{FormatArray(vulnerableTypes)}]" +
+            $" | Sleep: {puedeSerAfectadoSueno} | Confused: {puedeSerAfectadoconfuso}"
         );
     }
 
     // ══════════════════════════════════════════════════════════
-    // UPDATE — acumuladores de tiempo (sin coroutines)
-    // En C++: void update(float dt) { ... }
+    // UPDATE
     // ══════════════════════════════════════════════════════════
 
     void Update()
     {
         AvanzarCooldown();
         if (estaEnvenenado) ProcesarVenenoPorTiempo();
+        ProcesarEstadoEspecial();
     }
 
     // ══════════════════════════════════════════════════════════
-    // API PÚBLICA  ← los hitboxes solo llaman a estas dos
+    // API PÚBLICA
     // ══════════════════════════════════════════════════════════
 
-    // ── CanBeDamagedBy ───────────────────────────────────────
-    // La hitbox pregunta ANTES de aplicar daño.
-    // Devuelve true  → el golpe pasa.
-    // Devuelve false → el golpe se ignora.
     public bool CanBeDamagedBy(DamageType tipo, string weaponTag)
     {
         DebugCooldown(
@@ -228,8 +248,35 @@ public class Damageable : MonoBehaviour
         return true;
     }
 
-    // ── TakeDamage ───────────────────────────────────────────
-    // La hitbox llama DESPUÉS de que CanBeDamagedBy devuelva true.
+    /// <summary>
+    /// Llamado por los hitboxes. Acumula un golpe y devuelve true
+    /// cuando se alcanzan los 8 golpes (umbral para estado).
+    /// El hitbox decide qué estado aplicar.
+    /// </summary>
+    public bool RegistrarGolpeParaEstado()
+    {
+        golpesRecibidosParaEstado++;
+        DebugEstado(
+            $"[GolpesEstado] '{gameObject.name}' golpe {golpesRecibidosParaEstado}/{GOLPES_PARA_ESTADO}"
+        );
+        return golpesRecibidosParaEstado >= GOLPES_PARA_ESTADO;
+    }
+
+    /// <summary>
+    /// Resetea el contador de golpes para estado.
+    /// Llamar al aplicar el estado o al limpiarlo.
+    /// </summary>
+    public void ResetearGolpesParaEstado()
+    {
+        golpesRecibidosParaEstado = 0;
+        DebugEstado($"[GolpesEstado] '{gameObject.name}' contador reseteado.");
+    }
+
+    public int GetGolpesParaEstado()
+    {
+        return golpesRecibidosParaEstado;
+    }
+
     public virtual void TakeDamage(int amount, DamageType damageType, GameObject source)
     {
         if (amount <= 0) return;
@@ -244,7 +291,100 @@ public class Damageable : MonoBehaviour
         onHit?.Invoke();
         ProcesarEfectoDeEstado(damageType);
 
+        // ── Interrumpir estado especial al recibir daño ───────
+        if (estadoEspecial != EstadoEspecial.None)
+        {
+            DebugEstado($"[Estado] '{gameObject.name}' interrumpido de {estadoEspecial} por golpe.");
+            LimpiarEstadoEspecial();
+        }
+
         DebugDanio($"[Hit] Vida después: {currentHealth}/{maxHealth}");
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // ESTADOS SLEEP / CONFUSED — API
+    // ══════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Intenta aplicar SLEEP. Devuelve true si se aplicó.
+    /// </summary>
+    public bool AplicarSleep()
+    {
+        if (!puedeSerAfectadoSueno)
+        {
+            DebugEstado($"[Sleep] '{gameObject.name}' es inmune → ignorado.");
+            return false;
+        }
+        if (currentHealth <= 0) return false;
+
+        estadoEspecial = EstadoEspecial.Sleep;
+        timerEstadoEspecial = 0f;
+        ResetearGolpesParaEstado();
+        DebugEstado($"[Sleep] '{gameObject.name}' dormido por {DURACION_SLEEP}s.");
+        return true;
+    }
+
+    /// <summary>
+    /// Intenta aplicar CONFUSED. Devuelve true si se aplicó.
+    /// </summary>
+    public bool AplicarConfused()
+    {
+        if (!puedeSerAfectadoconfuso)
+        {
+            DebugEstado($"[Confused] '{gameObject.name}' es inmune → ignorado.");
+            return false;
+        }
+        if (currentHealth <= 0) return false;
+
+        estadoEspecial = EstadoEspecial.Confused;
+        timerEstadoEspecial = 0f;
+        ResetearGolpesParaEstado();
+        DebugEstado($"[Confused] '{gameObject.name}' confuso por {DURACION_CONFUSED}s.");
+        return true;
+    }
+
+    public EstadoEspecial GetEstadoEspecial()
+    {
+        return estadoEspecial;
+    }
+
+    public bool EstaDormido()
+    {
+        return estadoEspecial == EstadoEspecial.Sleep;
+    }
+
+    public bool EstaConfuso()
+    {
+        return estadoEspecial == EstadoEspecial.Confused;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // ESTADOS SLEEP / CONFUSED — PROCESAMIENTO
+    // ══════════════════════════════════════════════════════════
+
+    void ProcesarEstadoEspecial()
+    {
+        if (estadoEspecial == EstadoEspecial.None) return;
+
+        timerEstadoEspecial += Time.deltaTime;
+
+        if (estadoEspecial == EstadoEspecial.Sleep && timerEstadoEspecial >= DURACION_SLEEP)
+        {
+            DebugEstado($"[Sleep] '{gameObject.name}' despertó tras {DURACION_SLEEP}s.");
+            LimpiarEstadoEspecial();
+        }
+        else if (estadoEspecial == EstadoEspecial.Confused && timerEstadoEspecial >= DURACION_CONFUSED)
+        {
+            DebugEstado($"[Confused] '{gameObject.name}' se recuperó tras {DURACION_CONFUSED}s.");
+            LimpiarEstadoEspecial();
+        }
+    }
+
+    void LimpiarEstadoEspecial()
+    {
+        estadoEspecial = EstadoEspecial.None;
+        timerEstadoEspecial = 0f;
+        ResetearGolpesParaEstado();
     }
 
     // ══════════════════════════════════════════════════════════
@@ -253,7 +393,6 @@ public class Damageable : MonoBehaviour
 
     public void AvanzarCooldown()
     {
-        // Acumula tiempo entre frames igual que un timer en C++.
         if (tiempoDesdeUltimoGolpe < cooldownEntreGolpes)
             tiempoDesdeUltimoGolpe += Time.deltaTime;
     }
@@ -279,7 +418,6 @@ public class Damageable : MonoBehaviour
 
     // ══════════════════════════════════════════════════════════
     // EFECTOS DE ESTADO
-    // En C++: switch(damageType) { case POISON: ... }
     // ══════════════════════════════════════════════════════════
 
     void ProcesarEfectoDeEstado(DamageType tipo)
@@ -298,7 +436,6 @@ public class Damageable : MonoBehaviour
             case DamageType.Red:
             case DamageType.Blue:
             case DamageType.Gray:
-                // Sin efecto de estado adicional.
                 break;
 
             default:
@@ -381,8 +518,7 @@ public class Damageable : MonoBehaviour
     }
 
     // ══════════════════════════════════════════════════════════
-    // DAÑO DIRECTO — única función que baja currentHealth
-    // En C++: enemy.vida -= cantidad;
+    // DAÑO DIRECTO
     // ══════════════════════════════════════════════════════════
 
     void AplicarDanioDirecto(int cantidad)
@@ -391,6 +527,7 @@ public class Damageable : MonoBehaviour
         if (currentHealth <= 0)
         {
             currentHealth = 0;
+            LimpiarEstadoEspecial();
             Morir();
         }
     }
@@ -457,9 +594,7 @@ public class Damageable : MonoBehaviour
     }
 
     // ══════════════════════════════════════════════════════════
-    // HELPERS DE DEBUG — encapsulados por categoría
-    // El alumnado no necesita saber cómo funcionan por dentro.
-    // Cambiar el switch de LOG_* es suficiente para activarlos.
+    // HELPERS DE DEBUG
     // ══════════════════════════════════════════════════════════
 
     void DebugInit     (string msg) { if (LOG_INIT)     Debug.Log(msg); }
@@ -468,9 +603,8 @@ public class Damageable : MonoBehaviour
     void DebugVeneno   (string msg) { if (LOG_VENENO)   Debug.Log(msg); }
     void DebugSangrado (string msg) { if (LOG_SANGRADO) Debug.Log(msg); }
     public void DebugMuerte   (string msg) { if (LOG_MUERTE)   Debug.Log(msg); }
+    void DebugEstado   (string msg) { if (LOG_ESTADO)   Debug.Log(msg); }
 
-    // Convierte cualquier array a string legible para los logs.
-    // En C++: template<typename T> std::string formatArray(T* arr, int size)
     string FormatArray<T>(T[] arr)
     {
         if (arr == null || arr.Length == 0) return "cualquiera";

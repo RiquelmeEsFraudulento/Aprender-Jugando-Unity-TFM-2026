@@ -16,6 +16,14 @@ public class WeaponHitbox : MonoBehaviour
     // One hit per enemy per swing
     HashSet<Damageable> alreadyHit = new HashSet<Damageable>();
 
+    // ── Referencia al jugador para leer el estado seleccionado ─
+    private SimpleWalk playerCombat;
+
+    void Awake()
+    {
+        if (playerCombat == null)
+            playerCombat = FindAnyObjectByType<SimpleWalk>();
+    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -27,25 +35,72 @@ public class WeaponHitbox : MonoBehaviour
         Damageable damageable = other.GetComponentInParent<Damageable>();
         if (damageable == null)
             return;
-        Debug.Log("EO");
+
         // Prevent double hits on same enemy during this swing
         if (!alreadyHit.Add(damageable))
             return;
 
         // Check if this enemy accepts THIS color + THIS weapon tag
-        string weaponTag = gameObject.tag; // e.g. Kick, Rapier, LightSaber
+        string weaponTag = gameObject.tag;
         if (!damageable.CanBeDamagedBy(damageType, weaponTag))
             return;
 
         // Finally apply damage
         GameObject source = ownerRoot != null ? ownerRoot.gameObject : gameObject;
-        Debug.Log("EO2");
-
         damageable.TakeDamage(damage, damageType, source);
+
+        // ── Acumular golpe para estado especial ──────────────
+        ProcesarEstadoEspecial(damageable);
     }
 
-    public void Reactivar(){
+    // ══════════════════════════════════════════════════════════
+    // ESTADO ESPECIAL — Acumular golpes y aplicar si llega a 8
+    // ══════════════════════════════════════════════════════════
+
+    void ProcesarEstadoEspecial(Damageable damageable)
+    {
+        if (playerCombat == null)
+            playerCombat = FindAnyObjectByType<SimpleWalk>();
+
+        Damageable.EstadoEspecial estadoSeleccionado = playerCombat.GetEstadoSeleccionado();
+
+        if (estadoSeleccionado == Damageable.EstadoEspecial.None)
+            return;
+
+        if (damageable.GetEstadoEspecial() != Damageable.EstadoEspecial.None)
+            return;
+
+        bool alcanzoUmbral = damageable.RegistrarGolpeParaEstado();
+
+        if (alcanzoUmbral)
+        {
+            switch (estadoSeleccionado)
+            {
+                case Damageable.EstadoEspecial.Sleep:
+                    if (damageable.AplicarSleep())
+                    {
+                        EnemyScript enemy = damageable.GetComponent<EnemyScript>();
+                        if (enemy != null)
+                            enemy.ActivarSleep();
+                        Debug.Log($"[WeaponHitbox] SLEEP aplicado a '{damageable.name}' tras 8 golpes.");
+                    }
+                    break;
+
+                case Damageable.EstadoEspecial.Confused:
+                    if (damageable.AplicarConfused())
+                    {
+                        EnemyScript enemy = damageable.GetComponent<EnemyScript>();
+                        if (enemy != null)
+                            enemy.ActivarConfused();
+                        Debug.Log($"[WeaponHitbox] CONFUSED aplicado a '{damageable.name}' tras 8 golpes.");
+                    }
+                    break;
+            }
+        }
+    }
+
+    public void Reactivar()
+    {
         alreadyHit.Clear();
     }
-
 }
