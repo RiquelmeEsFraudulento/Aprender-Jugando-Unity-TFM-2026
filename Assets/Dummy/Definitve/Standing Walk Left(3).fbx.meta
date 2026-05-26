@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f6a84e4985bd45b4896576145839351f
+guid: 5e494a6a076a5914a9974a572a5a53cb
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,11 +31,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: DummyCorrer
+      name: DummyLeft
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 52
+      lastFrame: 73
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

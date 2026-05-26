@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6dac62ec0e6a0c940b3e9a1ce4c77d8a
+guid: d902c66f4de8dce4b951d12dba8c0185
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,18 +31,18 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: DummyAndarIzquierda
+      name: DummyRight
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 73
+      lastFrame: 76
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 0
       loopBlendPositionY: 0

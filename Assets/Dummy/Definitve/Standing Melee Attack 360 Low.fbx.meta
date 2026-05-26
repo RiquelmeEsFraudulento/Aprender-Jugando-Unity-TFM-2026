@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f2a630a184cab8647bf28891a5abc2cc
+guid: 48b90dc266d0265488c38a3a07072fb2
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,11 +31,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: DummyAndarDerecha
+      name: Dummy360Attack
       takeName: mixamo.com
       internalID: -203655887218126122
       firstFrame: 0
-      lastFrame: 76
+      lastFrame: 149
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

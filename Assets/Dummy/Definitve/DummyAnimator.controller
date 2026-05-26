@@ -8,7 +8,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Punch
-  m_Speed: 0.8
+  m_Speed: 1.52
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -1595617088808446364}
@@ -21,7 +21,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: d3fa9b1edbca5a14ebfbc9e97ba1c9d3, type: 2}
+  m_Motion: {fileID: 7400000, guid: 923f0bea08919914d82d8bda8f1aa72a, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -75,7 +75,7 @@ BlendTree:
   m_Name: Blend Tree
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: -203655887218126122, guid: 8305c371d2189fc4887e79734d4eeea9, type: 3}
+    m_Motion: {fileID: -203655887218126122, guid: c97fb9b99621f19478f037e985c9b43b, type: 3}
     m_Threshold: -0.25
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1.5
@@ -91,7 +91,7 @@ BlendTree:
     m_DirectBlendParameter: Blend
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -203655887218126122, guid: defb75c12e2d1b540bbdf5aee1696072, type: 3}
+    m_Motion: {fileID: -203655887218126122, guid: 29b3df1b5b2f2a245a95a3f97ce0d752, type: 3}
     m_Threshold: 0.31666672
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -424,16 +424,16 @@ BlendTree:
   m_Name: Blend Tree
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: -203655887218126122, guid: 6dac62ec0e6a0c940b3e9a1ce4c77d8a, type: 3}
-    m_Threshold: -1.3938355
+    m_Motion: {fileID: -203655887218126122, guid: c7a59184b4b1473438fa9180b0951fec, type: 3}
+    m_Threshold: -1.4003894
     m_Position: {x: -1, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: InputMagnitude
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -203655887218126122, guid: f2a630a184cab8647bf28891a5abc2cc, type: 3}
-    m_Threshold: 1
+    m_Motion: {fileID: -203655887218126122, guid: 7ac0641027f9ab345a8a2b8d04c985ff, type: 3}
+    m_Threshold: 1.0032703
     m_Position: {x: 1, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
@@ -441,8 +441,8 @@ BlendTree:
     m_Mirror: 0
   m_BlendParameter: StrafeDirection
   m_BlendParameterY: RetreatAmount
-  m_MinThreshold: -1.3938355
-  m_MaxThreshold: 1
+  m_MinThreshold: -1.4003894
+  m_MaxThreshold: 1.0032703
   m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0
