@@ -148459,14 +148459,14 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.96666664
+  - time: 0.9166667
     functionName: EnableRapierHitbox
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 1.15
+  - time: 1.3833333
     functionName: DisableRapierHitbox
     data: 
     objectReferenceParameter: {fileID: 0}

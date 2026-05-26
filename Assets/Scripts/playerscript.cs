@@ -33,7 +33,7 @@ public class SimpleWalk : MonoBehaviour
 
     public float kickRange       = 0.3f;   // Patadas: TrCrescent, TrChut
     public float lightSaberRange = 4f;     // LightSaber: TrSwSwing, TrSw360
-    public float rapierRange     = 1.2f;   // Rapier: TrRaSwing, TrRa360
+    public float rapierRange     = 1f;   // Rapier: TrRaSwing, TrRa360
 
     /// <summary>The enemy currently locked onto. Null when unlocked.</summary>
     private Transform lockedEnemy;
@@ -64,7 +64,7 @@ public class SimpleWalk : MonoBehaviour
     // COMBAT — Settings (equivalente a CombatScript)
     // ══════════════════════════════════════════════════════════
     [Header("Combat Settings")]
-    [SerializeField] private float attackCooldown = 0.6f;
+    [SerializeField] private float attackCooldown = 1.3f;
 
     [Header("Combat State")]
     public Vector2 moveAxis;
@@ -256,16 +256,31 @@ public class SimpleWalk : MonoBehaviour
 
         animator.SetBool("isWalking", moveDirection.magnitude > 0f && !isAttackingEnemy);
 
+        
+
+        /*
         // ── Tus ataques originales ────────────────────────────
         if (Input.GetKeyDown(KeyCode.B))      StartCoroutine(DanceSpin());
         if (Input.GetKeyDown(KeyCode.J))      StartCoroutine(JumpCountdown());
-        if (Input.GetKeyDown(KeyCode.M))      StartCoroutine(Crescent());
-        if (Input.GetKeyDown(KeyCode.K))      StartCoroutine(Chut());
+        if (Input.GetKeyDown(KeyCode.C))      StartCoroutine(Crescent());
+        if (Input.GetKeyDown(KeyCode.X))      StartCoroutine(Chut());
         if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();   // ← ahora lanza AttackCheck
         if (Input.GetKeyDown(KeyCode.Mouse1)) StartCoroutine(SwSwing());
         if (Input.GetKeyDown(KeyCode.R))      StartCoroutine(Ra360());
         if (Input.GetKeyDown(KeyCode.F))      StartCoroutine(Sw360());
+        if (Input.GetKeyDown(KeyCode.Z))      StartCoroutine(RaSwing());
         if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();  // ← ahora lanza CounterCheck
+        */
+
+        if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();   // ← ahora lanza AttackCheck
+        if (Input.GetKeyDown(KeyCode.Mouse1)) AttackCheckWithSpecified("TrSwSwing");
+        if (Input.GetKeyDown(KeyCode.R))      AttackCheckWithSpecified("TrRa360");
+        if (Input.GetKeyDown(KeyCode.F))      AttackCheckWithSpecified("TrSw360");
+        if (Input.GetKeyDown(KeyCode.Z))      AttackCheckWithSpecified("TrRaSwing");
+        if (Input.GetKeyDown(KeyCode.C))      AttackCheckWithSpecified("TrCrescent");
+        if (Input.GetKeyDown(KeyCode.X))      AttackCheckWithSpecified("TrChut");
+        if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();  // ← ahora lanza CounterCheck
+
     }
 
 
@@ -350,7 +365,35 @@ public class SimpleWalk : MonoBehaviour
         Attack(lockedTarget, distance);
     }
 
+    void AttackCheckWithSpecified(string attackTrigger)
+    {
+        if (isAttackingEnemy) return;
 
+        // ---- Target selection (identical to AttackCheck) ----
+        if (enemyDetection.CurrentTarget() == null)
+        {
+            if (enemyManager.AliveEnemyCount() == 0)
+            {
+                // No enemies: still play the animation without a target
+                AttackType(attackTrigger, 1.3f, null, 0);
+                return;
+            }
+            else
+            {
+                lockedTarget = enemyManager.RandomEnemy();
+            }
+        }
+
+        if (enemyDetection.InputMagnitude() > .2f)
+            lockedTarget = enemyDetection.CurrentTarget();
+
+        if (lockedTarget == null)
+            lockedTarget = enemyManager.RandomEnemy();
+
+        // ---- Force the specified attack, ignoring distance ----
+        // 1.3f = animation length, 0.65f = movement duration (lunge toward enemy)
+        AttackType(attackTrigger, 1.3f, lockedTarget, 0.65f);
+    }
 
     // ══════════════════════════════════════════════════════════
     // COMBAT — Attack (selección de ataque según distancia y tipo)
@@ -499,9 +542,9 @@ public class SimpleWalk : MonoBehaviour
             return;
         }
 
-        float duration = .2f;
+        float duration = .6f;
         animator.SetTrigger("Dodge");
-        transform.DOLookAt(lockedTarget.transform.position, .2f);
+        transform.DOLookAt(lockedTarget.transform.position, .6f);
         transform.DOMove(transform.position + lockedTarget.transform.forward, duration);
 
         if (counterCoroutine != null) StopCoroutine(counterCoroutine);
@@ -697,9 +740,9 @@ public class SimpleWalk : MonoBehaviour
     IEnumerator Ra360()    { isAttackingEnemy = true; animator.SetTrigger("TrRa360");   yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator Sw360()    { isAttackingEnemy = true; animator.SetTrigger("TrSw360");   yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator SwSwing()  { isAttackingEnemy = true; animator.SetTrigger("TrSwSwing"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
+    IEnumerator RaSwing()  { isAttackingEnemy = true; animator.SetTrigger("TrRaSwing"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator Crescent()  { isAttackingEnemy = true; animator.SetTrigger("TrCrescent"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator Chut()     { isAttackingEnemy = true; animator.SetTrigger("TrChut");    yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
-
     // ══════════════════════════════════════════════════════════
     // HITBOXES — llamadas desde Animation Events
     // ══════════════════════════════════════════════════════════
