@@ -3634,6 +3634,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 9100000, guid: d8038bf5bbbbc794b881a8a843f47a57, type: 2}
     - target: {fileID: 5866666021909216657, guid: c47cc1c30fbca7e4d8845c0fc5e17ca5, type: 3}
+      propertyPath: m_UpdateMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: c47cc1c30fbca7e4d8845c0fc5e17ca5, type: 3}
       propertyPath: m_CullingMode
       value: 1
       objectReference: {fileID: 0}
@@ -7843,6 +7847,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
+  forwardSpeed: 2
+  backwardSpeed: 1.3
+  strafeSpeed: 1.5
   animator: {fileID: 1966723363}
   detectionRadius: 8
   rotationThreshold: 2

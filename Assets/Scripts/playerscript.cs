@@ -14,6 +14,10 @@ public class SimpleWalk : MonoBehaviour
     public float speed = 2f;
     public Animator animator;
 
+    [Header("Walk Animation Regulation")]
+    [Tooltip("Multiplier for the walking animation speed. Set to 0.25 if you previously needed x4 speed.")]
+    public float walkAnimationSpeed = 0.25f;   // <--- NEW
+
     private CharacterController controller;
     private Vector3 moveDirection;
 
@@ -86,8 +90,6 @@ public class SimpleWalk : MonoBehaviour
     public UnityEvent<EnemyScript> OnCounterAttack;
     public UnityEvent<EnemyScript> OnTrajectory;
 
-
-    
     [Header("Estado especial seleccionado")]
     [Tooltip("7 = Sleep, 8 = Confused, 9 = None. Los hitboxes aplican este estado al llegar a 8 golpes.")]
     public Damageable.EstadoEspecial estadoSeleccionado = Damageable.EstadoEspecial.None;
@@ -166,7 +168,7 @@ public class SimpleWalk : MonoBehaviour
         // ── Scroll para cambiar objetivo (cuando estamos fijados) ─────
         if (isLockedOn && Mathf.Abs(Input.mouseScrollDelta.y) > 0.1f)
         {
-            int direction = Input.mouseScrollDelta.y > 0 ? 1 : -1; // arriba=1 (derecha), abajo=-1 (izquierda)
+            int direction = Input.mouseScrollDelta.y > 0 ? 1 : -1;
             CycleLockTarget(direction);
         }
 
@@ -174,11 +176,11 @@ public class SimpleWalk : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                CycleLockTarget(1);  // E = siguiente objetivo (derecha)
+                CycleLockTarget(1);
             }
             else if (Input.GetKeyDown(KeyCode.Q))
             {
-                CycleLockTarget(-1); // Q = objetivo anterior (izquierda)
+                CycleLockTarget(-1);
             }
         }
 
@@ -238,6 +240,19 @@ public class SimpleWalk : MonoBehaviour
             }
         }
 
+        // ══════════════════════════════════════════════════════════
+        // BLEND TREE DRIVING (2D Freeform Directional)
+        // ══════════════════════════════════════════════════════════
+        Vector3 localMove = transform.InverseTransformDirection(moveDirection);
+
+        animator.SetFloat("VelocityX", localMove.x, 0.1f, Time.deltaTime);
+        animator.SetFloat("VelocityY", localMove.z, 0.1f, Time.deltaTime);
+
+        // --- NEW: Set the walk animation speed to compensate for the x4 multiplier ---
+        animator.SetFloat("WalkAnimSpeed", walkAnimationSpeed);   // <--- drives clip speed in Blend Tree
+
+        animator.SetBool("isWalking", moveDirection.magnitude > 0f && !isAttackingEnemy);
+
         if (Input.GetKeyDown(KeyCode.Alpha7))
         {
             estadoSeleccionado = Damageable.EstadoEspecial.Sleep;
@@ -264,29 +279,28 @@ public class SimpleWalk : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.J))      StartCoroutine(JumpCountdown());
         if (Input.GetKeyDown(KeyCode.C))      StartCoroutine(Crescent());
         if (Input.GetKeyDown(KeyCode.X))      StartCoroutine(Chut());
-        if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();   // ← ahora lanza AttackCheck
+        if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();
         if (Input.GetKeyDown(KeyCode.Mouse1)) StartCoroutine(SwSwing());
         if (Input.GetKeyDown(KeyCode.R))      StartCoroutine(Ra360());
         if (Input.GetKeyDown(KeyCode.F))      StartCoroutine(Sw360());
         if (Input.GetKeyDown(KeyCode.Z))      StartCoroutine(RaSwing());
-        if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();  // ← ahora lanza CounterCheck
+        if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();
         */
 
-        if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();   // ← ahora lanza AttackCheck
+        if (Input.GetKeyDown(KeyCode.Mouse0)) AttackCheck();
         if (Input.GetKeyDown(KeyCode.Mouse1)) AttackCheckWithSpecified("TrSwSwing");
         if (Input.GetKeyDown(KeyCode.R))      AttackCheckWithSpecified("TrRa360");
         if (Input.GetKeyDown(KeyCode.F))      AttackCheckWithSpecified("TrSw360");
         if (Input.GetKeyDown(KeyCode.Z))      AttackCheckWithSpecified("TrRaSwing");
         if (Input.GetKeyDown(KeyCode.C))      AttackCheckWithSpecified("TrCrescent");
         if (Input.GetKeyDown(KeyCode.X))      AttackCheckWithSpecified("TrChut");
-        if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();  // ← ahora lanza CounterCheck
-
+        if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();
     }
 
 
     /// <summary>
-/// Cambia el enemigo fijado al más cercano a la derecha (direction=1) o izquierda (-1).
-/// </summary>
+    /// Cambia el enemigo fijado al más cercano a la derecha (direction=1) o izquierda (-1).
+    /// </summary>
     void CycleLockTarget(int direction)
     {
         if (lockedEnemy == null) return;
@@ -397,8 +411,7 @@ public class SimpleWalk : MonoBehaviour
 
     // ══════════════════════════════════════════════════════════
     // COMBAT — Attack (selección de ataque según distancia y tipo)
-// ───────────────────────────────────────────────────────────────────────────
-
+    // ───────────────────────────────────────────────────────────────────────────
     public void Attack(EnemyScript target, float distance)
     {
         attackslong  = new string[] { "TrRaSwing", "TrSwSwing", "TrRa360", "TrSw360" };
@@ -524,7 +537,7 @@ public class SimpleWalk : MonoBehaviour
             return;
 
         lockedTarget = ClosestCounterEnemy();
-        if (lockedTarget == null) return;   // ← important
+        if (lockedTarget == null) return;
 
             // ───── NUEVO: activar lock-on hacia el enemigo que contraatacamos ─────
         lockedEnemy = lockedTarget.transform;
@@ -607,7 +620,7 @@ public class SimpleWalk : MonoBehaviour
     float TargetDistance(EnemyScript target)
     {
         if (target == null) 
-            return float.MaxValue;  // or some large distance, or handle differently
+            return float.MaxValue;
         return Vector3.Distance(transform.position, target.transform.position);
     }
     public Vector3 TargetOffset(Transform target)
@@ -696,7 +709,7 @@ public class SimpleWalk : MonoBehaviour
         isLockedOn  = false;
         lockedEnemy = null;
         transform.DOKill();
-        manualUnlock = true;   // evita que se auto‑enganche
+        manualUnlock = true;
     }
 
     // ══════════════════════════════════════════════════════════
@@ -722,16 +735,6 @@ public class SimpleWalk : MonoBehaviour
         controller.Move(Vector3.up * 2f);
     }
 
-
-    // ══════════════════════════════════════════════════════════
-    // ESTADOS SLEEP / CONFUSED — Debug keys 7 / 8 / 9
-    // ══════════════════════════════════════════════════════════
-
-    /// <summary>
-    /// Aplica un estado especial al enemigo actualmente locked-on.
-    /// Teclas: 7 = Sleep, 8 = Confused.
-    /// </summary>
-
     public Damageable.EstadoEspecial GetEstadoSeleccionado()
     {
         return estadoSeleccionado;
@@ -743,6 +746,7 @@ public class SimpleWalk : MonoBehaviour
     IEnumerator RaSwing()  { isAttackingEnemy = true; animator.SetTrigger("TrRaSwing"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator Crescent()  { isAttackingEnemy = true; animator.SetTrigger("TrCrescent"); yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
     IEnumerator Chut()     { isAttackingEnemy = true; animator.SetTrigger("TrChut");    yield return new WaitForSeconds(1.3f); isAttackingEnemy = false; }
+
     // ══════════════════════════════════════════════════════════
     // HITBOXES — llamadas desde Animation Events
     // ══════════════════════════════════════════════════════════
