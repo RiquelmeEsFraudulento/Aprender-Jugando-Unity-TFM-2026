@@ -42,6 +42,7 @@ public class EnemyScript : Damageable
     public UnityEvent<EnemyScript> OnRetreat;
     public int   danyoAtaque        = 10;
     public float XPEarned = 5f;
+    [SerializeField] public EnemyHitbox enemyHitbox;
 
     private const bool LOG_IA = true;
 
@@ -453,6 +454,8 @@ public class EnemyScript : Damageable
         }
     }
 
+    // In EnemyScript.cs — replace the Attack() and HitEvent() methods
+
     private void Attack()
     {
         // ── No atacar si está dormido o confuso ────────────────
@@ -476,14 +479,30 @@ public class EnemyScript : Damageable
             return;
         }
 
-        if (!playerCombat.isCountering && !playerCombat.isAttackingEnemy)
+        // Find the hitbox and trigger its logic via distance check as fallback
+        EnemyHitbox hitbox = GetComponentInChildren<EnemyHitbox>();
+        if (hitbox != null)
         {
-            GolpearNinja(playerCombat.GetComponent<PlayerHealth>());
-            playerCombat.RecibirDanyo();
+            // Fallback: if hitbox captured nothing, check distance directly
+            SimpleWalk playerCombat = FindAnyObjectByType<SimpleWalk>();
+            if (playerCombat != null)
+            {
+                float dist = Vector3.Distance(transform.position, playerCombat.transform.position);
+                if (dist < 2.5f && !playerCombat.isCountering && !playerCombat.isAttackingEnemy)
+                {
+                    GolpearNinja(playerCombat.GetComponent<PlayerHealth>());
+                    playerCombat.RecibirDanyo();
+                }
+            }
         }
 
         PrepareAttack(false);
     }
+
+
+    public void EnableHitbox()     {enemyHitbox.OpenHitboxWindow(); }
+    public void DisableHitbox()     {enemyHitbox.CloseHitboxWindow(); }
+
 
     public void StopMoving()
     {
