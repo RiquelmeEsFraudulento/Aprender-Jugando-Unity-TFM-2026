@@ -32,6 +32,20 @@ public class SimpleWalk : MonoBehaviour
     [Tooltip("Minimum angle difference (degrees) before re-triggering DOTween rotation.")]
     public float rotationThreshold = 2f;
 
+    
+    // Add at the top of the class with other declarations (around line ~35):
+    [Header("Lock-On UI")]
+    public GameObject lockOnPrefab;          // Assign a prefab with a World Canvas in the Inspector
+    public float lockOnHeightOffset    = 2f;  // How far above the enemy's origin the indicator floats
+    public float lockOnSmoothTime      = 0.1f;
+
+    private GameObject   lockOnInstance;
+    private Transform    lockOnTransform;
+    private Camera       lockOnCamera;
+    private Vector3      lockOnVelocity;     // SmoothDamp velocity placeholder
+    
+    
+    
     [Tooltip("DOTween rotation duration in seconds.")]
     public float rotationDuration = 0.15f;
 
@@ -295,6 +309,11 @@ public class SimpleWalk : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C))      AttackCheckWithSpecified("TrCrescent");
         if (Input.GetKeyDown(KeyCode.X))      AttackCheckWithSpecified("TrChut");
         if (Input.GetKeyDown(KeyCode.Space))  CounterCheck();
+    }
+
+    void LateUpdate()
+    {
+        UpdateLockOnIndicator();
     }
 
 
@@ -696,20 +715,80 @@ public class SimpleWalk : MonoBehaviour
             transform.DOKill();
             transform
                 .DOLookAt(lockedEnemy.position, rotationDuration,
-                          AxisConstraint.Y, Vector3.up)
+                        AxisConstraint.Y, Vector3.up)
                 .SetEase(Ease.OutSine);
+
+            // ── Create the lock-on indicator on a World Canvas ──
+            CreateLockOnIndicator(lockedEnemy);
         }
+    }
+
+    /// <summary>
+    /// Instantiates a World Canvas prefab as a child of the locked enemy.
+    /// The Billboard script inside the prefab makes it always face the camera.
+    /// </summary>
+    void CreateLockOnIndicator(Transform target)
+    {
+        if (lockOnPrefab == null)
+        {
+            Debug.LogWarning("[Lock-On] lockOnPrefab is not assigned in the Inspector.");
+            return;
+        }
+
+        // Remove any previous indicator
+        if (lockOnInstance != null)
+            Destroy(lockOnInstance);
+
+        // Calculate spawn position: above the target
+        Vector3 spawnPos = target.position + Vector3.up * lockOnHeightOffset;
+
+        lockOnInstance  = Instantiate(lockOnPrefab, spawnPos, Quaternion.identity);
+        lockOnTransform = lockOnInstance.transform;
+
+        if (lockOnCamera == null)
+            lockOnCamera = Camera.main;
+    }
+
+    /// <summary>
+    /// Call from LateUpdate to follow and face the camera. Add to LateUpdate().
+    /// </summary>
+    void UpdateLockOnIndicator()
+    {
+        if (!isLockedOn || lockOnInstance == null || lockedEnemy == null)
+            return;
+
+        // Follow the locked enemy smoothly
+        Vector3 targetPos = lockedEnemy.position + Vector3.up * lockOnHeightOffset;
+        lockOnTransform.position = Vector3.SmoothDamp(
+            lockOnTransform.position,
+            targetPos,
+            ref lockOnVelocity,
+            lockOnSmoothTime
+        );
+
+        // Billboard: face the camera
+        if (lockOnCamera != null)
+            lockOnTransform.forward = lockOnCamera.transform.forward;
     }
 
     /// <summary>
     /// Releases the current lock-on target and kills any running rotation tween.
     /// </summary>
+    // Replace UnlockTarget() with this updated version:
     void UnlockTarget()
     {
         isLockedOn  = false;
         lockedEnemy = null;
         transform.DOKill();
         manualUnlock = true;
+
+        // ── Destroy the lock-on indicator ──
+        if (lockOnInstance != null)
+        {
+            Destroy(lockOnInstance);
+            lockOnInstance  = null;
+            lockOnTransform = null;
+        }
     }
 
     // ══════════════════════════════════════════════════════════
