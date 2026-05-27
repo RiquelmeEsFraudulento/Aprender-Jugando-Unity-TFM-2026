@@ -423,22 +423,23 @@ public class PlayerHUDController : MonoBehaviour
     //  SECTION 13 — VISUAL ELEMENT CACHING
     // ═══════════════════════════════════════════════════════════════════
 
+
     private void CacheVisualElements()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
 
-        _healthFill = root.Q<VisualElement>("health-fill");
-        _xpFill = root.Q<VisualElement>("xp-fill");
-        _levelLabel = root.Q<Label>("level-label");
+        _healthFill  = root.Q<VisualElement>("health-fill");
+        _xpFill      = root.Q<VisualElement>("xp-fill");
+        _levelLabel  = root.Q<Label>("level-label");
         _stateCircle = root.Q<VisualElement>("state-circle");
-        _lootPopup = root.Q<VisualElement>("loot-popup");
-        _lootLabel = root.Q<Label>("loot-label");
+        _lootPopup   = root.Q<VisualElement>("loot-popup");
+        _lootLabel   = root.Q<Label>("loot-label");
 
-        _slots = new VisualElement[SLOT_COUNT];
+        _slots  = new VisualElement[SLOT_COUNT];
         _labels = new Label[SLOT_COUNT];
         for (int i = 0; i < SLOT_COUNT; i++)
         {
-            _slots[i] = root.Q<VisualElement>(_slotVENames[i]);
+            _slots[i]  = root.Q<VisualElement>(_slotVENames[i]);
             _labels[i] = root.Q<Label>(_labelVENames[i]);
         }
     }

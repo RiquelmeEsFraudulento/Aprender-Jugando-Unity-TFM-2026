@@ -7,62 +7,65 @@
 
     <Style src="PlayerHUD.uss" />
 
-    <!-- Root: everything stacked vertically, anchored top-left -->
     <ui:VisualElement name="hud-root" class="hud-root">
 
-        <!-- ── HEALTH BAR ── -->
-        <ui:VisualElement name="health-container" class="bar-container bar-big">
-            <ui:VisualElement name="health-fill" class="bar-fill health-fill" />
-        </ui:VisualElement>
+        <!-- ═══ SINGLE MERGED PANEL ═══ -->
+        <ui:VisualElement name="hud-panel" class="hud-panel">
 
-        <!-- ── XP BAR ── -->
-        <ui:VisualElement name="xp-container" class="bar-container bar-medium">
-            <ui:VisualElement name="xp-fill" class="bar-fill xp-fill" />
-        </ui:VisualElement>
+            <!-- ── TOP ROW: Level + State + Items ── -->
+            <ui:VisualElement name="top-row" class="top-row">
 
-        <!-- ── BOTTOM ROW: level + state circle + item wheel ── -->
-        <ui:VisualElement name="bottom-row" class="bottom-row">
-
-            <!-- Level box -->
-            <ui:VisualElement name="level-box" class="level-box">
-                <ui:Label name="level-label" text="1" class="level-label" />
-            </ui:VisualElement>
-
-            <!-- State circle -->
-            <ui:VisualElement name="state-circle" class="state-circle state-none" />
-
-            <!-- ── ITEM SELECTOR WHEEL ── -->
-            <ui:VisualElement name="items-row" class="items-row">
-
-                <!-- Slot 0: Life Steal -->
-                <ui:VisualElement name="slot-lifesteal" class="item-slot slot-lifesteal slot-inactive">
-                    <ui:VisualElement name="icon-lifesteal"  class="item-icon" />
-                    <ui:Label         name="label-lifesteal" text="5" class="item-counter" />
+                <!-- Level badge -->
+                <ui:VisualElement name="level-box" class="level-box">
+                    <ui:Label name="level-label" text="1" class="level-label" />
                 </ui:VisualElement>
 
-                <!-- Slot 1: Potion -->
-                <ui:VisualElement name="slot-potion" class="item-slot slot-potion slot-inactive">
-                    <ui:VisualElement name="icon-potion"  class="item-icon" />
-                    <ui:Label         name="label-potion" text="5" class="item-counter" />
-                </ui:VisualElement>
+                <!-- State circle -->
+                <ui:VisualElement name="state-circle" class="state-circle state-none" />
 
-                <!-- Slot 2: Life Stone -->
-                <ui:VisualElement name="slot-lifestone" class="item-slot slot-lifestone slot-inactive">
-                    <ui:VisualElement name="icon-lifestone"  class="item-icon" />
-                    <ui:Label         name="label-lifestone" text="1" class="item-counter" />
-                </ui:VisualElement>
+                <!-- Item slots -->
+                <ui:VisualElement name="items-row" class="items-row">
 
-                <!-- Slot 3: Chaos -->
-                <ui:VisualElement name="slot-chaos" class="item-slot slot-chaos slot-inactive">
-                    <ui:VisualElement name="icon-chaos"  class="item-icon" />
-                    <ui:Label         name="label-chaos" text="0" class="item-counter" />
+                    <ui:VisualElement name="slot-lifesteal" class="item-slot slot-lifesteal slot-inactive">
+                        <ui:VisualElement name="icon-lifesteal" class="item-icon" />
+                        <ui:Label name="label-lifesteal" text="5" class="item-counter" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="slot-potion" class="item-slot slot-potion slot-inactive">
+                        <ui:VisualElement name="icon-potion" class="item-icon" />
+                        <ui:Label name="label-potion" text="5" class="item-counter" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="slot-lifestone" class="item-slot slot-lifestone slot-inactive">
+                        <ui:VisualElement name="icon-lifestone" class="item-icon" />
+                        <ui:Label name="label-lifestone" text="1" class="item-counter" />
+                    </ui:VisualElement>
+
+                    <ui:VisualElement name="slot-chaos" class="item-slot slot-chaos slot-inactive">
+                        <ui:VisualElement name="icon-chaos" class="item-icon" />
+                        <ui:Label name="label-chaos" text="0" class="item-counter" />
+                    </ui:VisualElement>
+
                 </ui:VisualElement>
 
             </ui:VisualElement>
 
+            <!-- ── BOTTOM: Bars stacked ── -->
+            <ui:VisualElement name="bars-stack" class="bars-stack">
+
+                <ui:VisualElement name="health-container" class="bar-container bar-health">
+                    <ui:VisualElement name="health-fill" class="bar-fill health-fill" />
+                </ui:VisualElement>
+
+                <ui:VisualElement name="xp-container" class="bar-container bar-xp">
+                    <ui:VisualElement name="xp-fill" class="bar-fill xp-fill" />
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
         </ui:VisualElement>
 
-        <!-- ── LOOT POPUP (shown briefly when loot is received) ── -->
+        <!-- ═══ LOOT POPUP (outside panel, floats) ═══ -->
         <ui:VisualElement name="loot-popup" class="loot-popup loot-hidden">
             <ui:Label name="loot-label" text="" class="loot-label" />
         </ui:VisualElement>

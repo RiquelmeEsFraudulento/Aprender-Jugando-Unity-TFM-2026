@@ -1,8 +1,21 @@
-/* ═══════════════════════════════════════════════════════════════
-   PlayerHUD.uss  v3 — Unity 6 Compatible
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   PlayerHUD.uss  v6 — PREMIUM UNIFIED PANEL
+   ═══════════════════════════════════════════════════════════════════════════
+   
+   Layout:
+   ┌─────────────────────────────────────────────────────┐
+   │ ┌──┐ ┌──┐  ┌────┐┌────┐┌────┐┌────┐               │ ← top-row
+   │ │L1│ │ ◯│  │ 🩸 ││ 🧪 ││ 💎 ││ ☯  │               │
+   │ └──┘ └──┘  │  5 ││  3 ││  1 ││  0 │               │
+   │            └────┘└────┘└────┘└────┘               │
+   │ ████████████████████████████████████░░░░  HP      │ ← bars-stack
+   │ ██████████████████████████░░░░░░░░░░░░  XP        │
+   └─────────────────────────────────────────────────────┘
+   
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Root ── */
+
+/* ── ROOT ── */
 .hud-root {
     position: absolute;
     top: 16px;
@@ -11,114 +24,130 @@
     align-items: flex-start;
 }
 
-/* ══════════════════════════════════════
-   BARS
-   ══════════════════════════════════════ */
-.bar-container {
-    background-color: rgba(20, 20, 20, 0.75);
-    border-radius: 5px;
-    overflow: hidden;
-    margin-bottom: 6px;
+
+/* ═══════════════════════════════════════════════════════════════
+   UNIFIED PANEL — the single glass card
+   ═══════════════════════════════════════════════════════════════ */
+.hud-panel {
+    flex-direction: column;
+    align-items: stretch;
+    background-color: rgba(10, 10, 18, 0.88);
+    border-radius: 14px;
     border-width: 1px;
-    border-color: rgba(255,255,255,0.08);
-}
-.bar-big    { width: 320px; height: 34px; }
-.bar-medium { width: 220px; height: 22px; }
-
-.bar-fill { height: 100%; width: 100%; }
-
-.health-fill {
-    background-color: rgb(210, 35, 35);
-    border-right-width: 2px;
-    border-right-color: rgba(255, 120, 120, 0.6);
-}
-.xp-fill {
-    background-color: rgb(210, 160, 20);
-    border-right-width: 2px;
-    border-right-color: rgba(255, 220, 100, 0.6);
+    border-color: rgba(255, 255, 255, 0.06);
+    padding: 10px 12px 10px 10px;
+    /* Premium border: subtle gradient-like double border effect */
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* ══════════════════════════════════════
-   BOTTOM ROW
-   ══════════════════════════════════════ */
-.bottom-row {
+
+/* ═══════════════════════════════════════════════════════════════
+   TOP ROW — Level + State + Items
+   ═══════════════════════════════════════════════════════════════ */
+.top-row {
     flex-direction: row;
     align-items: center;
-    margin-top: 2px;
+    margin-bottom: 8px;
 }
 
+
+/* ── Level badge ── */
 .level-box {
-    background-color: rgba(20, 20, 20, 0.80);
-    width: 40px;
-    height: 40px;
-    border-radius: 5px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
     justify-content: center;
     align-items: center;
-    margin-right: 8px;
-    border-width: 1px;
-    border-color: rgba(255,255,255,0.10);
+    margin-right: 6px;
+    background-color: rgba(22, 22, 32, 0.92);
+    border-width: 1.5px;
+    border-color: rgba(255, 255, 255, 0.1);
 }
+
 .level-label {
     color: rgb(255, 255, 255);
     -unity-font-style: bold;
-    font-size: 15px;
+    font-size: 16px;
     -unity-text-align: middle-center;
 }
 
-.state-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;
-    margin-right: 10px;
-    border-width: 1.5px;
-    border-color: rgba(255,255,255,0.12);
-}
-.state-none     { background-color: rgba(80, 80, 80, 0.85); }
-.state-sleep    { background-color: rgb(10, 10, 20); }
-.state-confused { background-color: rgb(230, 230, 230); }
 
-/* ══════════════════════════════════════
+/* ── State circle ── */
+.state-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 21px;
+    margin-right: 4px;
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.07);
+}
+
+.state-none     { background-color: rgba(45, 45, 58, 0.92); }
+.state-sleep    { background-color: rgb(6, 6, 28); }
+.state-confused { background-color: rgb(200, 200, 218); }
+
+
+/* ── Thin vertical divider ── */
+.controls-divider {
+    width: 1px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.05);
+    margin-left: 2px;
+    margin-right: 4px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
    ITEM SLOTS
-   ══════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════ */
 .items-row {
     flex-direction: row;
     align-items: center;
 }
 
 .item-slot {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    margin-left: 6px;
-    overflow: visible;
-    border-width: 2px;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
+    overflow: hidden;
+    border-width: 1.5px;
     padding: 0;
-    transition-property: border-color, background-color, scale;
+    position: relative;
+    transition-property: border-color, background-color, scale, opacity;
     transition-duration: 0.15s;
+    /* Default border: nearly invisible */
+    border-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(16, 16, 24, 0.9);
 }
 
-/* Base icon: centered, fills most of slot */
+/* ── Icon zone (top 66%) ── */
 .item-icon {
     position: absolute;
-    left: 6px;
-    top: 6px;
-    width: 36px;
-    height: 36px;
+    left: 5px;
+    top: 3px;
+    width: 42px;
+    height: 30px;
     -unity-background-scale-mode: scale-to-fit;
 }
 
-/* ── COUNTER BADGE ── */
+/* ── Badge zone (bottom 34%) ── */
 .item-counter {
     position: absolute;
-    bottom: 2px;
-    right: 3px;
-    font-size: 10px;
+    bottom: 1px;
+    left: 0;
+    right: 0;
+    height: 14px;
+    font-size: 11px;
     -unity-font-style: bold;
-    -unity-text-align: middle-right;
-    color: rgb(255, 255, 255);
+    -unity-text-align: middle-center;
+    color: rgb(200, 200, 210);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    padding: 0;
+    letter-spacing: 0.3px;
 }
 
-/* ── ITEM ICON BACKGROUND IMAGES ── */
 
 /* Life Steal — red */
 .slot-lifesteal .item-icon {
@@ -140,113 +169,191 @@
     background-image: url("project://database/Assets/OtherFiles/chaos.svg");
 }
 
-/* ══════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
    SLOT STATES
-   ══════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════ */
 
-/* ── INACTIVE ── */
+/* ── INACTIVE: clean, readable, no ugly overlay ── */
 .slot-inactive {
-    background-color: rgba(30, 30, 30, 0.80);
-    border-color: rgba(80, 80, 80, 0.70);
+    background-color: rgba(16, 16, 24, 0.9);
+    border-color: rgba(255, 255, 255, 0.04);
 }
+
 .slot-inactive .item-icon {
-    opacity: 0.4;
+    opacity: 0.5;
 }
+
 .slot-inactive .item-counter {
-    color: rgb(100, 100, 100);
+    color: rgb(120, 120, 135);
+    text-shadow: none;
 }
 
-/* ── SELECTED ── */
+
+/* ── SELECTED: the one the player is pointing at ── */
 .slot-selected {
-    border-color: rgb(240, 240, 240);
-    border-width: 2.5px;
-    background-color: rgba(50, 50, 50, 0.90);
-    scale: 1.12;
+    background-color: rgba(28, 28, 42, 0.95);
+    border-color: rgba(255, 255, 255, 0.7);
+    border-width: 2px;
+    scale: 1.08;
 }
+
 .slot-selected .item-icon {
-    opacity: 0.85;
+    opacity: 1.0;
 }
+
 .slot-selected .item-counter {
-    color: rgb(220, 220, 220);
+    color: rgb(255, 255, 255);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.25), 0 1px 2px rgba(0, 0, 0, 0.7);
 }
 
-/* ── ACTIVE — counter color ── */
+
+/* ── ACTIVE: effect is running ── */
+.slot-active .item-icon {
+    opacity: 1.0;
+}
+
 .slot-active .item-counter {
-    color: rgb(255, 230, 80);
+    color: rgb(255, 225, 50);
+    text-shadow: 0 0 10px rgba(255, 200, 30, 0.5), 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
-/* ── Life Steal active ── */
-.slot-lifesteal.slot-active {
-    background-color: rgba(55, 12, 12, 0.90);
-    border-color: rgb(220, 60, 60);
-}
-.slot-lifesteal.slot-active .item-icon {
-    opacity: 1;
-}
+
+/* ── Life Steal: selected ── */
 .slot-lifesteal.slot-selected {
-    border-color: rgb(255, 140, 140);
+    background-color: rgba(42, 10, 10, 0.93);
+    border-color: rgb(240, 70, 70);
+    border-width: 2px;
 }
 
-/* ── Potion active ── */
-.slot-potion.slot-active {
-    background-color: rgba(12, 50, 12, 0.90);
-    border-color: rgb(60, 200, 80);
+/* ── Life Steal: active ── */
+.slot-lifesteal.slot-active {
+    background-color: rgba(55, 10, 10, 0.94);
+    border-color: rgb(225, 50, 50);
+    border-width: 2px;
 }
-.slot-potion.slot-active .item-icon {
-    opacity: 1;
-}
+
+
+/* ── Potion: selected ── */
 .slot-potion.slot-selected {
-    border-color: rgb(140, 255, 150);
+    background-color: rgba(10, 40, 14, 0.93);
+    border-color: rgb(70, 220, 100);
+    border-width: 2px;
 }
 
-/* ── Life Stone active ── */
-.slot-lifestone.slot-active {
-    background-color: rgba(12, 35, 60, 0.90);
-    border-color: rgb(70, 155, 245);
+/* ── Potion: active ── */
+.slot-potion.slot-active {
+    background-color: rgba(10, 50, 15, 0.94);
+    border-color: rgb(50, 210, 80);
+    border-width: 2px;
 }
-.slot-lifestone.slot-active .item-icon {
-    opacity: 1;
-}
+
+
+/* ── Life Stone: selected ── */
 .slot-lifestone.slot-selected {
-    border-color: rgb(150, 200, 255);
+    background-color: rgba(12, 26, 52, 0.93);
+    border-color: rgb(90, 160, 245);
+    border-width: 2px;
 }
 
-/* ── Life Stone used this scene ── */
+/* ── Life Stone: active ── */
+.slot-lifestone.slot-active {
+    background-color: rgba(10, 28, 58, 0.94);
+    border-color: rgb(65, 140, 235);
+    border-width: 2px;
+}
+
+/* ── Life Stone: used this scene ── */
 .slot-lifestone.slot-used {
-    background-color: rgba(20, 20, 35, 0.80);
-    border-color: rgba(70, 70, 110, 0.60);
-}
-.slot-lifestone.slot-used .item-icon {
-    opacity: 0.25;
-}
-.slot-lifestone.slot-used .item-counter {
-    color: rgb(70, 70, 100);
-}
-
-/* ── Chaos active ── */
-.slot-chaos.slot-active {
-    background-color: rgba(50, 38, 5, 0.90);
-    border-color: rgb(225, 185, 50);
-}
-.slot-chaos.slot-active .item-icon {
-    opacity: 1;
-}
-.slot-chaos.slot-selected {
-    border-color: rgb(255, 230, 130);
-}
-
-/* ══════════════════════════════════════
-   LOOT POPUP
-   ══════════════════════════════════════ */
-.loot-popup {
-    margin-top: 10px;
-    background-color: rgba(10, 10, 10, 0.82);
-    border-radius: 6px;
+    background-color: rgba(10, 10, 18, 0.9);
+    border-color: rgba(35, 35, 55, 0.4);
     border-width: 1px;
-    border-color: rgba(255, 220, 80, 0.60);
-    padding: 5px 10px;
+}
+
+.slot-lifestone.slot-used .item-icon {
+    opacity: 0.2;
+}
+
+.slot-lifestone.slot-used .item-counter {
+    color: rgb(45, 45, 65);
+    text-shadow: none;
+}
+
+
+/* ── Chaos: selected ── */
+.slot-chaos.slot-selected {
+    background-color: rgba(38, 28, 6, 0.93);
+    border-color: rgb(240, 190, 60);
+    border-width: 2px;
+}
+
+/* ── Chaos: active ── */
+.slot-chaos.slot-active {
+    background-color: rgba(48, 34, 5, 0.94);
+    border-color: rgb(225, 175, 35);
+    border-width: 2px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   BARS STACK — sits inside the panel, below items
+   ═══════════════════════════════════════════════════════════════ */
+.bars-stack {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 2px;
+}
+
+.bar-container {
+    background-color: rgba(14, 14, 22, 0.92);
+    border-radius: 6px;
+    overflow: hidden;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.bar-health {
+    width: 100%;
+    height: 28px;
+    margin-bottom: 4px;
+}
+
+.bar-xp {
+    width: 100%;
+    height: 16px;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 100%;
+    border-radius: 5px;
+}
+
+.health-fill {
+    background-color: rgb(195, 35, 35);
+    border-right-width: 2px;
+    border-right-color: rgba(255, 90, 90, 0.35);
+}
+
+.xp-fill {
+    background-color: rgb(190, 145, 15);
+    border-right-width: 2px;
+    border-right-color: rgba(255, 205, 70, 0.3);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   LOOT POPUP
+   ═══════════════════════════════════════════════════════════════ */
+.loot-popup {
+    margin-top: 8px;
+    margin-left: 2px;
+    background-color: rgba(8, 8, 14, 0.93);
+    border-radius: 8px;
+    border-width: 1px;
+    border-color: rgba(255, 210, 70, 0.35);
+    padding: 6px 14px;
     transition-property: opacity;
-    transition-duration: 0.4s;
+    transition-duration: 0.35s;
 }
 
 .loot-hidden {
@@ -260,9 +367,9 @@
 }
 
 .loot-label {
-    color: rgb(255, 220, 80);
-    font-size: 12px;
+    color: rgb(255, 215, 75);
+    font-size: 13px;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
+    text-shadow: 0 0 12px rgba(255, 200, 60, 0.35), 0 1px 3px rgba(0, 0, 0, 0.9);
 }
-
