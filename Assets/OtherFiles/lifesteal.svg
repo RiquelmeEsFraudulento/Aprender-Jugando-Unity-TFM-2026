@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <g fill="currentColor" stroke="currentColor" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Palm -->
+    <path d="M6 18 Q5 28 16 29 Q27 28 26 18 L26 17 Q26 15 24 15 L24 14 Q24 12 22 12 L22 10 Q22 8 20 8 L20 5 Q20 3 18 3 Q16 3 16 5 L16 15 Q15 13 13 13 Q11 13 11 15 L11 18 Q11 16 9 16 Q7 16 6 18Z"
+          fill="currentColor" stroke="none"/>
+    <!-- Drain droplet -->
+    <path d="M21 5 Q22.5 3 21 1 Q19.5 3 21 5Z" fill="white" stroke="none" opacity="0.6"/>
+  </g>
+</svg>

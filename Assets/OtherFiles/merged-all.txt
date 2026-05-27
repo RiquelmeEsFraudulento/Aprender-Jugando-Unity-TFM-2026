@@ -1,0 +1,392 @@
+
+// ===== FILE: ./PlayerHUD.uss =====
+
+/* ═══════════════════════════════════════════════════════════════
+   PlayerHUD.uss  v2
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Root ── */
+.hud-root {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* ══════════════════════════════════════
+   BARS
+   ══════════════════════════════════════ */
+.bar-container {
+    background-color: rgba(20, 20, 20, 0.75);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 6px;
+    border-width: 1px;
+    border-color: rgba(255,255,255,0.08);
+}
+.bar-big    { width: 320px; height: 34px; }
+.bar-medium { width: 220px; height: 22px; }
+
+.bar-fill { height: 100%; width: 100%; }
+
+.health-fill {
+    background-color: rgb(210, 35, 35);
+    /* subtle inner glow via border */
+    border-right-width: 2px;
+    border-right-color: rgba(255, 120, 120, 0.6);
+}
+.xp-fill {
+    background-color: rgb(210, 160, 20);
+    border-right-width: 2px;
+    border-right-color: rgba(255, 220, 100, 0.6);
+}
+
+/* ══════════════════════════════════════
+   BOTTOM ROW
+   ══════════════════════════════════════ */
+.bottom-row {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 2px;
+}
+
+/* ── Level box ── */
+.level-box {
+    background-color: rgba(20, 20, 20, 0.80);
+    width: 40px; height: 40px;
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+    margin-right: 8px;
+    border-width: 1px;
+    border-color: rgba(255,255,255,0.10);
+}
+.level-label {
+    color: rgb(255, 255, 255);
+    font-size: 15px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+/* ── State circle ── */
+.state-circle {
+    width: 40px; height: 40px;
+    border-radius: 20px;
+    margin-right: 10px;
+    border-width: 1.5px;
+    border-color: rgba(255,255,255,0.12);
+}
+.state-none     { background-color: rgba(80, 80, 80, 0.85); }
+.state-sleep    { background-color: rgb(10, 10, 20); }
+.state-confused { background-color: rgb(230, 230, 230); }
+
+/* ══════════════════════════════════════
+   ITEM SLOTS
+   ══════════════════════════════════════ */
+.items-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+/* ── Base slot ── */
+.item-slot {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    margin-left: 6px;
+    overflow: visible;
+    border-width: 2px;
+    padding: 0px;
+    /* transition for smooth state change */
+    transition-property: border-color, background-color;
+    transition-duration: 0.15s;
+}
+
+/* Icon – centered, fills most of slot */
+.item-icon {
+    position: absolute;
+    left: 8px;
+    top: 7px;
+    width: 28px;
+    height: 28px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* Counter badge – bottom right */
+.item-counter {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    font-size: 10px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+}
+
+/* ──────────────────────────────────────
+   INACTIVE  (grey, dim icon)
+   ────────────────────────────────────── */
+.slot-inactive {
+    background-color: rgba(30, 30, 30, 0.80);
+    border-color: rgba(80, 80, 80, 0.70);
+}
+.slot-inactive .item-icon {
+    -unity-text-outline-color-per-property: rgb(100, 100, 100);
+}
+.slot-inactive .item-counter {
+    color: rgb(120, 120, 120);
+}
+
+/* ──────────────────────────────────────
+   SELECTED  (bright white outline, no color yet)
+   ────────────────────────────────────── */
+.slot-selected {
+    border-color: rgb(240, 240, 240);
+    border-width: 2.5px;
+    background-color: rgba(50, 50, 50, 0.90);
+    /* scale up slightly to feel "raised" */
+    scale: 1.12;
+}
+.slot-selected .item-icon {
+    -unity-text-outline-color-per-property: rgb(200, 200, 200);
+}
+.slot-selected .item-counter {
+    color: rgb(220, 220, 220);
+}
+
+/* ──────────────────────────────────────
+   ACTIVE  (effect running, per-item color)
+   ────────────────────────────────────── */
+.slot-active .item-counter {
+    color: rgb(255, 230, 80);
+}
+
+/* Life Steal — red */
+.slot-lifesteal.slot-active {
+    background-color: rgba(55, 12, 12, 0.90);
+    border-color: rgb(220, 60, 60);
+}
+.slot-lifesteal.slot-active .item-icon {
+    -unity-text-outline-color-per-property: rgb(230, 90, 90);
+}
+.slot-lifesteal.slot-selected {
+    border-color: rgb(255, 140, 140);
+}
+
+/* Potion — green */
+.slot-potion.slot-active {
+    background-color: rgba(12, 50, 12, 0.90);
+    border-color: rgb(60, 200, 80);
+}
+.slot-potion.slot-active .item-icon {
+    -unity-text-outline-color-per-property: rgb(90, 220, 110);
+}
+.slot-potion.slot-selected {
+    border-color: rgb(140, 255, 150);
+}
+
+/* Life Stone — blue */
+.slot-lifestone.slot-active {
+    background-color: rgba(12, 35, 60, 0.90);
+    border-color: rgb(70, 155, 245);
+}
+.slot-lifestone.slot-active .item-icon {
+    -unity-text-outline-color-per-property: rgb(110, 185, 255);
+}
+.slot-lifestone.slot-selected {
+    border-color: rgb(150, 200, 255);
+}
+
+/* Life Stone — used this scene (locked out) */
+.slot-lifestone.slot-used {
+    background-color: rgba(20, 20, 35, 0.80);
+    border-color: rgba(70, 70, 110, 0.60);
+}
+.slot-lifestone.slot-used .item-icon {
+    -unity-text-outline-color-per-property: rgb(60, 60, 90);
+}
+.slot-lifestone.slot-used .item-counter {
+    color: rgb(70, 70, 100);
+}
+
+/* Chaos — gold */
+.slot-chaos.slot-active {
+    background-color: rgba(50, 38, 5, 0.90);
+    border-color: rgb(225, 185, 50);
+}
+.slot-chaos.slot-active .item-icon {
+    -unity-text-outline-color-per-property: rgb(245, 205, 70);
+}
+.slot-chaos.slot-selected {
+    border-color: rgb(255, 230, 130);
+}
+
+/* ══════════════════════════════════════
+   LOOT POPUP
+   ══════════════════════════════════════ */
+.loot-popup {
+    margin-top: 10px;
+    background-color: rgba(10, 10, 10, 0.82);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgba(255, 220, 80, 0.60);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    opacity: 1;
+    /* transition used by C# to fade in/out */
+    transition-property: opacity;
+    transition-duration: 0.4s;
+}
+.loot-hidden {
+    opacity: 0;
+    /* keep in layout but invisible */
+    display: flex;
+    visibility: hidden;
+}
+.loot-visible {
+    opacity: 1;
+    visibility: visible;
+}
+.loot-label {
+    color: rgb(255, 220, 80);
+    font-size: 12px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+// ===== FILE: ./PlayerHUD.uxml =====
+
+<ui:UXML xmlns:ui="UnityEngine.UIElements"
+         xsi="http://www.w3.org/2001/XMLSchema-instance"
+         engine="UnityEngine.UIElements"
+         editor="UnityEditor.UIElements"
+         noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+         editor-extension-mode="False">
+
+    <Style src="PlayerHUD.uss" />
+
+    <!-- Root: everything stacked vertically, anchored top-left -->
+    <ui:VisualElement name="hud-root" class="hud-root">
+
+        <!-- ── HEALTH BAR ── -->
+        <ui:VisualElement name="health-container" class="bar-container bar-big">
+            <ui:VisualElement name="health-fill" class="bar-fill health-fill" />
+        </ui:VisualElement>
+
+        <!-- ── XP BAR ── -->
+        <ui:VisualElement name="xp-container" class="bar-container bar-medium">
+            <ui:VisualElement name="xp-fill" class="bar-fill xp-fill" />
+        </ui:VisualElement>
+
+        <!-- ── BOTTOM ROW: level + state circle + item wheel ── -->
+        <ui:VisualElement name="bottom-row" class="bottom-row">
+
+            <!-- Level box -->
+            <ui:VisualElement name="level-box" class="level-box">
+                <ui:Label name="level-label" text="1" class="level-label" />
+            </ui:VisualElement>
+
+            <!-- State circle -->
+            <ui:VisualElement name="state-circle" class="state-circle state-none" />
+
+            <!-- ── ITEM SELECTOR WHEEL ── -->
+            <ui:VisualElement name="items-row" class="items-row">
+
+                <!-- Slot 0: Life Steal -->
+                <ui:VisualElement name="slot-lifesteal" class="item-slot slot-lifesteal slot-inactive">
+                    <ui:VisualElement name="icon-lifesteal"  class="item-icon" />
+                    <ui:Label         name="label-lifesteal" text="5" class="item-counter" />
+                </ui:VisualElement>
+
+                <!-- Slot 1: Potion -->
+                <ui:VisualElement name="slot-potion" class="item-slot slot-potion slot-inactive">
+                    <ui:VisualElement name="icon-potion"  class="item-icon" />
+                    <ui:Label         name="label-potion" text="5" class="item-counter" />
+                </ui:VisualElement>
+
+                <!-- Slot 2: Life Stone -->
+                <ui:VisualElement name="slot-lifestone" class="item-slot slot-lifestone slot-inactive">
+                    <ui:VisualElement name="icon-lifestone"  class="item-icon" />
+                    <ui:Label         name="label-lifestone" text="1" class="item-counter" />
+                </ui:VisualElement>
+
+                <!-- Slot 3: Chaos -->
+                <ui:VisualElement name="slot-chaos" class="item-slot slot-chaos slot-inactive">
+                    <ui:VisualElement name="icon-chaos"  class="item-icon" />
+                    <ui:Label         name="label-chaos" text="0" class="item-counter" />
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+
+        <!-- ── LOOT POPUP (shown briefly when loot is received) ── -->
+        <ui:VisualElement name="loot-popup" class="loot-popup loot-hidden">
+            <ui:Label name="loot-label" text="" class="loot-label" />
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
+// ===== FILE: ./chaos.svg =====
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Dark half -->
+  <path d="M16 3
+    A13 13 0 0 0 16 29
+    A6.5 6.5 0 0 1 16 16
+    A6.5 6.5 0 0 0 16 3Z"
+    fill="currentColor"/>
+  <!-- Light half -->
+  <path d="M16 3
+    A13 13 0 0 1 16 29
+    A6.5 6.5 0 0 0 16 16
+    A6.5 6.5 0 0 1 16 3Z"
+    fill="white" opacity="0.85"/>
+  <!-- Small dot in dark half (light) -->
+  <circle cx="16" cy="9.5" r="2.5" fill="white" opacity="0.9"/>
+  <!-- Small dot in light half (dark) -->
+  <circle cx="16" cy="22.5" r="2.5" fill="currentColor"/>
+  <!-- Outer ring -->
+  <circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="1.5"/>
+</svg>
+
+// ===== FILE: ./lifesteal.svg =====
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <g fill="currentColor" stroke="currentColor" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Palm -->
+    <path d="M6 18 Q5 28 16 29 Q27 28 26 18 L26 17 Q26 15 24 15 L24 14 Q24 12 22 12 L22 10 Q22 8 20 8 L20 5 Q20 3 18 3 Q16 3 16 5 L16 15 Q15 13 13 13 Q11 13 11 15 L11 18 Q11 16 9 16 Q7 16 6 18Z"
+          fill="currentColor" stroke="none"/>
+    <!-- Drain droplet -->
+    <path d="M21 5 Q22.5 3 21 1 Q19.5 3 21 5Z" fill="white" stroke="none" opacity="0.6"/>
+  </g>
+</svg>
+
+// ===== FILE: ./lifestone.svg =====
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Top facet -->
+  <polygon points="10,5 22,5 27,13 5,13" fill="currentColor" opacity="0.9"/>
+  <!-- Main body -->
+  <polygon points="5,13 27,13 16,29" fill="currentColor"/>
+  <!-- Left inner facet (dark) -->
+  <polygon points="5,13 16,13 16,29" fill="black" opacity="0.15"/>
+  <!-- Top shine -->
+  <polygon points="12,5 20,5 23,10 9,10" fill="white" opacity="0.3"/>
+</svg>
+
+// ===== FILE: ./potion.svg =====
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Cork -->
+  <rect x="12" y="2" width="8" height="4" rx="1.5" fill="currentColor"/>
+  <!-- Neck -->
+  <rect x="13.5" y="6" width="5" height="5" fill="currentColor"/>
+  <!-- Body -->
+  <path d="M13 11 L11 15 Q7 19 7 23 Q7 30 16 30 Q25 30 25 23 Q25 19 21 15 L19 11 Z" fill="currentColor"/>
+  <!-- Shine -->
+  <ellipse cx="12" cy="22" rx="2" ry="1.5" fill="white" opacity="0.3"/>
+  <circle  cx="18" cy="18" r="1.5" fill="white" opacity="0.35"/>
+</svg>

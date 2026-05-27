@@ -129,6 +129,9 @@ public class Damageable : MonoBehaviour
     private const bool LOG_MUERTE    = true;
     private const bool LOG_ESTADO    = true;
 
+    public PlayerHUDController _hud = null;
+
+
     // ══════════════════════════════════════════════════════════
     // INSPECTOR
     // ══════════════════════════════════════════════════════════
@@ -202,6 +205,8 @@ public class Damageable : MonoBehaviour
     void Awake()
     {
         InicializarVida();
+        _hud = FindAnyObjectByType<PlayerHUDController>();
+
     }
 
     public void InicializarVida()
@@ -225,6 +230,7 @@ public class Damageable : MonoBehaviour
 
     void Update()
     {
+
         AvanzarCooldown();
         if (estaEnvenenado) ProcesarVenenoPorTiempo();
         ProcesarEstadoEspecial();
@@ -285,6 +291,11 @@ public class Damageable : MonoBehaviour
             $"[Hit] '{gameObject.name}' -{amount} | tipo={damageType}" +
             $" | fuente='{source?.name}' | Vida antes: {currentHealth}"
         );
+
+        float damagetosteal = amount;
+
+        _hud.OnLifeStealDamageDealt(damagetosteal);
+
 
         ReiniciarCooldown();
         AplicarDanioDirecto(amount);

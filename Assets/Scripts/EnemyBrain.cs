@@ -37,11 +37,11 @@ public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
     {
         if (AliveEnemyCount() == 0)
         {
-            StopCoroutine(AI_Loop(null));
+            AI_Loop_Coroutine = null;
             yield break;
         }
 
-        yield return new WaitForSeconds(Random.Range(.5f,1.5f));
+        yield return new WaitForSeconds(Random.Range(.5f, 1.5f));
 
         EnemyScript attackingEnemy = RandomEnemyExcludingOne(enemy);
 
@@ -49,9 +49,12 @@ public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
             attackingEnemy = RandomEnemy();
 
         if (attackingEnemy == null)
+        {
+            AI_Loop_Coroutine = null;
             yield break;
-            
-        yield return new WaitUntil(()=>attackingEnemy.IsRetreating() == false);
+        }
+
+        yield return new WaitUntil(() => attackingEnemy.IsRetreating() == false);
         yield return new WaitUntil(() => attackingEnemy.IsLockedTarget() == false);
         yield return new WaitUntil(() => attackingEnemy.IsStunned() == false);
 
@@ -61,10 +64,12 @@ public List<EnemyStruct> allEnemies = new List<EnemyStruct>();
 
         attackingEnemy.SetRetreat();
 
-        yield return new WaitForSeconds(Random.Range(0,.5f));
+        yield return new WaitForSeconds(Random.Range(0, .5f));
 
         if (AliveEnemyCount() > 0)
             AI_Loop_Coroutine = StartCoroutine(AI_Loop(attackingEnemy));
+        else
+            AI_Loop_Coroutine = null;
     }
 
     public EnemyScript RandomEnemy()

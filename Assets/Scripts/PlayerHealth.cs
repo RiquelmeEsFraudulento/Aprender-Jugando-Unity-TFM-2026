@@ -17,6 +17,11 @@ public class PlayerHealth : MonoBehaviour
     public float vida    = 10f;
     public float vidaMax = 20f;
 
+    public float lottery;
+    public float lootbox;
+
+    public PlayerHUDController hud;
+
     public float level; // Nivel del jugador, para escalar daño o XP
     public float XP; // Puntos de experiencia del jugador
 
@@ -24,6 +29,7 @@ public class PlayerHealth : MonoBehaviour
     {
         level = 1f;
         XP = 0f;
+        lootbox = 0f;
     }
     void Update()
     {
@@ -38,6 +44,12 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log("[Player] Daño recibido: -" + cantidad + " | Vida: " + vida);
     }
 
+    public void Lootbox()
+    {
+        hud.GrantLoot();
+        Debug.Log("[Player] Ha recibido una lootbox!");
+    }
+
     public void Curar(float cantidad)
     {
         vida += cantidad;
@@ -47,9 +59,8 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(float cantidad)
     {
         vida -= cantidad;
-        Debug.Log("[Player] Daño recibido: +" + cantidad + " | Vida: " + vida);
+        Debug.Log("[Player] Daño recibido: -" + cantidad + " | Vida: " + vida);
     }
-
     public void GanarXP(float cantidad)
     {
         XP += cantidad;

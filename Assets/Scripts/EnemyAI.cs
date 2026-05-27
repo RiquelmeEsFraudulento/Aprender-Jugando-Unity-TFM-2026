@@ -64,13 +64,15 @@ public class EnemyScript : Damageable
 
     IEnumerator EnemyMovement()
     {
+        if (this == null || !isActiveAndEnabled) yield break;
+
         yield return new WaitUntil(() => isWaiting == true);
 
-        // ── No mover si está dormido o confuso ─────────────────
         if (EstaDormido() || EstaConfuso())
         {
             yield return new WaitForSeconds(1f);
-            MovementCoroutine = StartCoroutine(EnemyMovement());
+            if (this != null && isActiveAndEnabled)
+                MovementCoroutine = StartCoroutine(EnemyMovement());
             yield break;
         }
 
@@ -89,7 +91,8 @@ public class EnemyScript : Damageable
 
         yield return new WaitForSeconds(1);
 
-        MovementCoroutine = StartCoroutine(EnemyMovement());
+        if (this != null && isActiveAndEnabled)
+            MovementCoroutine = StartCoroutine(EnemyMovement());
     }
 
     void Update()
@@ -301,6 +304,7 @@ public class EnemyScript : Damageable
 
     public override void Morir()
     {
+        playerCombat.GetComponent<PlayerHealth>().Lootbox();
         StopEnemyCoroutines();
 
         this.enabled = false;
@@ -532,7 +536,12 @@ public class EnemyScript : Damageable
         if (MovementCoroutine != null)
             StopCoroutine(MovementCoroutine);
 
-        // ── Parar también corrutinas de estados especiales ─────
+        if (DeathCoroutine != null)
+        {
+            StopCoroutine(DeathCoroutine);
+            DeathCoroutine = null;
+        }
+
         if (sleepCoroutine != null)
         {
             StopCoroutine(sleepCoroutine);
@@ -544,7 +553,6 @@ public class EnemyScript : Damageable
             confusedCoroutine = null;
         }
     }
-
     #region Public Booleans
 
     public bool IsAttackable()

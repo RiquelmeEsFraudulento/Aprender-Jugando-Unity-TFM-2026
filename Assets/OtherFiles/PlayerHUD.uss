@@ -1,3 +1,7 @@
+/* ═══════════════════════════════════════════════════════════════
+   PlayerHUD.uss  v3 — Unity 6 Compatible
+   ═══════════════════════════════════════════════════════════════ */
+
 /* ── Root ── */
 .hud-root {
     position: absolute;
@@ -7,79 +11,258 @@
     align-items: flex-start;
 }
 
-/* ── Shared bar container (grey background square) ── */
+/* ══════════════════════════════════════
+   BARS
+   ══════════════════════════════════════ */
 .bar-container {
-    background-color: rgb(80, 80, 80);
-    border-radius: 4px;
+    background-color: rgba(20, 20, 20, 0.75);
+    border-radius: 5px;
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    border-width: 1px;
+    border-color: rgba(255,255,255,0.08);
 }
+.bar-big    { width: 320px; height: 34px; }
+.bar-medium { width: 220px; height: 22px; }
 
-.bar-big {
-    width: 320px;
-    height: 36px;
-}
-
-.bar-medium {
-    width: 220px;
-    height: 24px;
-}
-
-/* ── Fill layers ── */
-.bar-fill {
-    height: 100%;
-    width: 100%;   /* controlled at runtime via style.width */
-}
+.bar-fill { height: 100%; width: 100%; }
 
 .health-fill {
-    background-color: rgb(200, 30, 30);   /* red */
+    background-color: rgb(210, 35, 35);
+    border-right-width: 2px;
+    border-right-color: rgba(255, 120, 120, 0.6);
 }
-
 .xp-fill {
-    background-color: rgb(218, 165, 32);  /* gold */
+    background-color: rgb(210, 160, 20);
+    border-right-width: 2px;
+    border-right-color: rgba(255, 220, 100, 0.6);
 }
 
-/* ── Bottom row ── */
+/* ══════════════════════════════════════
+   BOTTOM ROW
+   ══════════════════════════════════════ */
 .bottom-row {
     flex-direction: row;
     align-items: center;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
-/* ── Level box ── */
 .level-box {
-    background-color: rgb(80, 80, 80);
+    background-color: rgba(20, 20, 20, 0.80);
     width: 40px;
     height: 40px;
-    border-radius: 4px;
+    border-radius: 5px;
     justify-content: center;
     align-items: center;
-    margin-right: 10px;
+    margin-right: 8px;
+    border-width: 1px;
+    border-color: rgba(255,255,255,0.10);
 }
-
 .level-label {
     color: rgb(255, 255, 255);
-    font-size: 14px;
+    -unity-font-style: bold;
+    font-size: 15px;
+    -unity-text-align: middle-center;
+}
+
+.state-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    margin-right: 10px;
+    border-width: 1.5px;
+    border-color: rgba(255,255,255,0.12);
+}
+.state-none     { background-color: rgba(80, 80, 80, 0.85); }
+.state-sleep    { background-color: rgb(10, 10, 20); }
+.state-confused { background-color: rgb(230, 230, 230); }
+
+/* ══════════════════════════════════════
+   ITEM SLOTS
+   ══════════════════════════════════════ */
+.items-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.item-slot {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    margin-left: 6px;
+    overflow: visible;
+    border-width: 2px;
+    padding: 0;
+    transition-property: border-color, background-color, scale;
+    transition-duration: 0.15s;
+}
+
+/* Base icon: centered, fills most of slot */
+.item-icon {
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    width: 36px;
+    height: 36px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* ── COUNTER BADGE ── */
+.item-counter {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    font-size: 10px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-right;
+    color: rgb(255, 255, 255);
+}
+
+/* ── ITEM ICON BACKGROUND IMAGES ── */
+
+/* Life Steal — red */
+.slot-lifesteal .item-icon {
+    background-image: url("project://database/Assets/OtherFiles/lifesteal.svg");
+}
+
+/* Potion — green */
+.slot-potion .item-icon {
+    background-image: url("project://database/Assets/OtherFiles/potion.svg");
+}
+
+/* Life Stone — blue */
+.slot-lifestone .item-icon {
+    background-image: url("project://database/Assets/OtherFiles/lifestone.svg");
+}
+
+/* Chaos — gold */
+.slot-chaos .item-icon {
+    background-image: url("project://database/Assets/OtherFiles/chaos.svg");
+}
+
+/* ══════════════════════════════════════
+   SLOT STATES
+   ══════════════════════════════════════ */
+
+/* ── INACTIVE ── */
+.slot-inactive {
+    background-color: rgba(30, 30, 30, 0.80);
+    border-color: rgba(80, 80, 80, 0.70);
+}
+.slot-inactive .item-icon {
+    opacity: 0.4;
+}
+.slot-inactive .item-counter {
+    color: rgb(100, 100, 100);
+}
+
+/* ── SELECTED ── */
+.slot-selected {
+    border-color: rgb(240, 240, 240);
+    border-width: 2.5px;
+    background-color: rgba(50, 50, 50, 0.90);
+    scale: 1.12;
+}
+.slot-selected .item-icon {
+    opacity: 0.85;
+}
+.slot-selected .item-counter {
+    color: rgb(220, 220, 220);
+}
+
+/* ── ACTIVE — counter color ── */
+.slot-active .item-counter {
+    color: rgb(255, 230, 80);
+}
+
+/* ── Life Steal active ── */
+.slot-lifesteal.slot-active {
+    background-color: rgba(55, 12, 12, 0.90);
+    border-color: rgb(220, 60, 60);
+}
+.slot-lifesteal.slot-active .item-icon {
+    opacity: 1;
+}
+.slot-lifesteal.slot-selected {
+    border-color: rgb(255, 140, 140);
+}
+
+/* ── Potion active ── */
+.slot-potion.slot-active {
+    background-color: rgba(12, 50, 12, 0.90);
+    border-color: rgb(60, 200, 80);
+}
+.slot-potion.slot-active .item-icon {
+    opacity: 1;
+}
+.slot-potion.slot-selected {
+    border-color: rgb(140, 255, 150);
+}
+
+/* ── Life Stone active ── */
+.slot-lifestone.slot-active {
+    background-color: rgba(12, 35, 60, 0.90);
+    border-color: rgb(70, 155, 245);
+}
+.slot-lifestone.slot-active .item-icon {
+    opacity: 1;
+}
+.slot-lifestone.slot-selected {
+    border-color: rgb(150, 200, 255);
+}
+
+/* ── Life Stone used this scene ── */
+.slot-lifestone.slot-used {
+    background-color: rgba(20, 20, 35, 0.80);
+    border-color: rgba(70, 70, 110, 0.60);
+}
+.slot-lifestone.slot-used .item-icon {
+    opacity: 0.25;
+}
+.slot-lifestone.slot-used .item-counter {
+    color: rgb(70, 70, 100);
+}
+
+/* ── Chaos active ── */
+.slot-chaos.slot-active {
+    background-color: rgba(50, 38, 5, 0.90);
+    border-color: rgb(225, 185, 50);
+}
+.slot-chaos.slot-active .item-icon {
+    opacity: 1;
+}
+.slot-chaos.slot-selected {
+    border-color: rgb(255, 230, 130);
+}
+
+/* ══════════════════════════════════════
+   LOOT POPUP
+   ══════════════════════════════════════ */
+.loot-popup {
+    margin-top: 10px;
+    background-color: rgba(10, 10, 10, 0.82);
+    border-radius: 6px;
+    border-width: 1px;
+    border-color: rgba(255, 220, 80, 0.60);
+    padding: 5px 10px;
+    transition-property: opacity;
+    transition-duration: 0.4s;
+}
+
+.loot-hidden {
+    opacity: 0;
+    display: none;
+}
+
+.loot-visible {
+    opacity: 1;
+    display: flex;
+}
+
+.loot-label {
+    color: rgb(255, 220, 80);
+    font-size: 12px;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
 }
 
-/* ── State circle ── */
-.state-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 20px;   /* makes it a circle */
-}
-
-/* States */
-.state-none {
-    background-color: rgb(80, 80, 80);   /* grey = no state / pressing 9 */
-}
-
-.state-sleep {
-    background-color: rgb(10, 10, 10);   /* black = Sleep (key 7) */
-}
-
-.state-confused {
-    background-color: rgb(240, 240, 240); /* white = Confused (key 8) */
-}

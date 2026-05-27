@@ -112,6 +112,8 @@ public class SimpleWalk : MonoBehaviour
     private string[] attacks;
     private string[] attackslong;
     private string[] attacksnear;
+    private PlayerHUDController _hud;
+    
 
     private bool manualUnlock = false;
 
@@ -128,6 +130,9 @@ public class SimpleWalk : MonoBehaviour
 
         if (enemyDetection == null)
             enemyDetection = GetComponentInChildren<EnemyDetection>();
+    
+        _hud = FindAnyObjectByType<PlayerHUDController>();
+
     }
 
     // ══════════════════════════════════════════════════════════

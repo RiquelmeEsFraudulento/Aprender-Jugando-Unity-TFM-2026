@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Top facet -->
+  <polygon points="10,5 22,5 27,13 5,13" fill="currentColor" opacity="0.9"/>
+  <!-- Main body -->
+  <polygon points="5,13 27,13 16,29" fill="currentColor"/>
+  <!-- Left inner facet (dark) -->
+  <polygon points="5,13 16,13 16,29" fill="black" opacity="0.15"/>
+  <!-- Top shine -->
+  <polygon points="12,5 20,5 23,10 9,10" fill="white" opacity="0.3"/>
+</svg>

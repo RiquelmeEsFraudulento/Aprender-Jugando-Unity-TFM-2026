@@ -146,6 +146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -398,6 +399,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   playerHealth: {fileID: 1966723367}
+  enemyManager: {fileID: 359466628}
+  lifeStealCount: 5
+  potionCount: 5
+  lifeStoneCount: 1
+  chaosCount: 0
+  lifeStoneAvailableThisScene: 1
+  lifeStealDuration: 15
+  lifeStealHealFraction: 0.25
+  lifeStealIsActive: 0
+  lifeStealRemainingTime: 0
+  potionHotDuration: 5
+  potionHealPercent: 0.15
+  potionIsActive: 0
+  potionRemainingTime: 0
+  lifeStoneTriggerThreshold: 0.25
+  lifeStoneInstantHeal: 0.2
+  lifeStoneHotHeal: 0.1
+  lifeStoneHotDuration: 5
+  lifeStoneIsActive: 0
+  lifeStoneRemainingTime: 0
+  chaosDotDuration: 3
+  chaosDotPercentPerS: 0.1
+  chaosPenaltyInstant: 0.5
+  chaosIsActive: 0
+  chaosRemainingTime: 0
 --- !u!114 &98785669
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,12 +455,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 98785667}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.87819, y: 3.21608, z: -5.81425}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.5712824, y: 1.79608, z: -3.1893954}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1966723366}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &99540058
 GameObject:
@@ -587,6 +613,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7615f9f4523fdf4cba884c8d65a3a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -1951,6 +1978,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -2287,6 +2315,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -2482,6 +2511,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -2704,6 +2734,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7615f9f4523fdf4cba884c8d65a3a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -3751,6 +3782,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: c47cc1c30fbca7e4d8845c0fc5e17ca5, type: 3}
       insertIndex: 1
       addedObject: {fileID: 1560405374}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: c47cc1c30fbca7e4d8845c0fc5e17ca5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 98785670}
     - targetCorrespondingSourceObject: {fileID: -6874584590210671055, guid: c47cc1c30fbca7e4d8845c0fc5e17ca5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1274718641}
@@ -4936,6 +4970,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 359466629}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
       propertyPath: m_LocalPosition.x
       value: 10.81
       objectReference: {fileID: 0}
@@ -5047,6 +5093,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -5321,6 +5368,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -5590,6 +5638,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -5927,6 +5976,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -6167,6 +6217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -6495,6 +6546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -6657,6 +6709,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -6749,6 +6802,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 359466629}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.6601164
@@ -6848,6 +6913,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -7816,6 +7882,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -8413,11 +8480,11 @@ MonoBehaviour:
   animator: {fileID: 1966723363}
   walkAnimationSpeed: 0.25
   detectionRadius: 8
-  rotationThreshold: 2
-  lockOnPrefab: {fileID: 508397044}
-  lockOnHeightOffset: 2
-  lockOnSmoothTime: 0.1
   rotationDuration: 0.15
+  lockOnPrefab: {fileID: 508397044}
+  lockOnHeightOffset: 2.5
+  lockOnSmoothTime: 0.1
+  rotationThreshold: 2
   kickRange: 0.3
   lightSaberRange: 4
   rapierRange: 1.2
@@ -8498,6 +8565,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   vida: 90
   vidaMax: 100
+  lottery: 0
+  lootbox: 0
+  hud: {fileID: 98785668}
   level: 0
   XP: 0
 --- !u!114 &1966723368
@@ -8520,6 +8590,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 359466629}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.864369
@@ -8624,6 +8706,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -8806,6 +8889,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7615f9f4523fdf4cba884c8d65a3a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -8935,6 +9019,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7615f9f4523fdf4cba884c8d65a3a1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Damageable
+  _hud: {fileID: 0}
   maxHealth: 10
   currentHealth: 10
   cooldownEntreGolpes: 0.25
@@ -9014,6 +9099,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _hud: {fileID: 0}
   maxHealth: 10
   currentHealth: 10
   cooldownEntreGolpes: 0.25
@@ -9923,6 +10009,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
   cooldownEntreGolpes: 0.25
@@ -10147,7 +10234,6 @@ SceneRoots:
   - {fileID: 2128402319}
   - {fileID: 399161738}
   - {fileID: 813690291}
-  - {fileID: 98785670}
   - {fileID: 1688922227}
   - {fileID: 1536714273}
   - {fileID: 359466629}
