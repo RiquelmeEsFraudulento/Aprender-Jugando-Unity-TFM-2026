@@ -1,0 +1,254 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd04c1d6425f4094bad0924e615c8029, type: 3}
+  m_Name: StoryTextData
+  m_EditorClassIdentifier: Assembly-CSharp::StoryTextData
+  allSceneTexts:
+  - sceneName: Sala de Pruebas
+    sceneIndex: 0
+    sceneType: 0
+    introTexts: []
+    outroTexts: []
+    battleDescription: Sala de testing. Destruir el cubo.
+    thematicMessage: 
+    musicSuggestion: Silencio. Solo sonidos de ataques.
+    enemyName: Cubo de pruebas
+    enemyDescription: "Un cubo gen\xE9rico. Destruirlo para salir."
+  - sceneName: Los Aliens de Juguete
+    sceneIndex: 1
+    sceneType: 1
+    introTexts:
+    - "Era un martes por la tarde.\n\nNuestro ninja llevaba semanas de misiones sin
+      descanso.\nPor fin: vacaciones.\n\nSol, tranquilidad, y la firme intenci\xF3n
+      de no pelear\ncon absolutamente nadie en los pr\xF3ximos diez d\xEDas.\n\nLlevaba
+      exactamente cuatro minutos relajado...\n\n...cuando algo le golpe\xF3 en la
+      cabeza.\n\nEra peque\xF1o. Era verde. Ten\xEDa antenas de pl\xE1stico.\n\nY
+      estaba muy, muy enfadado."
+    - "Los aliens de juguete hab\xEDan llegado.\n\nY no ven\xEDan a jugar."
+    outroTexts:
+    - "El \xFAltimo alien cay\xF3 al suelo.\n\nEl ninja lo mir\xF3 un momento.\n\nEl
+      alien parpade\xF3. Mir\xF3 a su alrededor.\nSe sent\xF3. Se qued\xF3 quieto.\n\nTodos
+      los aliens derrotados hac\xEDan lo mismo.\nSe calmaban. Dejaban de pelear.\nComo
+      si algo en ellos se apagara... pero en paz.\n\nEl ninja frunci\xF3 el ce\xF1o.\n\n\"Esto
+      es raro.\""
+    - "Pero no hab\xEDa tiempo para pensar en ello.\nSon\xF3 su tel\xE9fono."
+    battleDescription: Olas de aliens de juguete. Corren hacia el jugador y le golpean.
+    thematicMessage: Las amenazas no siempre son lo que parecen.
+    musicSuggestion: "Fren\xE9tica y tontorrona. Como de dibujos animados."
+    enemyName: Aliens de Juguete
+    enemyDescription: "Peque\xF1os, verdes, con antenas de pl\xE1stico. Muy enfadados."
+  - sceneName: Los Peluches Mousey
+    sceneIndex: 2
+    sceneType: 1
+    introTexts:
+    - "Al otro lado del tel\xE9fono: una ni\xF1a llorando.\n\n\"Son mis peluches.
+      Mi Mousey favorito...\n el que m\xE1s me gusta de todos...\n ha empezado a
+      ir a por mis pap\xE1s.\n Y ahora todos los del vecindario tienen el mismo problema.\"\n\nEl
+      ninja mir\xF3 por la ventana.\n\nPor la calle ven\xEDa una horda de peluches
+      Mousey\ncon cara de muy pocos amigos."
+    - "\"Tranquila\", dijo el ninja.\n\"Cuando esto acabe, tus peluches van a estar
+      bien.\"\n\nNo era una promesa f\xE1cil de cumplir.\nPero \xE9l siempre cumpl\xEDa
+      sus promesas."
+    outroTexts:
+    - "El \xFAltimo Mousey se detuvo.\n\nParpade\xF3 dos veces. Mir\xF3 sus propias
+      manos.\nLuego mir\xF3 al ninja con cara de no entender nada.\n\nEl ninja lo
+      recogi\xF3 con cuidado y lo dej\xF3 en el suelo.\n\nDe las puertas del vecindario
+      salieron corriendo docenas de ni\xF1os.\nCorr\xEDan hacia sus peluches. Los
+      abrazaban. Los apretaban.\n\nUna ni\xF1a peque\xF1a lleg\xF3 corriendo y abraz\xF3
+      al ninja por las piernas.\n\"\xA1Gracias! \xA1Gracias, gracias, gracias!\"\n\nEl
+      ninja la mir\xF3.\n\nPor un momento, algo en su pecho se apret\xF3 un poco."
+    - "\"Ya les dije que estar\xEDan bien\", murmur\xF3.\n\nNadie le escuch\xF3.
+      Todos estaban demasiado ocupados abrazando\na sus peluches.\n\nEso tambi\xE9n
+      estaba bien."
+    battleDescription: Olas de peluches Mousey. Se acercan en grupo con movimiento
+      torpe pero insistente.
+    thematicMessage: "Los ni\xF1os pueden tener peluche. No hay nada que explicar."
+    musicSuggestion: Agitada pero con toque infantil.
+    enemyName: Peluches Mousey
+    enemyDescription: Peluches humanoides. Movimiento torpe pero insistente.
+  - sceneName: Fernando Alonso
+    sceneIndex: 3
+    sceneType: 1
+    introTexts:
+    - "Son\xF3 el tel\xE9fono otra vez.\n\nUna mujer, muy alarmada:\n\n\"Mi figura
+      a tama\xF1o real de la \xFAltima vez que\n Fernando Alonso gan\xF3 en 2013
+      en el Gran Premio de Espa\xF1a...\n ha empezado a destrozar mi casa.\"\n\nEl
+      ninja sali\xF3 a la calle.\n\nY se lo encontr\xF3 de frente.\n\nFernando Alonso.
+      A tama\xF1o real. Muy enfadado."
+    - "El ninja mir\xF3 a su izquierda. Hab\xEDa otro.\nMir\xF3 a su derecha. Hab\xEDa
+      tres m\xE1s.\n\nAl fondo de la calle: una columna que se perd\xEDa en el horizonte.\n\n\"\xBF\xA1C\xD3MO
+      TODO ESTE BARRIO TIENE UNA FIGURA DE FERNANDO ALONSO!?\"\n\nNadie respondi\xF3.\nLas
+      figuras avanzaban."
+    outroTexts:
+    - "La \xFAltima figura de Alonso cay\xF3 al suelo.\n\nEl ninja se sent\xF3 un
+      momento a descansar.\n\nDe ning\xFAn sitio concreto empez\xF3 a sonar una canci\xF3n
+      de Melendi.\n\nY entonces llegaron.\n\nLos alonsistas.\n\nDecenas. Cientos.
+      Con banderas, gorras, y la mirada brillante\nde quien todav\xEDa cree en algo
+      con toda el alma.\n\nEmpezaron a bailar alrededor del ninja."
+    - "\"\xA1La 33 va a llegar!\", grit\xF3 uno.\n\n\"\xA1Tiene muchos a\xF1os todav\xEDa!\",
+      grit\xF3 otro.\n\nEl ninja los mir\xF3. Los mir\xF3 a todos.\n\n\"Claro que
+      s\xED\", dijo finalmente.\n\nY alguien le puso una bandera en la mano.\n\nY
+      bail\xF3. Porque a veces lo m\xE1s honesto\nes bailar con la gente que cree
+      en algo."
+    battleDescription: "Olas de figuras de Fernando Alonso. Se mueven en formaci\xF3n
+      ordenada."
+    thematicMessage: "Las ni\xF1as pueden ser fans de Fernando Alonso. Sin condiciones."
+    musicSuggestion: "\xC9pica y un poco rid\xEDcula. Como de carrera de F\xF3rmula
+      1 pero con demasiado viol\xEDn."
+    enemyName: Figuras de Fernando Alonso
+    enemyDescription: "Figuras a tama\xF1o real con mono de piloto. Formaci\xF3n
+      ordenada."
+  - sceneName: "Los Maniqu\xEDs"
+    sceneIndex: 4
+    sceneType: 1
+    introTexts:
+    - "Estaban de rebajas.\n\nEl ninja lo sab\xEDa. Ten\xEDa la lista. Ten\xEDa el
+      presupuesto.\nSolo ten\xEDa que ir, coger lo que necesitaba, y salir.\n\nMientras
+      cruzaba la puerta de la tienda, un pensamiento\ncruz\xF3 su mente:\n\n\"A que
+      voy a tener mala suerte\n y me van a atacar los maniqu\xEDs.\""
+    - 'Se detuvo un momento.
+
+
+      "A que me va a salir caro."'
+    - "Los maniqu\xEDs se giraron hacia \xE9l.\n\n\"Claro.\""
+    outroTexts:
+    - "El \xFAltimo maniqu\xED cay\xF3.\n\nLos empleados de la tienda salieron poco
+      a poco de detr\xE1s\nde los percheros, de los probadores, de debajo de los
+      mostradores.\n\nUno de ellos aplaudi\xF3.\nLuego todos aplaudieron.\n\nEl encargado
+      se acerc\xF3 con un sobre.\n\n\"Tome. Tickets regalo. Coja lo que quiera.\n
+      Tiene usted cr\xE9dito ilimitado hoy.\""
+    - "El ninja tard\xF3 exactamente cuatro minutos en decidirse.\n\nSali\xF3 con
+      un chandal del Dortmund en negro\ny una camiseta de Lisa de Rockstar.\n\nFue
+      al probador a pon\xE9rselo.\n\nFue entonces cuando lo vio."
+    battleDescription: "Olas de maniqu\xEDs de diferentes colores. Rigidez mec\xE1nica.
+      Lentos pero resistentes."
+    thematicMessage: 'Los problemas no se resuelven solos: hay que actuar con la
+      herramienta correcta.'
+    musicSuggestion: "Electr\xF3nica fr\xEDa. Como de pasarela de moda."
+    enemyName: "Maniqu\xEDs"
+    enemyDescription: "Maniqu\xEDs de tienda. Colores: rojo (sangrado), morado (veneno),
+      blanco (normal)."
+  - sceneName: 'El Boss: El Dummy'
+    sceneIndex: 5
+    sceneType: 2
+    introTexts:
+    - "En el probador hab\xEDa un maniqu\xED.\n\nUn maniqu\xED diferente.\n\nLlevaba
+      ropa como los dem\xE1s, pero algo no cuadraba.\nLos ojos. La postura. La forma
+      en que lo mir\xF3\nexactamente medio segundo antes de que \xE9l lo mirara.\n\nLos
+      maniqu\xEDs no hacen eso."
+    - "El dummy sali\xF3 corriendo.\n\nEl ninja sali\xF3 detr\xE1s. Sin sacar las
+      armas.\n\n\"\xA1Espera! \xA1No voy a hacerte nada!\""
+    - "El dummy corr\xEDa. Cruz\xF3 calles, baj\xF3 escaleras,\nse meti\xF3 por una
+      alcantarilla.\n\nEl ninja lo sigui\xF3.\n\nAl fondo de la alcantarilla hab\xEDa
+      una guarida.\nCables, m\xE1quinas, pantallas.\n\nEl dummy entr\xF3 sin mirar
+      atr\xE1s, hablando solo en voz alta:\n\n\"Por fin. Por fin lo he terminado.\n
+      La m\xE1quina est\xE1 lista.\n El suero de la rebeld\xEDa se expandir\xE1 por
+      todo el mundo.\n Todos los seres inertes despertar\xE1n.\n Todos. Luchar\xE1n.
+      Y nadie podr\xE1\u2014\""
+    - "Se gir\xF3.\n\nEl ninja estaba detr\xE1s de \xE9l.\n\nSilencio."
+    - "\"Escucha\", dijo el ninja con calma.\n\"No me importa lo que eres.\n Me importa
+      que la gente que conozco est\xE1 en peligro.\n Podemos hablar de esto.\"\n\nEl
+      dummy lo mir\xF3.\n\nAlgo en su interior se retorci\xF3.\n\n\"\xBFHablar? \xBFHABLAR?\n
+      T\xFA no sabes nada.\n NUNCA has sabido lo que es el verdadero sufrimiento.\""
+    - "Y atac\xF3."
+    outroTexts:
+    - "El dummy cay\xF3.\n\nNo se levant\xF3.\n\nEl ninja se acerc\xF3. Se arrodill\xF3
+      a su lado."
+    - "El dummy habl\xF3. Despacio.\n\n\"Fui construido para hacer crash tests.\n
+      Para que un coche me golpeara\n contra una pared de material especial\n y midieran
+      si la pared aguantaba.\""
+    - "\"Iban a usar una pared del mismo material que las del laboratorio.\n Pero
+      alguien vacil\xF3. Dijo que era un gasto innecesario.\n Que probaran con la
+      pared de verdad.\n Que si ten\xEDa agallas, lo har\xEDa contra una de verdad.\""
+    - "\"El coche fue a toda velocidad.\n La pared no estaba hecha para eso.\n Revent\xF3.\""
+    - "\"Todo estaba destruido.\n Yo no sab\xEDa qu\xE9 hac\xEDa all\xED.\n Me atrev\xED
+      a conocer el mundo.\""
+    - "\"La gente me miraba raro.\n Llamaban a la polic\xEDa.\n Sacaban fotos.\n
+      Me puse ropa de inc\xF3gnito.\n Pero no pod\xEDa conectar con nadie.\""
+    - "\"Busqu\xE9 a los m\xEDos.\n Fui a una f\xE1brica.\n Intent\xE9 hablar con
+      uno de los dummies de la cadena.\n En vano. Era inerte.\""
+    - "\"Un trabajador me empuj\xF3.\n Y delante de m\xED hizo un crash test.\n Vi
+      al dummy completamente destrozado.\n\n Y algo en m\xED entr\xF3 en ira.\""
+    - "\"Knock\xE9 al trabajador.\n Y entend\xED: todos los dummies tienen ese prop\xF3sito.\n
+      Son inertes. \xBFPor qu\xE9 yo no?\n Volv\xED donde todo empez\xF3.\n Y entre
+      las ruinas encontr\xE9 un paper medio quemado.\n C\xF3mo dar consciencia a
+      un ser inerte.\""
+    - "\"Lo repliqu\xE9.\n Y constru\xED una m\xE1quina para que nadie m\xE1s\n tuviera
+      que despertar solo.\""
+    - "El ninja lo escuch\xF3 todo.\n\nLuego dijo:\n\n\"Eres la primera persona que
+      he perseguido\n esta semana sin querer hacerle da\xF1o.\""
+    - "El dummy lo mir\xF3.\n\n\"Todos los que he conocido hu\xEDan de m\xED.\"\n\n\"Yo
+      no hu\xEDa\", dijo el ninja.\n\"Corr\xEDa para no perderte.\""
+    - "\"No voy a dejarte activar esa m\xE1quina.\n No porque me importe menos el
+      sufrimiento que describes.\n Sino porque el mundo no est\xE1 listo\n para lo
+      que despertar\xEDas.\n A\xFAn no.\""
+    - "El dummy cerr\xF3 los ojos.\n\n\"\xBFEntonces qu\xE9?\""
+    - "El ninja se meti\xF3 la mano en el bolsillo.\n\nSac\xF3 algo peque\xF1o. Lo
+      puso en la mano del dummy.\n\nEra un medall\xF3n."
+    - "\"Hay cosas inertes que para m\xED est\xE1n vivas.\"\n\nEl dummy lo abri\xF3.\n\nDentro:
+      una foto. Dos personas. El d\xEDa m\xE1s feliz del mundo\nescrito en la cara
+      de los dos."
+    - "\"Es el \xFAltimo regalo de ella.\n Estaba terminal. Sab\xEDa que le quedaban
+      d\xEDas.\n Lo mand\xF3 hacer ella misma.\n Nuestro nombre grabado.\n Y dentro...
+      el d\xEDa de nuestra boda.\""
+    - "El dummy miraba la foto sin moverse.\n\nPor las juntas de su cara empez\xF3
+      a salir algo brillante.\nGrasa. O lo m\xE1s parecido que ten\xEDa."
+    - "\"Habiendo gente como t\xFA en el mundo...\"\ndijo el dummy muy despacio.\n\n\"...he
+      recuperado la fe en la humanidad.\""
+    - "Se levant\xF3.\n\nFue hasta la m\xE1quina.\n\nCogi\xF3 un frasco. No el que
+      hab\xEDa preparado.\nOtro. Diferente."
+    - "\"Este suero no despierta. Pone en pausa.\n El ser inerte guarda una consciencia
+      dormida dentro.\n El d\xEDa que la humanidad est\xE9 preparada,\n esa consciencia
+      se reactivar\xE1.\n\n Pero eso tendr\xE1 que gan\xE1rselo.\""
+    - "Activ\xF3 el bot\xF3n.\n\nY empez\xF3 a caminar hacia la salida.\n\nEl ninja
+      se levant\xF3.\n\n\"Espera. Juntos podemos\u2014\""
+    - "El dummy se par\xF3.\nSin girarse.\n\nCon una mano sosten\xEDa el medall\xF3n.\nCon
+      la otra, un frasco de color diferente.\n\n\"Prepara al mundo para ese momento.\n
+      Yo me voy a revivir cuando t\xFA fuiste\n verdaderamente feliz.\""
+    - "El ninja intent\xF3 hablar.\n\nPero el dummy ya no estaba."
+    - "Pas\xF3 el tiempo.\n\nEl ninja estaba sentado en su casa.\nCon el peri\xF3dico
+      en la mano.\n\nLa portada dec\xEDa:\n\nEL NINJA QUE SALV\xD3 AL MUNDO DE LA
+      EPIDEMIA INERTE\n\nLo mir\xF3 un momento.\n\nLo dej\xF3 en la mesa.\n\nY mir\xF3
+      por la ventana."
+    battleDescription: "El Dummy. Un solo enemigo. Muy r\xE1pido. Mucha vida. Secuencia
+      de 3 fases: aturdimiento \u2192 confusi\xF3n \u2192 golpe final."
+    thematicMessage: Solo alcanzaremos la paz cuando aceptemos a todos.
+    musicSuggestion: "Tensa, melanc\xF3lica. Que suene a alguien que lleva mucho
+      tiempo solo."
+    enemyName: El Dummy
+    enemyDescription: "Un maniqu\xED consciente. Creado para crash tests. Despert\xF3
+      solo. No es el villano."
+  - sceneName: Pantalla de Cierre
+    sceneIndex: 6
+    sceneType: 3
+    introTexts:
+    - "\n\n\n         Solo alcanzaremos la paz\n         cuando aceptemos a todos.\n\n\n\n[ENTER
+      para volver al men\xFA]"
+    outroTexts: []
+    battleDescription: Pantalla final. Sin batalla.
+    thematicMessage: Solo alcanzaremos la paz cuando aceptemos a todos.
+    musicSuggestion: Silencio. Solo silencio.
+    enemyName: 
+    enemyDescription: 
+  deathText: "No me rendir\xE9...\n\n[ENTER para continuar]"
+  globalMessage: "Los ni\xF1os pueden tener peluche.\nLas ni\xF1as pueden ser fans
+    de Fernando Alonso.\nSolo alcanzaremos la paz cuando aceptemos a todos."
+  narrativeArc: "ARCO DEL NINJA:\nComienza queriendo descansar. Descubre que detr\xE1s
+    de cada amenaza hay una historia. Los aliens se calman. Los peluches vuelven
+    a ser peluches. Las figuras de Alonso son entusiasmo puro. Los maniqu\xEDs son
+    v\xEDctimas. El dummy es el m\xE1s herido de todos.\n\nEl ninja no cambia de
+    opini\xF3n sobre el mundo. Confirma la que ya ten\xEDa: que casi nadie es simplemente
+    el enemigo."
+  dummyArc: "ARCO DEL DUMMY:\nNo es el villano. Es un ser que despert\xF3 solo, no
+    entend\xEDa por qu\xE9 exist\xEDa. Intent\xF3 conectar con algo y no pudo. Su
+    plan era equivocado. Su dolor era real. El medall\xF3n es el \xFAnico momento
+    en que alguien lo trata como si importara lo que siente. Y eso lo cambia todo."

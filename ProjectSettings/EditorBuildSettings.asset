@@ -4,6 +4,27 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TestingScene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/Scene2_Aliens.unity
+    guid: d865085df824b5843a04eb58ea338596
+  - enabled: 1
+    path: Assets/Scenes/Scene3_Peluches.unity
+    guid: 1822272ab40491a40bf6f1e084f06467
+  - enabled: 1
+    path: Assets/Scenes/Scene4_Alonso.unity
+    guid: c2b525cc564f89a489d6750760b91976
+  - enabled: 1
+    path: Assets/Scenes/Scene5_Maniquis.unity
+    guid: 8dc3a9f78ee5396448fb267f6e941c21
+  - enabled: 1
+    path: Assets/Scenes/Scene6_Boss.unity
+    guid: 8515c6173453d5943995a67b1a3cf254
+  - enabled: 1
+    path: Assets/Scenes/FinalScene.unity
+    guid: 2d75383c5923af443944533a298ccc4f
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}

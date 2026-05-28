@@ -266,7 +266,7 @@ public class PlayerHUDController : MonoBehaviour
     {
         bool anyAtOne = false;
 
-        foreach (EnemyStruct entry in enemyManager.allEnemies)
+        foreach (EnemyManager.EnemyStruct entry in enemyManager.allEnemies)
         {
             if (entry.enemyScript == null) continue;
             if (!entry.enemyScript.IsAttackable()) continue;

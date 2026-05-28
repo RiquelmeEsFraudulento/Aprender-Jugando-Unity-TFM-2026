@@ -145,29 +145,44 @@ public class SimpleWalk : MonoBehaviour
 
         moveAxis = new Vector2(horizontal, vertical);
 
-        // ── Auto-lock si no hay lock y hay enemigos vivos ──────
-        if (!isLockedOn && !manualUnlock && enemyManager.AliveEnemyCount() > 0)
+        if (enemyManager == null)
         {
-            // Solo auto-lockar si aún no tenemos target válido en este frame
-            if (lockedTarget == null || !lockedTarget.IsAttackable())
+            enemyManager = FindAnyObjectByType<EnemyManager>();
+        }
+        if (enemyManager != null)
+        {
+            // ── Auto-lock si no hay lock y hay enemigos vivos ──────
+            if (!isLockedOn && !manualUnlock && enemyManager.AliveEnemyCount() > 0)
             {
-                TryLockOn();
-            }
-            else
-            {
-                // Recuperar lock-on hacia el target que ya teníamos
-                Transform t = lockedTarget.transform;
-                if (t != null)
+                // Solo auto-lockar si aún no tenemos target válido en este frame
+                if (lockedTarget == null || !lockedTarget.IsAttackable())
                 {
-                    lockedEnemy = t;
-                    isLockedOn = true;
-                    transform.DOKill();
-                    transform.DOLookAt(lockedEnemy.position, rotationDuration, AxisConstraint.Y, Vector3.up)
-                        .SetEase(Ease.OutSine);
-                    CreateLockOnIndicator(lockedEnemy);
+                    TryLockOn();
+                }
+                else
+                {
+                    // Recuperar lock-on hacia el target que ya teníamos
+                    Transform t = lockedTarget.transform;
+                    if (t != null)
+                    {
+                        lockedEnemy = t;
+                        isLockedOn = true;
+                        transform.DOKill();
+                        transform.DOLookAt(lockedEnemy.position, rotationDuration, AxisConstraint.Y, Vector3.up)
+                            .SetEase(Ease.OutSine);
+                        CreateLockOnIndicator(lockedEnemy);
+                    }
                 }
             }
+        }else
+        {
+            Debug.LogWarning("[PlayerScript] No se encontró EnemyManager en escena.");
+
+            // Sin manager → asegurar que no haya lock-on activo
+            if (isLockedOn)
+                UnlockTarget();
         }
+        
 
         // ── Lock-On Toggle (Tab) ──────────────────────────────
         if (Input.GetKeyDown(KeyCode.Tab))
@@ -379,7 +394,7 @@ public class SimpleWalk : MonoBehaviour
         }
 
         // ── 3) Fallback: aleatorio ──────────────────────────
-        if (enemyManager.AliveEnemyCount() > 0)
+        if (enemyManager != null && enemyManager.AliveEnemyCount() > 0)
         {
             lockedTarget = enemyManager.RandomEnemy();
             if (lockedTarget != null)

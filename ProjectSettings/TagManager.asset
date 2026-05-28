@@ -14,6 +14,8 @@ TagManager:
   - OtherMe
   - Punio
   - Enemy
+  - SpawnPoint
+  - TestCube
   layers:
   - Default
   - TransparentFX

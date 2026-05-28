@@ -1,20 +1,16 @@
 // ============================================================
-// PlayerHealth.cs
+// PlayerHealth.cs — MODIFICADO
 // ============================================================
-// Componente mínimo de vida del jugador.
-// Añádelo al mismo GameObject que SimpleWalk.
-// La Potion lo busca con GetComponentInParent<PlayerHealth>().
-//
-// Puedes expandirlo con eventos, UI, animaciones de daño, etc.
+// Añade detección de muerte que notifica al GameManager.
+// Reemplaza tu PlayerHealth.cs existente con este.
 // ============================================================
 
-using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Vida del jugador")]
-    public float vida    = 10f;
+    public float vida = 10f;
     public float vidaMax = 20f;
 
     public float lottery;
@@ -22,20 +18,29 @@ public class PlayerHealth : MonoBehaviour
 
     public PlayerHUDController hud;
 
-    public float level; // Nivel del jugador, para escalar daño o XP
-    public float XP; // Puntos de experiencia del jugador
+    public float level = 1f;
+    public float XP = 0f;
+
+    private bool isDead = false;
 
     void Start()
     {
         level = 1f;
         XP = 0f;
         lootbox = 0f;
+        isDead = false;
     }
+
     void Update()
     {
-        // Clamp: nunca salirse del rango [0, vidaMax].
-        // En C++: vida = std::clamp(vida, 0f, vidaMax);
         vida = Mathf.Clamp(vida, 0f, vidaMax);
+
+        // Detectar muerte
+        if (vida <= 0f && !isDead)
+        {
+            isDead = true;
+            OnDeath();
+        }
     }
 
     public void RecibirDanio(float cantidad)
@@ -61,16 +66,33 @@ public class PlayerHealth : MonoBehaviour
         vida -= cantidad;
         Debug.Log("[Player] Daño recibido: -" + cantidad + " | Vida: " + vida);
     }
+
     public void GanarXP(float cantidad)
     {
         XP += cantidad;
         Debug.Log("[Player] XP ganado: +" + cantidad + " | XP total: " + XP);
-        // Aquí podrías añadir lógica para subir de nivel, mejorar stats, etc.
-        if (XP >= level * 10) // Ejemplo: necesitas 10 XP para el nivel 1, 20 XP para el nivel 2, etc.
+
+        if (XP >= level * 10)
         {
             level += 1f;
-            vidaMax += 2f; // Ejemplo: cada nivel aumenta la vida máxima
+            vidaMax += 2f;
             Debug.Log("[Player] Subió al nivel " + level + "! Vida máxima aumentada a " + vidaMax);
         }
+    }
+
+    void OnDeath()
+    {
+        Debug.Log("[Player] ¡El jugador ha muerto!");
+
+        // Notificar al GameManager
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnPlayerDied();
+        }
+    }
+
+    public void ResetDeath()
+    {
+        isDead = false;
     }
 }

@@ -6,10 +6,10 @@ using DG.Tweening;
 public class EnemyScript : Damageable
 {
     //Declarations
-    private Animator animator;
-    private SimpleWalk playerCombat;
-    private EnemyManager enemyManager;
-    private EnemyDetection enemyDetection;
+    public Animator animator;
+    public SimpleWalk playerCombat;
+    public EnemyManager enemyManager;
+    public EnemyDetection enemyDetection;
     public CharacterController characterController;
 
     [Header("Stats")]
@@ -20,15 +20,15 @@ public class EnemyScript : Damageable
     [SerializeField] private bool isPreparingAttack;
     [SerializeField] private bool isMoving;
     [SerializeField] private bool isRetreating;
-    [SerializeField] private bool isLockedTarget;
-    [SerializeField] private bool isStunned;
-    [SerializeField] private bool isWaiting = true;
+    [SerializeField] public bool isLockedTarget;
+    [SerializeField] public bool isStunned;
+    [SerializeField] public bool isWaiting = true;
 
     [Header("Polish")]
     private Coroutine PrepareAttackCoroutine;
     private Coroutine RetreatCoroutine;
     private Coroutine DamageCoroutine;
-    private Coroutine MovementCoroutine;
+    public Coroutine MovementCoroutine;
     private Coroutine DeathCoroutine;
     private Coroutine lockTimerCoroutine;
 
@@ -46,23 +46,35 @@ public class EnemyScript : Damageable
 
     private const bool LOG_IA = true;
 
-    void Start()
-    {
-        enemyManager = GetComponentInParent<EnemyManager>();
-        base.InicializarVida();
-        animator = GetComponent<Animator>();
-        characterController = GetComponent<CharacterController>();
+    public virtual void Start()
+        {
+            enemyManager = GetComponentInParent<EnemyManager>();
 
-        playerCombat = FindAnyObjectByType<SimpleWalk>();
-        enemyDetection = playerCombat.GetComponentInChildren<EnemyDetection>();
+            if (enemyManager == null)
+            {
+                Debug.LogWarning($"[EnemyScript] '{name}' no encontró EnemyManager en el padre.");
+            }
 
-        playerCombat.OnCounterAttack.AddListener((x) => OnPlayerCounter(x));
-        playerCombat.OnTrajectory.AddListener((x) => OnPlayerTrajectory(x));
+            base.InicializarVida();
+            animator = GetComponent<Animator>();
+            characterController = GetComponent<CharacterController>();
 
-        MovementCoroutine = StartCoroutine(EnemyMovement());
+            playerCombat = FindAnyObjectByType<SimpleWalk>();
+            if (playerCombat != null)
+            {
+                enemyDetection = playerCombat.GetComponentInChildren<EnemyDetection>();
+                playerCombat.OnCounterAttack.AddListener((x) => OnPlayerCounter(x));
+                playerCombat.OnTrajectory.AddListener((x) => OnPlayerTrajectory(x));
+            }
+
+            // Tell parent manager to re-register including us
+            if (enemyManager != null)
+                enemyManager.RegisterAllEnemiesInChildren();
+
+            MovementCoroutine = StartCoroutine(EnemyMovement());
     }
 
-    IEnumerator EnemyMovement()
+    public IEnumerator EnemyMovement()
     {
         if (this == null || !isActiveAndEnabled) yield break;
 
@@ -299,7 +311,7 @@ public class EnemyScript : Damageable
         this.enabled = false;
         characterController.enabled = false;
         animator.SetTrigger("Death");
-        enemyManager.SetEnemyAvailiability(this, false);
+        enemyManager.SetEnemyAvailability(this, false);
     }
 
     public override void Morir()
@@ -310,7 +322,7 @@ public class EnemyScript : Damageable
         this.enabled = false;
         characterController.enabled = false;
         animator.SetTrigger("Death");
-        enemyManager.SetEnemyAvailiability(this, false);
+        enemyManager.SetEnemyAvailability(this, false);
         enemyManager.RemoveEnemy(this);
         playerCombat.GetComponent<PlayerHealth>().GanarXP(XPEarned);
         DeathCoroutine = StartCoroutine(MuerteCooldown());

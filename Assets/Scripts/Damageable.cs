@@ -319,7 +319,7 @@ public class Damageable : MonoBehaviour
     /// <summary>
     /// Intenta aplicar SLEEP. Devuelve true si se aplicó.
     /// </summary>
-    public bool AplicarSleep()
+    public virtual bool AplicarSleep()
     {
         if (!puedeSerAfectadoSueno)
         {
@@ -338,7 +338,7 @@ public class Damageable : MonoBehaviour
     /// <summary>
     /// Intenta aplicar CONFUSED. Devuelve true si se aplicó.
     /// </summary>
-    public bool AplicarConfused()
+    public virtual bool AplicarConfused()
     {
         if (!puedeSerAfectadoconfuso)
         {
@@ -373,7 +373,7 @@ public class Damageable : MonoBehaviour
     // ESTADOS SLEEP / CONFUSED — PROCESAMIENTO
     // ══════════════════════════════════════════════════════════
 
-    void ProcesarEstadoEspecial()
+    public virtual void ProcesarEstadoEspecial()
     {
         if (estadoEspecial == EstadoEspecial.None) return;
 
@@ -391,7 +391,7 @@ public class Damageable : MonoBehaviour
         }
     }
 
-    void LimpiarEstadoEspecial()
+    public virtual void LimpiarEstadoEspecial()
     {
         estadoEspecial = EstadoEspecial.None;
         timerEstadoEspecial = 0f;
