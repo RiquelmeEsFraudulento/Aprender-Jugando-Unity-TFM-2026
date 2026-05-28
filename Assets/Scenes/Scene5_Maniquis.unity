@@ -1239,6 +1239,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 632895265}
   isPreparingAttack: 0
   isMoving: 0
@@ -1460,6 +1464,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 652239573}
   isPreparingAttack: 0
   isMoving: 0
@@ -1656,6 +1664,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 672067121}
   isPreparingAttack: 0
   isMoving: 0
@@ -3814,6 +3826,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1475440925}
   isPreparingAttack: 0
   isMoving: 0
@@ -3926,6 +3942,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1606526467}
   isPreparingAttack: 0
   isMoving: 0
@@ -4302,6 +4322,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1654715474}
   isPreparingAttack: 0
   isMoving: 0
@@ -5148,6 +5172,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1721433779}
   isPreparingAttack: 0
   isMoving: 0
@@ -5695,6 +5723,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 2044250955}
   isPreparingAttack: 0
   isMoving: 0
@@ -6515,6 +6547,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 2066685662}
   isPreparingAttack: 0
   isMoving: 0
@@ -6657,6 +6693,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemies Maniqui
       objectReference: {fileID: 0}
+    - target: {fileID: 4967221342138692660, guid: 0d39449891064894791db5fc8b1b1fae, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5056575633741091030, guid: 0d39449891064894791db5fc8b1b1fae, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.1726699
@@ -6753,6 +6793,10 @@ PrefabInstance:
     - target: {fileID: 5095601788493664054, guid: 49c440e7ffc8c0e449566dfcc61dc966, type: 3}
       propertyPath: m_Name
       value: Enemy Dummy
+      objectReference: {fileID: 0}
+    - target: {fileID: 5095601788493664054, guid: 49c440e7ffc8c0e449566dfcc61dc966, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -197,10 +197,10 @@ public class SimpleWalk : MonoBehaviour
         }
 
         // ── Scroll / Q / E para cambiar objetivo ─────────────
-        if (isLockedOn && Mathf.Abs(Input.mouseScrollDelta.y) > 0.1f)
-        {
-            CycleLockTarget(Input.mouseScrollDelta.y > 0 ? 1 : -1);
-        }
+        //if (isLockedOn && Mathf.Abs(Input.mouseScrollDelta.y) > 0.1f)
+        //{
+            //CycleLockTarget(Input.mouseScrollDelta.y > 0 ? 1 : -1);
+        //}
         if (isLockedOn)
         {
             if (Input.GetKeyDown(KeyCode.E)) CycleLockTarget(1);

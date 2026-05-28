@@ -231,9 +231,9 @@ MonoBehaviour:
     sceneIndex: 6
     sceneType: 3
     introTexts:
-    - "\n\n\n         Solo alcanzaremos la paz\n         cuando aceptemos a todos.\n\n\n\n[ENTER
-      para volver al men\xFA]"
-    outroTexts: []
+    - "\n\n\n         Solo alcanzaremos la paz\n         cuando aceptemos a todos.\n\n"
+    outroTexts:
+    - Gracias por aprender jugando con mi juego
     battleDescription: Pantalla final. Sin batalla.
     thematicMessage: Solo alcanzaremos la paz cuando aceptemos a todos.
     musicSuggestion: Silencio. Solo silencio.

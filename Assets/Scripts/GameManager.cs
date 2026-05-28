@@ -1,3 +1,7 @@
+// ══════════════════════════════════════════════════════════
+// GameManager.cs — FIX TOTAL: while loop, no recursion
+// ══════════════════════════════════════════════════════════
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,7 +33,7 @@ public class GameManager : MonoBehaviour
         "FinalScene"
     };
 
-    [Header("Rondas por Escena")]
+    [Header("Rondas por Escena Normal")]
     public int roundsPerScene = 3;
 
     private int currentSceneIndex = 0;
@@ -37,60 +41,48 @@ public class GameManager : MonoBehaviour
     private bool isInBattle = false;
     private bool isInCutscene = false;
     private bool hasShownIntro = false;
+    private int extraRoundsFromDeath = 0;
+
+    private Coroutine activeBattleCoroutine;
 
     private float savedPlayerHealth = -1f;
     private float savedPlayerMaxHealth = -1f;
     private float savedPlayerXP = -1f;
     private float savedPlayerLevel = -1f;
 
-    // ══════════════════════════════════════════════════════════
-    // SINGLETON
-    // ══════════════════════════════════════════════════════════
-
     void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
 
-    void Start()
-    {
-        AutoFindReferences();
-    }
+    void Start() => AutoFindReferences();
 
     void AutoFindReferences()
     {
-        if (player == null)
-        {
-            SimpleWalk sw = FindAnyObjectByType<SimpleWalk>();
-            if (sw != null) player = sw.gameObject;
-        }
-        if (enemySpawner == null)
-            enemySpawner = FindAnyObjectByType<EnemySpawner>();
-        if (spawnPoint == null && player != null)
-            spawnPoint = player.transform;
+        if (player == null) { SimpleWalk sw = FindAnyObjectByType<SimpleWalk>(); if (sw != null) player = sw.gameObject; }
+        if (enemySpawner == null) enemySpawner = FindAnyObjectByType<EnemySpawner>();
+        if (spawnPoint == null && player != null) spawnPoint = player.transform;
     }
 
-    // ══════════════════════════════════════════════════════════
-    // SCENE LOAD
-    // ══════════════════════════════════════════════════════════
+    bool IsTestingScene() => GameObject.FindGameObjectWithTag("TestCube") != null;
+    bool IsBossScene() => currentSceneIndex == sceneOrder.IndexOf("Scene6_Boss");
+    bool IsFinalScene() => currentSceneIndex == sceneOrder.Count - 1;
+
+    int GetTotalRoundsForThisScene()
+    {
+        return (IsBossScene() ? 1 : roundsPerScene) + extraRoundsFromDeath;
+    }
 
     void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
     void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        StartCoroutine(AfterSceneLoaded());
-    }
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode) => StartCoroutine(AfterSceneLoaded());
 
     IEnumerator AfterSceneLoaded()
     {
-        Debug.Log("[GameManager] === ESCENA CARGADA ===");
+        Debug.Log($"[GM] === ESCENA [{currentSceneIndex}] {sceneOrder[currentSceneIndex]} ===");
         yield return null;
 
         AutoFindReferences();
@@ -106,229 +98,158 @@ public class GameManager : MonoBehaviour
 
         RestorePlayerStats();
 
-        // ── CHECK IF TESTING SCENE (has TestCube) ────────────
-        if (IsTestingScene())
-        {
-            Debug.Log("[GameManager] Escena de testing detectada.");
-            yield return StartCoroutine(HandleTestingScene());
-        }
-        else if (currentSceneIndex > 0 && currentSceneIndex < sceneOrder.Count - 1)
-        {
-            // ── BATTLE SCENE ──────────────────────────────────
-            // 1) SPAWN ENEMIES FIRST
-            Debug.Log("[GameManager] === PRIMER SPAWN DE ENEMIGOS ===");
-            yield return StartCoroutine(SpawnFirstEnemies());
-
-            // 2) PLAYER APPEARS
-            Debug.Log("[GameManager] Jugador aparece en la escena.");
-            SetPlayerActive(true);
-
-            // 3) PLAY INTRO
-            if (!hasShownIntro)
-            {
-                hasShownIntro = true;
-                yield return StartCoroutine(ShowIntroCutscene());
-            }
-
-            // 4) START BATTLE
-            yield return StartCoroutine(StartBattleRound());
-        }
+        if (IsTestingScene()) yield return StartCoroutine(HandleTestingScene());
+        else if (IsFinalScene()) yield return StartCoroutine(HandleFinalScene());
+        else if (IsBossScene()) yield return StartCoroutine(HandleBossScene());
+        else if (currentSceneIndex > 0) yield return StartCoroutine(HandleNormalBattleScene());
+        else SetPlayerActive(true);
     }
 
     // ══════════════════════════════════════════════════════════
-    // TESTING SCENE — Check for TestCube
+    // TESTING
     // ══════════════════════════════════════════════════════════
-
-    bool IsTestingScene()
-    {
-        GameObject testCube = GameObject.FindGameObjectWithTag("TestCube");
-        if (testCube != null)
-        {
-            Debug.Log("[GameManager] TestCube encontrado → escena de testing.");
-            return true;
-        }
-        return false;
-    }
 
     IEnumerator HandleTestingScene()
     {
-        Debug.Log("[GameManager] === MODO TESTING ===");
-
-        // Make sure player is active
         SetPlayerActive(true);
-
-        // Wait until TestCube is destroyed
-        Debug.Log("[GameManager] Esperando que TestCube sea destruido...");
-
-        while (true)
-        {
-            GameObject testCube = GameObject.FindGameObjectWithTag("TestCube");
-            if (testCube == null)
-            {
-                Debug.Log("[GameManager] TestCube destruido → avanzando a siguiente escena.");
-                break;
-            }
-            yield return new WaitForSeconds(0.5f);
-        }
-
-        // Advance to next scene
+        while (GameObject.FindGameObjectWithTag("TestCube") != null) yield return new WaitForSeconds(0.5f);
         yield return StartCoroutine(AdvanceToNextScene());
     }
 
     // ══════════════════════════════════════════════════════════
-    // FIRST SPAWN — Spawn enemies BEFORE player appears
+    // FINAL
+    // ══════════════════════════════════════════════════════════
+
+    IEnumerator HandleFinalScene()
+    {
+        SetPlayerActive(true);
+        if (!hasShownIntro) { hasShownIntro = true; yield return StartCoroutine(ShowIntroCutscene()); }
+        yield return new WaitForSeconds(1f);
+        yield return StartCoroutine(ShowOutroCutscene());
+        Debug.Log("[GM] ████ COMPLETADO ████");
+        yield return new WaitForSeconds(2f);
+        yield return StartCoroutine(AdvanceToNextScene());
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // BOSS — while loop, no recursion
+    // ══════════════════════════════════════════════════════════
+
+    IEnumerator HandleBossScene()
+    {
+        extraRoundsFromDeath = 0;
+        int total = GetTotalRoundsForThisScene();
+        Debug.Log($"[GM] === BOSS — {total} rondas (extra:{extraRoundsFromDeath}) ===");
+
+        yield return StartCoroutine(SpawnFirstEnemies());
+        SetPlayerActive(true);
+        if (!hasShownIntro) { hasShownIntro = true; yield return StartCoroutine(ShowIntroCutscene()); }
+
+        StopActiveBattle();
+        activeBattleCoroutine = StartCoroutine(BattleLoop(total, true));
+        yield return activeBattleCoroutine;
+        activeBattleCoroutine = null;
+
+        yield return StartCoroutine(ShowOutroCutscene());
+        yield return StartCoroutine(AdvanceToNextScene());
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // NORMAL — while loop, no recursion
+    // ══════════════════════════════════════════════════════════
+
+    IEnumerator HandleNormalBattleScene()
+    {
+        extraRoundsFromDeath = 0;
+        int total = GetTotalRoundsForThisScene();
+        Debug.Log($"[GM] === BATALLA NORMAL — {total} rondas (base:{roundsPerScene} + extra:{extraRoundsFromDeath}) ===");
+
+        yield return StartCoroutine(SpawnFirstEnemies());
+        SetPlayerActive(true);
+        if (!hasShownIntro) { hasShownIntro = true; yield return StartCoroutine(ShowIntroCutscene()); }
+
+        StopActiveBattle();
+        currentRound = 0;
+        activeBattleCoroutine = StartCoroutine(BattleLoop(total, false));
+        yield return activeBattleCoroutine;
+        activeBattleCoroutine = null;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // BATTLE LOOP — WHILE, NO RECURSION
+    // ══════════════════════════════════════════════════════════
+
+    IEnumerator BattleLoop(int totalRounds, bool isBoss)
+    {
+        while (currentRound < totalRounds)
+        {
+            currentRound++;
+            Debug.Log($"[GM] ███ RONDA {currentRound}/{totalRounds} ███");
+            isInBattle = true;
+
+            yield return StartCoroutine(WaitForAllEnemiesDead());
+
+            Debug.Log($"[GM] ███ RONDA {currentRound}/{totalRounds} COMPLETADA ███");
+            isInBattle = false;
+
+            if (currentRound < totalRounds)
+            {
+                Debug.Log($"[GM] Preparando ronda {currentRound + 1}/{totalRounds}...");
+                yield return StartCoroutine(DestroyAllManagers());
+                yield return StartCoroutine(SpawnNextWave());
+            }
+        }
+
+        Debug.Log($"[GM] ███ TODAS LAS RONDAS COMPLETADAS ({totalRounds}) ███");
+        activeBattleCoroutine = null;
+        yield return StartCoroutine(ShowOutroCutscene());
+        yield return StartCoroutine(AdvanceToNextScene());
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // STOP battle — kills the single coroutine
+    // ══════════════════════════════════════════════════════════
+
+    void StopActiveBattle()
+    {
+        if (activeBattleCoroutine != null)
+        {
+            Debug.Log("[GM] ■ DETENIENDO batalla activa.");
+            StopCoroutine(activeBattleCoroutine);
+            activeBattleCoroutine = null;
+        }
+        isInBattle = false;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // SPAWN FIRST ENEMIES
     // ══════════════════════════════════════════════════════════
 
     IEnumerator SpawnFirstEnemies()
     {
-        Debug.Log("[GameManager] === SPAWN PRIMERA OLEADA ===");
-
-        // Keep player disabled during spawn
+        Debug.Log("[GM] === SPAWN PRIMERA OLEADA ===");
         SetPlayerActive(false);
 
-        // Find all EnemySpawners with tag "Respawn"
         GameObject[] respawnPoints = GameObject.FindGameObjectsWithTag("Respawn");
-        Debug.Log($"[GameManager] Encontrados {respawnPoints.Length} spawn points.");
+        if (respawnPoints.Length == 0) { Debug.LogError("[GM] NO HAY SPAWN POINTS!"); SetPlayerActive(true); yield break; }
 
-        if (respawnPoints.Length == 0)
-        {
-            Debug.LogError("[GameManager] NO HAY SPAWN POINTS CON TAG 'Respawn'!");
-            SetPlayerActive(true);
-            yield break;
-        }
-
-        // Spawn from each point
         foreach (GameObject rp in respawnPoints)
         {
             EnemySpawner spawner = rp.GetComponent<EnemySpawner>();
             if (spawner != null)
             {
-                Debug.Log($"[GameManager] Spawneando desde '{rp.name}'...");
                 EnemyManager spawned = spawner.Spawn();
-                if (spawned != null)
-                {
-                    Debug.Log($"[GameManager] Spawned: '{spawned.name}' con {spawned.allEnemies.Count} hijos.");
-                }
-                else
-                {
-                    Debug.LogError($"[GameManager] Spawner '{rp.name}' devolvió NULL!");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"[GameManager] '{rp.name}' no tiene EnemySpawner!");
+                if (spawned != null) Debug.Log($"[GM] Spawned: '{spawned.name}' ({spawned.allEnemies.Count}).");
             }
         }
 
-        // Wait for Start() to run on new prefabs
-        Debug.Log("[GameManager] Esperando inicialización de Managers...");
         yield return new WaitForSeconds(0.5f);
 
-        // Find all spawned EnemyManagers
-        EnemyManager[] allManagers = FindObjectsByType<EnemyManager>();
-        Debug.Log($"[GameManager] {allManagers.Length} EnemyManager(s) en escena.");
+        EnemyManager[] managers = FindObjectsByType<EnemyManager>();
+        if (managers.Length > 0) StartAIOnAllManagers();
+        else Debug.LogError("[GM] CRITICAL: No managers tras spawn!");
 
-        if (allManagers.Length > 0)
-        {
-            // Count total enemies
-            int totalEnemies = 0;
-            foreach (EnemyManager mgr in allManagers)
-            {
-                totalEnemies += mgr.allEnemies.Count;
-            }
-            Debug.Log($"[GameManager] Total enemigos: {totalEnemies}");
-
-            StartAIOnAllManagers();
-        }
-        else
-        {
-            Debug.Log("[GameManager] CRITICAL: No se encontró EnemyManager después del spawn!");
-        }
-
-        Debug.Log("[GameManager] === PRIMERA OLEADA COMPLETADA ===");
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // INTRO / OUTRO
-    // ══════════════════════════════════════════════════════════
-
-    IEnumerator ShowIntroCutscene()
-    {
-        isInCutscene = true;
-        Time.timeScale = 0f;
-        currentRound = 0;
-        SetPlayerActive(false);
-
-        StoryTextData.SceneTexts sceneTexts = storyData.GetSceneTexts(currentSceneIndex);
-        if (sceneTexts != null && sceneTexts.introTexts.Count > 0)
-        {
-            yield return StartCoroutine(DisplayTextSequence(sceneTexts.introTexts.ToArray()));
-        }
-
-        Time.timeScale = 1f;
-        isInCutscene = false;
-        SetPlayerActive(true);
-
-        Debug.Log("[GameManager] Intro terminada.");
-    }
-
-    IEnumerator ShowOutroCutscene()
-    {
-        isInCutscene = true;
-        Time.timeScale = 0f;
-        SetPlayerActive(false);
-
-        StoryTextData.SceneTexts sceneTexts = storyData.GetSceneTexts(currentSceneIndex);
-        if (sceneTexts != null && sceneTexts.outroTexts.Count > 0)
-        {
-            yield return StartCoroutine(DisplayTextSequence(sceneTexts.outroTexts.ToArray()));
-        }
-
-        Time.timeScale = 1f;
-        isInCutscene = false;
-        SetPlayerActive(true);
-
-        Debug.Log("[GameManager] Outro terminada.");
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // BATTLE ROUNDS
-    // ══════════════════════════════════════════════════════════
-
-    IEnumerator StartBattleRound()
-    {
-        currentRound++;
-        Debug.Log($"[GameManager] ███ RONDA {currentRound}/{roundsPerScene} ███");
-
-        isInBattle = true;
-
-        // Wait for all enemies to die
-        yield return StartCoroutine(WaitForAllEnemiesDead());
-
-        Debug.Log($"[GameManager] ███ RONDA {currentRound} COMPLETADA ███");
-        isInBattle = false;
-
-        // Check if more rounds needed
-        if (currentRound < roundsPerScene)
-        {
-            Debug.Log($"[GameManager] Preparando ronda {currentRound + 1}...");
-
-            // ── DESTROY OLD MANAGERS ──────────────────────────
-            yield return StartCoroutine(DestroyAllManagers());
-
-            // ── SPAWN NEW WAVE ────────────────────────────────
-            yield return StartCoroutine(SpawnNextWave());
-
-            // ── START NEXT ROUND ──────────────────────────────
-            yield return StartCoroutine(StartBattleRound());
-        }
-        else
-        {
-            // All rounds complete — show outro
-            Debug.Log("[GameManager] Todas las rondas completadas!");
-            yield return StartCoroutine(ShowOutroCutscene());
-            yield return StartCoroutine(AdvanceToNextScene());
-        }
+        Debug.Log("[GM] === SPAWN COMPLETADO ===");
     }
 
     // ══════════════════════════════════════════════════════════
@@ -337,31 +258,31 @@ public class GameManager : MonoBehaviour
 
     IEnumerator WaitForAllEnemiesDead()
     {
-        Debug.Log("[GameManager] Esperando que mueran todos los enemigos...");
+        float timeout = 60f;
+        float elapsed = 0f;
 
         while (true)
         {
-            if (player != null)
+            if (player == null) yield break;
+
+            EnemyManager[] managers = FindObjectsByType<EnemyManager>();
+
+            if (managers.Length == 0) { Debug.Log("[GM] No hay managers → muertos."); yield break; }
+
+            int alive = 0;
+            foreach (EnemyManager m in managers) alive += m.AliveEnemyCount();
+
+            if (alive <= 0) { Debug.Log("[GM] ¡Todos muertos!"); yield break; }
+
+            elapsed += 0.5f;
+            if (elapsed >= timeout)
             {
-                EnemyManager[] managers = FindObjectsByType<EnemyManager>();
-
-                if (managers.Length == 0)
-                {
-                    Debug.Log("[GameManager] No hay managers → todos muertos.");
-                    yield break;
-                }
-
-                int totalAlive = 0;
-                foreach (EnemyManager mgr in managers)
-                {
-                    totalAlive += mgr.AliveEnemyCount();
-                }
-
-                if (totalAlive <= 0)
-                {
-                    Debug.Log("[GameManager] ¡Todos los enemigos muertos!");
-                    yield break;
-                }
+                Debug.Log($"[GM] TIMEOUT. Forzando muerte de {alive} enemigos.");
+                foreach (EnemyManager m in managers)
+                    foreach (var e in m.allEnemies)
+                        if (e.enemyScript != null) e.enemyScript.Morir();
+                yield return new WaitForSeconds(1f);
+                yield break;
             }
 
             yield return new WaitForSeconds(0.5f);
@@ -374,38 +295,13 @@ public class GameManager : MonoBehaviour
 
     IEnumerator DestroyAllManagers()
     {
-        Debug.Log("[GameManager] === DESTRUYENDO MANAGERS ANTIGUOS ===");
+        Debug.Log("[GM] Destruyendo managers...");
+        foreach (var m in FindObjectsByType<EnemyManager>()) if (m != null) Destroy(m.gameObject);
+        yield return null; yield return null;
 
-        EnemyManager[] managers = FindObjectsByType<EnemyManager>();
-        Debug.Log($"[GameManager] Destruyendo {managers.Length} manager(s).");
-
-        foreach (EnemyManager mgr in managers)
-        {
-            if (mgr != null)
-            {
-                Debug.Log($"[GameManager] Destruyendo: '{mgr.name}'");
-                Destroy(mgr.gameObject);
-            }
-        }
-
-        // Wait for destruction to process
-        yield return null;
-        yield return null;
-
-        // Clear spawner references
-        GameObject[] respawnPoints = GameObject.FindGameObjectsWithTag("Respawn");
-        foreach (GameObject rp in respawnPoints)
-        {
-            EnemySpawner spawner = rp.GetComponent<EnemySpawner>();
-            if (spawner != null)
-            {
-                spawner.ClearCurrentManager();
-            }
-        }
-
+        foreach (var rp in GameObject.FindGameObjectsWithTag("Respawn")) rp.GetComponent<EnemySpawner>()?.ClearCurrentManager();
         enemySpawner = FindAnyObjectByType<EnemySpawner>();
-
-        Debug.Log("[GameManager] Managers destruidos.");
+        Debug.Log("[GM] Managers destruidos.");
     }
 
     // ══════════════════════════════════════════════════════════
@@ -414,96 +310,126 @@ public class GameManager : MonoBehaviour
 
     IEnumerator SpawnNextWave()
     {
-        Debug.Log("[GameManager] === SPAWNANDO NUEVA OLEADA ===");
+        Debug.Log("[GM] === SPAWN NUEVA OLEADA ===");
+        yield return new WaitForSeconds(0.5f);
+
+        foreach (var rp in GameObject.FindGameObjectsWithTag("Respawn"))
+        {
+            EnemySpawner sp = rp.GetComponent<EnemySpawner>();
+            if (sp != null) { EnemyManager nm = sp.Spawn(); if (nm != null) Debug.Log($"[GM] Oleada: '{nm.name}' ({nm.allEnemies.Count})."); }
+        }
 
         yield return new WaitForSeconds(0.5f);
 
-        // Find all Respawn points
-        GameObject[] respawnPoints = GameObject.FindGameObjectsWithTag("Respawn");
-        Debug.Log($"[GameManager] {respawnPoints.Length} spawn points encontrados.");
+        EnemyManager[] newMgrs = FindObjectsByType<EnemyManager>();
+        if (newMgrs.Length > 0) StartAIOnAllManagers();
+        else Debug.LogError("[GM] CRITICAL: No managers tras spawn!");
 
-        foreach (GameObject rp in respawnPoints)
-        {
-            EnemySpawner spawner = rp.GetComponent<EnemySpawner>();
-            if (spawner != null)
-            {
-                Debug.Log($"[GameManager] Spawneando desde '{rp.name}'...");
-                EnemyManager newMgr = spawner.Spawn();
-                if (newMgr != null)
-                {
-                    Debug.Log($"[GameManager] Spawned: '{newMgr.name}' con {newMgr.allEnemies.Count} enemigos.");
-                }
-                else
-                {
-                    Debug.LogError($"[GameManager] Spawner '{rp.name}' devolvió NULL!");
-                }
-            }
-        }
-
-        // Wait for initialization
-        yield return new WaitForSeconds(0.5f);
-
-        // Start AI on new managers
-        EnemyManager[] newManagers = FindObjectsByType<EnemyManager>();
-        Debug.Log($"[GameManager] {newManagers.Length} manager(s) nuevos en escena.");
-
-        if (newManagers.Length > 0)
-        {
-            StartAIOnAllManagers();
-            Debug.Log($"[GameManager] Nueva oleada lista.");
-        }
-        else
-        {
-            Debug.LogError("[GameManager] CRITICAL: No managers después del spawn!");
-        }
-
-        Debug.Log("[GameManager] === NUEVA OLEADA COMPLETADA ===");
+        Debug.Log("[GM] === OLEADA COMPLETADA ===");
     }
 
     // ══════════════════════════════════════════════════════════
-    // PLAYER DEATH
+    // INTRO / OUTRO
     // ══════════════════════════════════════════════════════════
 
-    public void OnPlayerDied()
+    IEnumerator ShowIntroCutscene()
     {
-        StartCoroutine(PlayerDeathSequence());
+        isInCutscene = true; Time.timeScale = 0f; SetPlayerActive(false);
+        var st = storyData.GetSceneTexts(currentSceneIndex);
+        if (st != null && st.introTexts.Count > 0) yield return StartCoroutine(DisplayTextSequence(st.introTexts.ToArray()));
+        else { Debug.Log("[GM] Sin intro."); yield return new WaitForSecondsRealtime(1f); }
+        Time.timeScale = 1f; isInCutscene = false; SetPlayerActive(true);
+        Debug.Log("[GM] Intro terminada.");
+    }
+
+    IEnumerator ShowOutroCutscene()
+    {
+        isInCutscene = true; Time.timeScale = 0f; SetPlayerActive(false);
+        var st = storyData.GetSceneTexts(currentSceneIndex);
+        if (st != null && st.outroTexts.Count > 0) yield return StartCoroutine(DisplayTextSequence(st.outroTexts.ToArray()));
+        else { Debug.Log("[GM] Sin outro."); yield return new WaitForSecondsRealtime(1f); }
+        Time.timeScale = 1f; isInCutscene = false; SetPlayerActive(true);
+        Debug.Log("[GM] Outro terminada.");
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // PLAYER DEATH — SIMPLE
+    // ══════════════════════════════════════════════════════════
+
+    public void OnPlayerDied() => StartCoroutine(ShowDeathScreenAndSequence());
+
+    private bool _deathActive = false;
+    private bool _pendingDeath = false;
+
+    IEnumerator ShowDeathScreenAndSequence()
+    {
+        int total = GetTotalRoundsForThisScene();
+        Debug.Log($"[GM] ☠☠☠ MUERTE — Ronda {currentRound}/{total} ☠☠☠");
+
+        isInBattle = false; isInCutscene = true; Time.timeScale = 0f; SetPlayerActive(false);
+
+        string txt = storyData != null ? storyData.deathText : "No me rendiré...\n\n[ENTER para continuar]";
+        yield return StartCoroutine(DisplaySingleText(txt));
+
+        Time.timeScale = 1f; isInCutscene = false;
+
+        if (_deathActive) { _pendingDeath = true; yield break; }
+
+        yield return StartCoroutine(PlayerDeathSequence());
+
+        while (_pendingDeath)
+        {
+            _pendingDeath = false;
+            Debug.Log("[GM] ☠ Muerte encolada.");
+            yield return StartCoroutine(ShowDeathScreenForPending());
+            yield return StartCoroutine(PlayerDeathSequence());
+        }
+    }
+
+    IEnumerator ShowDeathScreenForPending()
+    {
+        isInCutscene = true; Time.timeScale = 0f; SetPlayerActive(false);
+        Debug.Log($"[GM] ☠☠☠ MUERTE (encolado) — Ronda {currentRound}/{GetTotalRoundsForThisScene()} ☠☠☠");
+        yield return StartCoroutine(DisplaySingleText(storyData != null ? storyData.deathText : "No me rendiré..."));
+        Time.timeScale = 1f; isInCutscene = false;
     }
 
     IEnumerator PlayerDeathSequence()
     {
-        Debug.Log("[GameManager] === JUGADOR MURIÓ ===");
+        _deathActive = true;
 
-        isInBattle = false;
-        isInCutscene = true;
-        Time.timeScale = 0f;
-        SetPlayerActive(false);
+        int before = GetTotalRoundsForThisScene();
+        extraRoundsFromDeath++;
+        int after = GetTotalRoundsForThisScene();
 
-        string deathText = storyData != null ? storyData.deathText :
-            "No me rendiré...\n\n[ENTER para continuar]";
+        Debug.Log($"[GM] ☀ Extra: {before}→{after} rondas (extraRounds={extraRoundsFromDeath}). Reintentando ronda {currentRound}.");
 
-        yield return StartCoroutine(DisplaySingleText(deathText));
+        // ■ DETENER batalla activa (la while loop)
+        StopActiveBattle();
 
-        Time.timeScale = 1f;
-        isInCutscene = false;
-
-        // Destroy old managers
         yield return StartCoroutine(DestroyAllManagers());
-
-        // Respawn enemies
         yield return StartCoroutine(SpawnNextWave());
-
-        // Respawn player
         RespawnPlayer();
         SetPlayerActive(true);
 
-        // Restart current round
-        yield return StartCoroutine(StartBattleRound());
+        // Ajustar: BattleLoop hace currentRound++ al entrar al while
+        // Queremos que vuelva a la MISMA ronda
+        currentRound--;
+        if (currentRound < 0) currentRound = 0;
+
+        Debug.Log($"[GM] ☀ currentRound={currentRound}, BattleLoop sube a {currentRound + 1}");
+
+        _deathActive = false;
+
+        // ■ LANZAR nueva BattleLoop con nuevo total
+        activeBattleCoroutine = StartCoroutine(BattleLoop(after, IsBossScene()));
+        yield return activeBattleCoroutine;
+        activeBattleCoroutine = null;
     }
 
     void RespawnPlayer()
     {
         if (player == null || spawnPoint == null) return;
-
         CharacterController cc = player.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
         player.transform.position = spawnPoint.position;
@@ -513,12 +439,41 @@ public class GameManager : MonoBehaviour
         PlayerHealth ph = player.GetComponent<PlayerHealth>();
         if (ph != null)
         {
-            if (savedPlayerHealth > 0)
-                ph.vida = savedPlayerHealth;
+            ph.vida = savedPlayerHealth > 0 ? savedPlayerHealth : ph.vidaMax;
             ph.ResetDeath();
         }
+        Debug.Log($"[GM] Respawn. Vida: {ph?.vida}/{ph?.vidaMax}");
+    }
 
-        Debug.Log("[GameManager] Jugador respawneado.");
+    // ══════════════════════════════════════════════════════════
+    // TEXT DISPLAY
+    // ══════════════════════════════════════════════════════════
+
+    IEnumerator DisplayTextSequence(string[] texts)
+    {
+        var ui = GetOrCreateStoryUI();
+        for (int i = 0; i < texts.Length; i++)
+        {
+            ui.ShowText(texts[i]);
+            yield return StartCoroutine(ui.WaitForInput());
+            ui.HideText();
+            yield return new WaitForSecondsRealtime(0.3f);
+        }
+    }
+
+    IEnumerator DisplaySingleText(string text)
+    {
+        var ui = GetOrCreateStoryUI();
+        ui.ShowText(text);
+        yield return StartCoroutine(ui.WaitForInput());
+        ui.HideText();
+    }
+
+    StoryTextUI_Canvas GetOrCreateStoryUI()
+    {
+        var ui = FindAnyObjectByType<StoryTextUI_Canvas>();
+        if (ui == null) { var go = new GameObject("StoryTextUI"); ui = go.AddComponent<StoryTextUI_Canvas>(); DontDestroyOnLoad(go); }
+        return ui;
     }
 
     // ══════════════════════════════════════════════════════════
@@ -527,135 +482,32 @@ public class GameManager : MonoBehaviour
 
     void StartAIOnAllManagers()
     {
-        EnemyManager[] managers = FindObjectsByType<EnemyManager>();
-        foreach (EnemyManager mgr in managers)
-        {
-            if (mgr != null)
-            {
-                mgr.StartAI();
-                Debug.Log($"[GameManager] StartAI en '{mgr.name}'.");
-            }
-        }
+        foreach (var m in FindObjectsByType<EnemyManager>())
+            if (m != null) { m.StartAI(); Debug.Log($"[GM] StartAI '{m.name}'."); }
     }
 
     void SetPlayerActive(bool active)
     {
         if (player == null) return;
-
-        SimpleWalk sw = player.GetComponent<SimpleWalk>();
-        if (sw != null) sw.enabled = active;
-
-        CharacterController cc = player.GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = active;
-
-        Animator anim = player.GetComponent<Animator>();
-        if (anim != null) anim.enabled = active;
-
-        Debug.Log($"[GameManager] Jugador {(active ? "ACTIVADO" : "DESACTIVADO")}.");
+        var sw = player.GetComponent<SimpleWalk>(); if (sw != null) sw.enabled = active;
+        var cc = player.GetComponent<CharacterController>(); if (cc != null) cc.enabled = active;
+        var an = player.GetComponent<Animator>(); if (an != null) an.enabled = active;
     }
-
-    // ══════════════════════════════════════════════════════════
-    // SAVE / RESTORE
-    // ══════════════════════════════════════════════════════════
 
     public void SavePlayerStats()
     {
         if (player == null) return;
-        PlayerHealth ph = player.GetComponent<PlayerHealth>();
-        if (ph == null) return;
-
-        savedPlayerHealth = ph.vida;
-        savedPlayerMaxHealth = ph.vidaMax;
-        savedPlayerXP = ph.XP;
-        savedPlayerLevel = ph.level;
+        var ph = player.GetComponent<PlayerHealth>(); if (ph == null) return;
+        savedPlayerHealth = ph.vida; savedPlayerMaxHealth = ph.vidaMax; savedPlayerXP = ph.XP; savedPlayerLevel = ph.level;
+        Debug.Log($"[GM] Stats guardados: {savedPlayerHealth}/{savedPlayerMaxHealth}");
     }
 
     void RestorePlayerStats()
     {
         if (player == null) return;
-        PlayerHealth ph = player.GetComponent<PlayerHealth>();
-        if (ph == null) return;
-
-        if (savedPlayerHealth > 0)
-        {
-            ph.vida = savedPlayerHealth;
-            ph.vidaMax = savedPlayerMaxHealth;
-            ph.XP = savedPlayerXP;
-            ph.level = savedPlayerLevel;
-        }
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // TEXT DISPLAY
-    // ══════════════════════════════════════════════════════════
-    IEnumerator DisplayTextSequence(string[] texts)
-    {
-        Debug.Log($"[GameManager] === TEXT SEQUENCE START: {texts.Length} pages ===");
-
-        // Find or create StoryTextUI
-        StoryTextUI_Canvas storyUI = FindAnyObjectByType<StoryTextUI_Canvas>();
-        if (storyUI == null)
-        {
-            Debug.Log("[GameManager] Creating StoryTextUI...");
-            GameObject uiGO = new GameObject("StoryTextUI");
-            storyUI = uiGO.AddComponent<StoryTextUI_Canvas>();
-            DontDestroyOnLoad(uiGO);
-        }
-
-        for (int i = 0; i < texts.Length; i++)
-        {
-            Debug.Log($"[GameManager] --- Page {i + 1}/{texts.Length} ---");
-
-            storyUI.ShowText(texts[i]);
-
-            // Wait for player to press ENTER/SPACE/CLICK
-            yield return StartCoroutine(storyUI.WaitForInput());
-
-            Debug.Log($"[GameManager] Page {i + 1} complete, hiding...");
-
-            storyUI.HideText();
-
-            // Small pause between pages for smooth transition
-            yield return new WaitForSecondsRealtime(0.3f);
-        }
-
-        Debug.Log("[GameManager] === TEXT SEQUENCE COMPLETE ===");
-    }
-
-    IEnumerator DisplaySingleText(string text)
-    {
-        Debug.Log("[GameManager] === SINGLE TEXT START ===");
-
-        StoryTextUI_Canvas storyUI = FindAnyObjectByType<StoryTextUI_Canvas>();
-        if (storyUI == null)
-        {
-            GameObject uiGO = new GameObject("StoryTextUI");
-            storyUI = uiGO.AddComponent<StoryTextUI_Canvas>();
-            DontDestroyOnLoad(uiGO);
-        }
-
-        storyUI.ShowText(text);
-        yield return StartCoroutine(storyUI.WaitForInput());
-        storyUI.HideText();
-
-        Debug.Log("[GameManager] === SINGLE TEXT COMPLETE ===");
-    }
-
-    IEnumerator WaitForEnterOrClick()
-    {
-        yield return new WaitUntil(() => !Input.GetKeyDown(KeyCode.Return) &&
-                                          !Input.GetMouseButtonDown(0));
-        yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Return) ||
-                                          Input.GetKeyDown(KeyCode.Space) ||
-                                          Input.GetMouseButtonDown(0));
-    }
-
-    TextScreenManager CreateTextScreenManager()
-    {
-        GameObject go = new GameObject("TextScreenManager");
-        TextScreenManager tsm = go.AddComponent<TextScreenManager>();
-        tsm.Initialize();
-        return tsm;
+        var ph = player.GetComponent<PlayerHealth>(); if (ph == null) return;
+        if (savedPlayerHealth > 0) { ph.vida = savedPlayerHealth; ph.vidaMax = savedPlayerMaxHealth; ph.XP = savedPlayerXP; ph.level = savedPlayerLevel; }
+        Debug.Log($"[GM] Stats restaurados: {ph.vida}/{ph.vidaMax}");
     }
 
     // ══════════════════════════════════════════════════════════
@@ -664,34 +516,35 @@ public class GameManager : MonoBehaviour
 
     IEnumerator AdvanceToNextScene()
     {
-        Debug.Log("[GameManager] Avanzando a siguiente escena...");
-
+        Debug.Log("[GM] Avanzando...");
         SavePlayerStats();
-        currentSceneIndex++;
-        hasShownIntro = false;
-        currentRound = 0;
+        StopActiveBattle();
+        currentSceneIndex++; hasShownIntro = false; currentRound = 0; extraRoundsFromDeath = 0;
 
         if (currentSceneIndex < sceneOrder.Count)
         {
+            Debug.Log($"[GM] → [{currentSceneIndex}] {sceneOrder[currentSceneIndex]}");
             SceneManager.LoadScene(sceneOrder[currentSceneIndex]);
         }
         else
         {
             currentSceneIndex = 0;
-            SceneManager.LoadScene(sceneOrder[currentSceneIndex]);
-            Debug.Log("[GameManager] ¡Juego completado!");
+            Debug.Log("[GM] ¡Completado! Volviendo al inicio.");
+            SceneManager.LoadScene(sceneOrder[0]);
         }
-
         yield return null;
     }
 
     // ══════════════════════════════════════════════════════════
-    // API
+    // PUBLIC API
     // ══════════════════════════════════════════════════════════
 
     public int GetCurrentSceneIndex() => currentSceneIndex;
     public int GetCurrentRound() => currentRound;
     public int GetRoundsPerScene() => roundsPerScene;
+    public int GetTotalRoundsThisScene() => GetTotalRoundsForThisScene();
+    public int GetExtraRoundsFromDeath() => extraRoundsFromDeath;
     public bool IsInBattle() => isInBattle;
     public bool IsInCutscene() => isInCutscene;
+    public string GetCurrentSceneName() => (currentSceneIndex >= 0 && currentSceneIndex < sceneOrder.Count) ? sceneOrder[currentSceneIndex] : "Unknown";
 }
