@@ -161,6 +161,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 38405753}
   isPreparingAttack: 0
   isMoving: 0
@@ -632,17 +636,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &130874487 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4037125743402905719, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
-  m_PrefabInstance: {fileID: 1366732365}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 510ae6e0fa445004dadcedb222c8c2a7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
 --- !u!1 &205778010
 GameObject:
   m_ObjectHideFlags: 0
@@ -1489,6 +1482,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 632895265}
   isPreparingAttack: 0
   isMoving: 0
@@ -1710,6 +1707,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 652239573}
   isPreparingAttack: 0
   isMoving: 0
@@ -1906,6 +1907,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 672067121}
   isPreparingAttack: 0
   isMoving: 0
@@ -2074,7 +2079,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   player: {fileID: 1966723361}
   spawnPoint: {fileID: 971567196}
-  enemyManager: {fileID: 130874487}
+  enemySpawner: {fileID: 0}
   storyData: {fileID: 11400000, guid: 8432eccba38068647914566b9fb8deb7, type: 2}
   sceneOrder:
   - TestingScene
@@ -3944,6 +3949,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1326051445}
   isPreparingAttack: 0
   isMoving: 0
@@ -4214,6 +4223,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1363189695}
   isPreparingAttack: 0
   isMoving: 0
@@ -4548,6 +4561,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1475440925}
   isPreparingAttack: 0
   isMoving: 0
@@ -4711,6 +4728,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1606526467}
   isPreparingAttack: 0
   isMoving: 0
@@ -5087,6 +5108,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1654715474}
   isPreparingAttack: 0
   isMoving: 0
@@ -5250,6 +5275,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1675668091}
   isPreparingAttack: 0
   isMoving: 0
@@ -6142,6 +6171,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1721433779}
   isPreparingAttack: 0
   isMoving: 0
@@ -6760,6 +6793,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 2044250955}
   isPreparingAttack: 0
   isMoving: 0
@@ -7673,6 +7710,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 2066685662}
   isPreparingAttack: 0
   isMoving: 0
@@ -7795,6 +7836,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3017425839582107311, guid: 42322804bf058274da41b3185cd4bbeb, type: 3}
+      propertyPath: m_TagString
+      value: UI
+      objectReference: {fileID: 0}
     - target: {fileID: 6239634012593368106, guid: 42322804bf058274da41b3185cd4bbeb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.3069077

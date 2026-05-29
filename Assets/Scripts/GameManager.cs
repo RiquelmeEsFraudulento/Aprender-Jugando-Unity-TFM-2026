@@ -500,6 +500,10 @@ public class GameManager : MonoBehaviour
         var ph = player.GetComponent<PlayerHealth>(); if (ph == null) return;
         savedPlayerHealth = ph.vida; savedPlayerMaxHealth = ph.vidaMax; savedPlayerXP = ph.XP; savedPlayerLevel = ph.level;
         Debug.Log($"[GM] Stats guardados: {savedPlayerHealth}/{savedPlayerMaxHealth}");
+
+        var hud = player.GetComponentInChildren<PlayerHUDController>();
+        if (hud != null)
+            hud.SavePlayerHUDStats();
     }
 
     void RestorePlayerStats()
@@ -508,6 +512,13 @@ public class GameManager : MonoBehaviour
         var ph = player.GetComponent<PlayerHealth>(); if (ph == null) return;
         if (savedPlayerHealth > 0) { ph.vida = savedPlayerHealth; ph.vidaMax = savedPlayerMaxHealth; ph.XP = savedPlayerXP; ph.level = savedPlayerLevel; }
         Debug.Log($"[GM] Stats restaurados: {ph.vida}/{ph.vidaMax}");
+
+        var hud = player.GetComponentInChildren<PlayerHUDController>();
+        if (hud != null)
+        {
+            hud.RestorePlayerHUDStats();
+            hud.AddItemsOnSceneChange();
+        }
     }
 
     // ══════════════════════════════════════════════════════════

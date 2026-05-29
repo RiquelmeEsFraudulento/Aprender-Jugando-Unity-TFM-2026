@@ -16,6 +16,7 @@ TagManager:
   - Enemy
   - SpawnPoint
   - TestCube
+  - UI
   layers:
   - Default
   - TransparentFX

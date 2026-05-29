@@ -48,7 +48,13 @@ public class PlayerHUDController : MonoBehaviour
     public int lifeStealCount = 5;
     public int potionCount = 5;
     public int lifeStoneCount = 1;
-    public int chaosCount = 0;
+    public int chaosCount = 2;
+
+    [HideInInspector] public int savedLifeStealCount;
+    [HideInInspector] public int savedPotionCount;
+    [HideInInspector] public int savedLifeStoneCount;
+    [HideInInspector] public int savedChaosCount;
+
 
     /// <summary>
     /// True  = Life Stone is available this scene.
@@ -88,7 +94,7 @@ public class PlayerHUDController : MonoBehaviour
     /// <summary>
     /// Call from damage-dealing logic: heals player for a fraction of damage.
     /// </summary>
-
+    
 
 // AFTER:
     public void OnLifeStealDamageDealt(float damage)
@@ -243,8 +249,8 @@ public class PlayerHUDController : MonoBehaviour
 
     [Header("Chaos Settings")]
     public float chaosDotDuration = 3f;
-    public float chaosDotPercentPerS = 0.10f;
-    public float chaosPenaltyInstant = 0.50f;
+    public float chaosDotPercentPerS = 0.03f;
+    public float chaosPenaltyInstant = 0.10f;
 
     [HideInInspector] public bool chaosIsActive = false;
     [HideInInspector] public float chaosRemainingTime = 0f;
@@ -255,42 +261,78 @@ public class PlayerHUDController : MonoBehaviour
     {
         if (chaosCount <= 0) return false;
         if (playerHealth == null) return false;
-        if (enemyManager == null) return false;
+
+        // ── REBUSCAR el manager activo en cada uso ──
+        EnemyManager activeManager = GetActiveEnemyManager();
+        if (activeManager == null)
+        {
+            Debug.LogWarning("[Chaos] No hay EnemyManager activo en la escena.");
+            return false;
+        }
 
         chaosCount--;
-        ApplyChaos();
+        
+        // Aplicar usando el manager ACTIVO, no la referencia cacheada
+        ApplyChaosToManager(activeManager);
+        return true;
+    }
+    private void ApplyChaos()
+    {
+        // Wrapper que busca el manager actual automáticamente
+        EnemyManager activeManager = GetActiveEnemyManager();
+        if (activeManager == null)
+        {
+            Debug.LogWarning("[Chaos] No hay EnemyManager activo.");
+            return;
+        }
+        ApplyChaosToManager(activeManager);
+    }
+
+    
+
+    /// <summary>
+    /// Devuelve true si el enemigo existe, está activo, y tiene vida > 0.
+    /// Se llama antes de CADA operación que pueda fallar si el enemigo murió.
+    /// </summary>
+    private bool IsEnemyAlive(EnemyScript enemy)
+    {
+        if (enemy == null) return false;
+        if (!enemy.isActiveAndEnabled) return false;
+        if (!enemy.IsAttackable()) return false;
         return true;
     }
 
-    private void ApplyChaos()
+    private void ApplyChaosToManager(EnemyManager mgr)
     {
         bool anyAtOne = false;
 
-        foreach (EnemyManager.EnemyStruct entry in enemyManager.allEnemies)
+        foreach (EnemyManager.EnemyStruct entry in mgr.allEnemies)
         {
-            if (entry.enemyScript == null) continue;
-            if (!entry.enemyScript.IsAttackable()) continue;
+            EnemyScript e = entry.enemyScript;
 
-            int hp = entry.enemyScript.currentHealth;
+            // ── Antes de calcular ──
+            if (!IsEnemyAlive(e)) continue;
 
+            int hp = e.currentHealth;
             if (hp % 2 != 0) hp += 1;
 
             int newHp = hp / 2;
             newHp = Mathf.Max(newHp, 1);
-
-            int damageToDeal = entry.enemyScript.currentHealth - newHp;
+            int damageToDeal = e.currentHealth - newHp;
 
             if (damageToDeal > 0)
             {
-                entry.enemyScript.TakeDamage(damageToDeal, DamageType.Normal, gameObject);
+                // ── ANTES de golpear (el DoT pudo haberlo matado en este mismo frame) ──
+                if (!IsEnemyAlive(e)) continue;
+
+                e.TakeDamage(damageToDeal, DamageType.Normal, gameObject);
             }
 
-            if (entry.enemyScript != null
-                && entry.enemyScript.IsAttackable()
-                && entry.enemyScript.currentHealth == 1)
-            {
+            // ── DESPUÉS de golpear: ¿existe y tiene 1 HP? ──
+            if (!IsEnemyAlive(e)) continue;
+
+            if (e.currentHealth == 1)
                 anyAtOne = true;
-            }
         }
 
         if (_chaosDotCoroutine != null) StopCoroutine(_chaosDotCoroutine);
@@ -399,6 +441,11 @@ public class PlayerHUDController : MonoBehaviour
     {
         if (playerHealth == null) return;
 
+        if (enemyManager == null || enemyManager.gameObject == null || !enemyManager.isActiveAndEnabled)
+        {
+            enemyManager = FindAnyObjectByType<EnemyManager>();
+        }
+
         UpdateBars();
         UpdateStateCircle();
         UpdateScrollWheel();
@@ -417,6 +464,25 @@ public class PlayerHUDController : MonoBehaviour
 
         if (enemyManager == null)
             enemyManager = FindAnyObjectByType<EnemyManager>();
+    }
+
+
+    /// <summary>
+    /// Devuelve el EnemyManager ACTIVO en la escena.
+    /// Lo rebusca cada vez porque los managers se destruyen y
+    /// se recrean dinámicamente entre rondas.
+    /// Mantiene la referencia cacheada si sigue viva.
+    /// </summary>
+    private EnemyManager GetActiveEnemyManager()
+    {
+        // Si la referencia cacheada sigue viva, úsala
+        if (enemyManager != null && enemyManager.gameObject != null 
+            && enemyManager.isActiveAndEnabled)
+            return enemyManager;
+
+        // Si no, rebuscar
+        enemyManager = FindAnyObjectByType<EnemyManager>();
+        return enemyManager;
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -723,4 +789,39 @@ public class PlayerHUDController : MonoBehaviour
         _lootPopup.RemoveFromClassList("loot-visible");
         _lootPopup.AddToClassList("loot-hidden");
     }
+
+
+    public void SavePlayerHUDStats()
+{
+    if (playerHealth == null) return;
+
+    savedLifeStealCount = lifeStealCount;
+    savedPotionCount = potionCount;
+    savedLifeStoneCount = lifeStoneCount;
+    savedChaosCount = chaosCount;
+
+    Debug.Log($"[HUD] Stats guardados: LS={lifeStealCount}, P={potionCount}, St={lifeStoneCount}, Ch={chaosCount}");
+}
+
+public void RestorePlayerHUDStats()
+{
+    lifeStealCount = savedLifeStealCount;
+    potionCount = savedPotionCount;
+    lifeStoneCount = savedLifeStoneCount;
+    chaosCount = savedChaosCount;
+    lifeStoneAvailableThisScene = true;
+
+    Debug.Log($"[HUD] Stats restaurados: LS={lifeStealCount}, P={potionCount}, St={lifeStoneCount}, Ch={chaosCount}");
+}
+
+public void AddItemsOnSceneChange()
+{
+    lifeStealCount = Mathf.Min(lifeStealCount + 2, MAX_STACKABLE);
+    potionCount = Mathf.Min(potionCount + 2, MAX_STACKABLE);
+    lifeStoneCount++;
+    chaosCount++;
+    lifeStoneAvailableThisScene = true;
+
+    Debug.Log($"[HUD] Items escena: LS={lifeStealCount}, P={potionCount}, St={lifeStoneCount}, Ch={chaosCount}");
+}
 }

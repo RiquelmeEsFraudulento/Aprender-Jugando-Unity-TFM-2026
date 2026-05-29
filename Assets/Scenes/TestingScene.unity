@@ -161,6 +161,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 38405753}
   isPreparingAttack: 0
   isMoving: 0
@@ -609,12 +613,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 122208062}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.4307, y: 2.722, z: -6.31425}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.6355498, y: 1.3019999, z: -0.69370985}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 962288312}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &122208068
 Rigidbody:
@@ -1489,6 +1493,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 632895265}
   isPreparingAttack: 0
   isMoving: 0
@@ -1710,6 +1718,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 652239573}
   isPreparingAttack: 0
   isMoving: 0
@@ -1906,6 +1918,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 672067121}
   isPreparingAttack: 0
   isMoving: 0
@@ -2521,6 +2537,106 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.2, y: 0.2, z: 0.2}
   m_Center: {x: -0.03, y: 0.01, z: 0}
+--- !u!1001 &962288311
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1942057165176231363, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_Name
+      value: Enemies Alien (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1942057165176231363, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1942057165176231363, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.79515
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -5.62054
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037125743402905719, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: totalRounds
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037125743402905719, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: currentRound
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037125743402905719, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: aliveEnemyCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037125743402905719, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: allEnemies.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037125743402905719, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: allEnemies.Array.data[0].enemyScript
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037125743402905719, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      propertyPath: allEnemies.Array.data[1].enemyScript
+      value: 
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects:
+    - {fileID: 850048767251353793, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+    - {fileID: 8728763014029272324, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+    - {fileID: 5687521654968249401, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 122208067}
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+--- !u!4 &962288312 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2366012813428042508, guid: c0b28c4a78c1f3a4ab1c54ccee1b0268, type: 3}
+  m_PrefabInstance: {fileID: 962288311}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -3944,6 +4060,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1326051445}
   isPreparingAttack: 0
   isMoving: 0
@@ -4214,6 +4334,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1363189695}
   isPreparingAttack: 0
   isMoving: 0
@@ -4548,6 +4672,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1475440925}
   isPreparingAttack: 0
   isMoving: 0
@@ -4711,6 +4839,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1606526467}
   isPreparingAttack: 0
   isMoving: 0
@@ -5087,6 +5219,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1654715474}
   isPreparingAttack: 0
   isMoving: 0
@@ -5250,6 +5386,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1675668091}
   isPreparingAttack: 0
   isMoving: 0
@@ -6142,6 +6282,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1721433779}
   isPreparingAttack: 0
   isMoving: 0
@@ -6760,6 +6904,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 2044250955}
   isPreparingAttack: 0
   isMoving: 0
@@ -7673,6 +7821,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 2066685662}
   isPreparingAttack: 0
   isMoving: 0
@@ -7795,6 +7947,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4451143524429493153, guid: 42322804bf058274da41b3185cd4bbeb, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 963194227}
     - target: {fileID: 6239634012593368106, guid: 42322804bf058274da41b3185cd4bbeb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5.3069077
@@ -7843,10 +7999,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: '  '
       objectReference: {fileID: 0}
-    - target: {fileID: 6763406908484417168, guid: 42322804bf058274da41b3185cd4bbeb, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7861,7 +8013,7 @@ SceneRoots:
   - {fileID: 1248561784885951963}
   - {fileID: 99540062}
   - {fileID: 971567196}
-  - {fileID: 122208067}
+  - {fileID: 962288311}
   - {fileID: 2034082252}
   - {fileID: 771052539}
   - {fileID: 1454803789}

@@ -19,6 +19,9 @@ public class LockOnIndicator : MonoBehaviour
     public float pulseAmount    = 0.15f;
     public Vector3 baseScale    = new Vector3(1f, 1f, 1f);
 
+    [Header("Range Indicator")]
+    public RangeIndicator rangeIndicator;
+
     private float _timer;
     private Canvas _canvas;
 
@@ -27,6 +30,9 @@ public class LockOnIndicator : MonoBehaviour
         _canvas = GetComponentInChildren<Canvas>();
         // Start from zero scale for pop-in effect
         transform.localScale = Vector3.zero;
+
+        // Auto-find RangeIndicator in children
+        rangeIndicator = GetComponentInChildren<RangeIndicator>();
     }
 
     void OnEnable()
