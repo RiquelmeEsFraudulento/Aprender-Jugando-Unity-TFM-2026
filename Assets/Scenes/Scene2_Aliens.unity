@@ -1079,9 +1079,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   allEnemies: []
+  hiveName: Hive
+  _showDebugLogs: 1
   totalRounds: 3
   currentRound: 1
-  aliveEnemyCount: 0
+  pauseSwarm: 1.2
+  pauseSwarmVariance: 0.4
+  pausePack: 0.7
+  pausePackVariance: 0.2
+  pauseDuo: 0.3
+  duoCoordinationDelay: 0.8
+  pauseLast: 0.15
+  lastAggroRange: 2
+  maxReadyWait: 3
+  maxAttackWait: 6
+  maxRetreatWait: 3
+  maxConsecutiveFailures: 3
+  failureCooldown: 2
+  minReuseCooldown: 2
 --- !u!1 &540691797
 GameObject:
   m_ObjectHideFlags: 0
@@ -2344,9 +2359,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   allEnemies: []
+  hiveName: Hive
+  _showDebugLogs: 1
   totalRounds: 3
   currentRound: 1
-  aliveEnemyCount: 3
+  pauseSwarm: 1.2
+  pauseSwarmVariance: 0.4
+  pausePack: 0.7
+  pausePackVariance: 0.2
+  pauseDuo: 0.3
+  duoCoordinationDelay: 0.8
+  pauseLast: 0.15
+  lastAggroRange: 2
+  maxReadyWait: 3
+  maxAttackWait: 6
+  maxRetreatWait: 3
+  maxConsecutiveFailures: 3
+  failureCooldown: 2
+  minReuseCooldown: 2
 --- !u!1 &818740523
 GameObject:
   m_ObjectHideFlags: 0
@@ -2439,7 +2469,7 @@ Transform:
   m_GameObject: {fileID: 853453160}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.4307, y: 1.42, z: -9.014}
+  m_LocalPosition: {x: 5.4307, y: 1.42, z: -2.53}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4665,9 +4695,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   allEnemies: []
+  hiveName: Hive
+  _showDebugLogs: 1
   totalRounds: 3
   currentRound: 1
-  aliveEnemyCount: 3
+  pauseSwarm: 1.2
+  pauseSwarmVariance: 0.4
+  pausePack: 0.7
+  pausePackVariance: 0.2
+  pauseDuo: 0.3
+  duoCoordinationDelay: 0.8
+  pauseLast: 0.15
+  lastAggroRange: 2
+  maxReadyWait: 3
+  maxAttackWait: 6
+  maxRetreatWait: 3
+  maxConsecutiveFailures: 3
+  failureCooldown: 2
+  minReuseCooldown: 2
 --- !u!4 &1536714273
 Transform:
   m_ObjectHideFlags: 0
@@ -5374,9 +5419,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   allEnemies: []
+  hiveName: Hive
+  _showDebugLogs: 1
   totalRounds: 3
   currentRound: 1
-  aliveEnemyCount: 3
+  pauseSwarm: 1.2
+  pauseSwarmVariance: 0.4
+  pausePack: 0.7
+  pausePackVariance: 0.2
+  pauseDuo: 0.3
+  duoCoordinationDelay: 0.8
+  pauseLast: 0.15
+  lastAggroRange: 2
+  maxReadyWait: 3
+  maxAttackWait: 6
+  maxRetreatWait: 3
+  maxConsecutiveFailures: 3
+  failureCooldown: 2
+  minReuseCooldown: 2
 --- !u!4 &1688922227
 Transform:
   m_ObjectHideFlags: 0
@@ -7809,9 +7869,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   allEnemies: []
+  hiveName: Hive
+  _showDebugLogs: 1
   totalRounds: 3
   currentRound: 1
-  aliveEnemyCount: 3
+  pauseSwarm: 1.2
+  pauseSwarmVariance: 0.4
+  pausePack: 0.7
+  pausePackVariance: 0.2
+  pauseDuo: 0.3
+  duoCoordinationDelay: 0.8
+  pauseLast: 0.15
+  lastAggroRange: 2
+  maxReadyWait: 3
+  maxAttackWait: 6
+  maxRetreatWait: 3
+  maxConsecutiveFailures: 3
+  failureCooldown: 2
+  minReuseCooldown: 2
 --- !u!4 &2128402319
 Transform:
   m_ObjectHideFlags: 0

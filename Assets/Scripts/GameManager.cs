@@ -225,69 +225,144 @@ public class GameManager : MonoBehaviour
     // SPAWN FIRST ENEMIES
     // ══════════════════════════════════════════════════════════
 
-    IEnumerator SpawnFirstEnemies()
+    // ══════════════════════════════════════════════════════════
+// FIX: SpawnFirstEnemies — Usar nueva API
+// ══════════════════════════════════════════════════════════
+
+IEnumerator SpawnFirstEnemies()
+{
+    Debug.Log("[GM] === SPAWN PRIMERA OLEADA ===");
+    SetPlayerActive(false);
+
+    GameObject[] respawnPoints = GameObject.FindGameObjectsWithTag("Respawn");
+
+    if (respawnPoints.Length == 0)
     {
-        Debug.Log("[GM] === SPAWN PRIMERA OLEADA ===");
-        SetPlayerActive(false);
-
-        GameObject[] respawnPoints = GameObject.FindGameObjectsWithTag("Respawn");
-        if (respawnPoints.Length == 0) { Debug.LogError("[GM] NO HAY SPAWN POINTS!"); SetPlayerActive(true); yield break; }
-
-        foreach (GameObject rp in respawnPoints)
-        {
-            EnemySpawner spawner = rp.GetComponent<EnemySpawner>();
-            if (spawner != null)
-            {
-                EnemyManager spawned = spawner.Spawn();
-                if (spawned != null) Debug.Log($"[GM] Spawned: '{spawned.name}' ({spawned.allEnemies.Count}).");
-            }
-        }
-
-        yield return new WaitForSeconds(0.5f);
-
-        EnemyManager[] managers = FindObjectsByType<EnemyManager>();
-        if (managers.Length > 0) StartAIOnAllManagers();
-        else Debug.LogError("[GM] CRITICAL: No managers tras spawn!");
-
-        Debug.Log("[GM] === SPAWN COMPLETADO ===");
+        Debug.LogError("[GM] NO HAY SPAWN POINTS!");
+        SetPlayerActive(true);
+        yield break;
     }
 
+    foreach (GameObject rp in respawnPoints)
+    {
+        EnemySpawner spawner = rp.GetComponent<EnemySpawner>();
+        if (spawner != null)
+        {
+            EnemyManager spawned = spawner.Spawn();
+            if (spawned != null)
+            {
+                Debug.Log($"[GM] Spawned: '{spawned.hiveName}' ({spawned.totalCount} agentes).");
+                spawned.WakeUp();  // Despertar la colmena
+            }
+        }
+    }
+
+    yield return new WaitForSeconds(1f); // Dar tiempo a que se registren
+
+    Debug.Log("[GM] === SPAWN COMPLETADO ===");
+}
+
+// ══════════════════════════════════════════════════════════
+// FIX: SpawnNextWave — Resetear contadores de ronda
+// ══════════════════════════════════════════════════════════
+
+IEnumerator SpawnNextWave()
+{
+    Debug.Log("[GM] === SPAWN NUEVA OLEADA ===");
+    yield return new WaitForSeconds(0.5f);
+
+    foreach (var rp in GameObject.FindGameObjectsWithTag("Respawn"))
+    {
+        EnemySpawner sp = rp.GetComponent<EnemySpawner>();
+        if (sp != null)
+        {
+            EnemyManager nm = sp.Spawn();
+            if (nm != null)
+            {
+                Debug.Log($"[GM] Oleada: '{nm.hiveName}' ({nm.totalCount} agentes).");
+                nm.WakeUp();
+            }
+        }
+    }
+
+    yield return new WaitForSeconds(1f);
+    Debug.Log("[GM] === NUEVA OLEADA COMPLETADA ===");
+}
     // ══════════════════════════════════════════════════════════
     // WAIT FOR ALL ENEMIES DEAD
     // ══════════════════════════════════════════════════════════
 
-    IEnumerator WaitForAllEnemiesDead()
+    // REEMPLAZA la función WaitForAllEnemiesDead en GameManager.cs:
+
+IEnumerator WaitForAllEnemiesDead()
+{
+    float timeout = 60f;
+    float elapsed = 0f;
+
+    while (true)
     {
-        float timeout = 60f;
-        float elapsed = 0f;
+        if (player == null) yield break;
 
-        while (true)
+        var managers = FindObjectsByType<EnemyManager>();
+
+        if (managers.Length == 0)
         {
-            if (player == null) yield break;
-
-            EnemyManager[] managers = FindObjectsByType<EnemyManager>();
-
-            if (managers.Length == 0) { Debug.Log("[GM] No hay managers → muertos."); yield break; }
-
-            int alive = 0;
-            foreach (EnemyManager m in managers) alive += m.AliveEnemyCount();
-
-            if (alive <= 0) { Debug.Log("[GM] ¡Todos muertos!"); yield break; }
-
-            elapsed += 0.5f;
-            if (elapsed >= timeout)
-            {
-                Debug.Log($"[GM] TIMEOUT. Forzando muerte de {alive} enemigos.");
-                foreach (EnemyManager m in managers)
-                    foreach (var e in m.allEnemies)
-                        if (e.enemyScript != null) e.enemyScript.Morir();
-                yield return new WaitForSeconds(1f);
-                yield break;
-            }
-
-            yield return new WaitForSeconds(0.5f);
+            Debug.Log("[GM] Sin managers → enemigos muertos.");
+            yield break;
         }
+
+        int vivos = 0;
+        foreach (var m in managers)
+        {
+            if (m != null)
+                vivos += m.aliveEnemyCount;
+        }
+
+        if (vivos <= 0)
+        {
+            Debug.Log("[GM] 💀 ¡Todos muertos!");
+            yield break;
+        }
+
+        elapsed += 0.5f;
+
+        if (elapsed >= timeout)
+        {
+            Debug.LogWarning($"[GM] ⏰ TIMEOUT. Ejecutando {vivos} restantes.");
+            foreach (var m in managers)
+            {
+                if (m == null) continue;
+                m.Shutdown();
+
+                // Matar agentes restantes
+                var agents = new List<EnemyScript>();
+                foreach (var entry in m.allEnemies)
+                {
+                    if (entry.enemyScript != null && entry.enemyScript.IsAttackable())
+                        agents.Add(entry.enemyScript);
+                }
+
+                foreach (var agent in agents)
+                {
+                    try
+                    {
+                        if (agent != null && agent.IsAttackable())
+                            agent.Morir();
+                    }
+                    catch
+                    {
+                        if (agent != null && agent.gameObject != null)
+                            Destroy(agent.gameObject);
+                    }
+                }
+            }
+            yield return new WaitForSeconds(2f);
+            yield break;
+        }
+
+        yield return new WaitForSeconds(0.5f);
     }
+}
 
     // ══════════════════════════════════════════════════════════
     // DESTROY ALL MANAGERS
@@ -295,37 +370,37 @@ public class GameManager : MonoBehaviour
 
     IEnumerator DestroyAllManagers()
     {
-        Debug.Log("[GM] Destruyendo managers...");
-        foreach (var m in FindObjectsByType<EnemyManager>()) if (m != null) Destroy(m.gameObject);
-        yield return null; yield return null;
+        Debug.Log("[GM] Despertando managers...");
 
-        foreach (var rp in GameObject.FindGameObjectsWithTag("Respawn")) rp.GetComponent<EnemySpawner>()?.ClearCurrentManager();
-        enemySpawner = FindAnyObjectByType<EnemySpawner>();
-        Debug.Log("[GM] Managers destruidos.");
-    }
-
-    // ══════════════════════════════════════════════════════════
-    // SPAWN NEXT WAVE
-    // ══════════════════════════════════════════════════════════
-
-    IEnumerator SpawnNextWave()
-    {
-        Debug.Log("[GM] === SPAWN NUEVA OLEADA ===");
-        yield return new WaitForSeconds(0.5f);
-
-        foreach (var rp in GameObject.FindGameObjectsWithTag("Respawn"))
+        // Primero shutdown limpio
+        foreach (var m in FindObjectsByType<EnemyManager>())
         {
-            EnemySpawner sp = rp.GetComponent<EnemySpawner>();
-            if (sp != null) { EnemyManager nm = sp.Spawn(); if (nm != null) Debug.Log($"[GM] Oleada: '{nm.name}' ({nm.allEnemies.Count})."); }
+            if (m != null)
+                m.Shutdown();
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return null;
+        yield return null;
 
-        EnemyManager[] newMgrs = FindObjectsByType<EnemyManager>();
-        if (newMgrs.Length > 0) StartAIOnAllManagers();
-        else Debug.LogError("[GM] CRITICAL: No managers tras spawn!");
+        // Luego destruir GameObjects
+        foreach (var m in FindObjectsByType<EnemyManager>())
+        {
+            if (m != null)
+                Destroy(m.gameObject);
+        }
 
-        Debug.Log("[GM] === OLEADA COMPLETADA ===");
+        yield return null;
+        yield return null;
+
+        // Limpiar spawners
+        foreach (var rp in GameObject.FindGameObjectsWithTag("Respawn"))
+        {
+            var sp = rp.GetComponent<EnemySpawner>();
+            sp?.ClearCurrentManager();
+        }
+
+        enemySpawner = FindAnyObjectByType<EnemySpawner>();
+        Debug.Log("[GM] Managers destruidos.");
     }
 
     // ══════════════════════════════════════════════════════════
@@ -481,10 +556,16 @@ public class GameManager : MonoBehaviour
     // ══════════════════════════════════════════════════════════
 
     void StartAIOnAllManagers()
+{
+    foreach (var m in FindObjectsByType<EnemyManager>())
     {
-        foreach (var m in FindObjectsByType<EnemyManager>())
-            if (m != null) { m.StartAI(); Debug.Log($"[GM] StartAI '{m.name}'."); }
+        if (m != null)
+        {
+            m.WakeUp();
+            Debug.Log($"[GM] WakeUp '{m.hiveName}' ({m.AliveCount()} vivos).");
+        }
     }
+}
 
     void SetPlayerActive(bool active)
     {

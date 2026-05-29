@@ -2350,7 +2350,7 @@ MonoBehaviour:
   speed: 2
   animator: {fileID: 33652511142278736}
   walkAnimationSpeed: 0.25
-  detectionRadius: 8
+  detectionRadius: 12
   rotationDuration: 0.15
   lockOnPrefab: {fileID: 8560313634231963754}
   lockOnHeightOffset: 2.5
@@ -2359,8 +2359,6 @@ MonoBehaviour:
   kickRange: 1.5
   lightSaberRange: 5
   rapierRange: 3
-  ballPrefab: {fileID: 6415272138833605108, guid: 4a25b28ee80131b429153997f1a191e3, type: 3}
-  ballSpawnPoint: {fileID: 0}
   RapierCollider: {fileID: 1996376590833352798}
   LightSaberCollider: {fileID: 4233489650997703759}
   RightKickCollider: {fileID: 108269370259215941}
@@ -2369,7 +2367,7 @@ MonoBehaviour:
   LightSaber: {fileID: 6493756014119127239}
   RightKick: {fileID: 1748969507699105351}
   LeftKick: {fileID: 2160674262136304721}
-  attackCooldown: 0.6
+  attackCooldown: 1.5
   moveAxis: {x: 0, y: 0}
   isAttackingEnemy: 0
   isCountering: 0

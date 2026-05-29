@@ -246,9 +246,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   allEnemies: []
+  hiveName: Hive
+  _showDebugLogs: 1
   totalRounds: 3
   currentRound: 1
-  aliveEnemyCount: 3
+  pauseSwarm: 1.2
+  pauseSwarmVariance: 0.4
+  pausePack: 0.7
+  pausePackVariance: 0.2
+  pauseDuo: 0.3
+  duoCoordinationDelay: 0.8
+  pauseLast: 0.15
+  lastAggroRange: 2
+  maxReadyWait: 3
+  maxAttackWait: 6
+  maxRetreatWait: 3
+  maxConsecutiveFailures: 3
+  failureCooldown: 2
+  minReuseCooldown: 2
 --- !u!1001 &644490233935106482
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -259,7 +274,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 16.51
+      value: 7.11
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.y
@@ -267,7 +282,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -9.21
+      value: -6.47
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -429,6 +444,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 1861421062791229136}
   isPreparingAttack: 0
   isMoving: 0
@@ -468,7 +487,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.1793182
+      value: 0.79
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.y
@@ -476,7 +495,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.1169662
+      value: -2.1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -643,6 +662,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 5972054997090467087}
   isPreparingAttack: 0
   isMoving: 0
@@ -677,7 +700,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.7
+      value: 10.86
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.y
@@ -685,7 +708,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.23
+      value: -1.23
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 78c49ae276d041048b4f8585aacaa0bb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -857,6 +880,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 937703092736960588}
   isPreparingAttack: 0
   isMoving: 0

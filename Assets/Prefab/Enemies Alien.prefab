@@ -47,9 +47,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 510ae6e0fa445004dadcedb222c8c2a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  totalRounds: 3
-  currentRound: 1
-  aliveEnemyCount: 3
   allEnemies:
   - enemyScript: {fileID: 3658133378600901782}
     enemyAvailability: 0
@@ -57,6 +54,24 @@ MonoBehaviour:
     enemyAvailability: 0
   - enemyScript: {fileID: 2676547233334797997}
     enemyAvailability: 0
+  hiveName: Hive
+  _showDebugLogs: 1
+  totalRounds: 3
+  currentRound: 1
+  pauseSwarm: 1.2
+  pauseSwarmVariance: 0.4
+  pausePack: 0.7
+  pausePackVariance: 0.2
+  pauseDuo: 0.3
+  duoCoordinationDelay: 0.8
+  pauseLast: 0.15
+  lastAggroRange: 2
+  maxReadyWait: 3
+  maxAttackWait: 6
+  maxRetreatWait: 3
+  maxConsecutiveFailures: 3
+  failureCooldown: 2
+  minReuseCooldown: 2
 --- !u!1 &3160428010697037306
 GameObject:
   m_ObjectHideFlags: 0
@@ -285,7 +300,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.85
+      value: -0.36
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
       propertyPath: m_LocalRotation.w
@@ -448,6 +463,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 2410585392348182863}
   isPreparingAttack: 0
   isMoving: 0
@@ -657,6 +676,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 6109562262744681886}
   isPreparingAttack: 0
   isMoving: 0
@@ -711,7 +734,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.551459
+      value: 5.27
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 45026c206949d2349b00801d7b380161, type: 3}
       propertyPath: m_LocalRotation.w
@@ -871,6 +894,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 8025277333824299641}
   isPreparingAttack: 0
   isMoving: 0

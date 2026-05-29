@@ -29,9 +29,9 @@ public class EnemySpawner : MonoBehaviour
         // Check if we already have a live manager
         if (currentManager != null)
         {
-            if (currentManager.AliveEnemyCount() > 0)
+            if (currentManager.aliveEnemyCount > 0)
             {
-                Debug.Log($"[EnemySpawner] '{name}' ya tiene EnemyManager vivo con {currentManager.AliveEnemyCount()} enemigos.");
+                Debug.Log($"[EnemySpawner] '{name}' ya tiene EnemyManager vivo con {currentManager.aliveEnemyCount} enemigos.");
                 return currentManager;
             }
             else

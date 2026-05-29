@@ -242,7 +242,7 @@ public class SimpleWalk : MonoBehaviour
         }
 
         // Si no hay manager o no hay enemigos, nada que hacer
-        if (enemyManager == null || enemyManager.AliveEnemyCount() == 0)
+        if (enemyManager == null || enemyManager.aliveEnemyCount == 0)
             return;
 
         // Intentar auto-lockear al más cercano
@@ -409,7 +409,7 @@ public class SimpleWalk : MonoBehaviour
     /// </summary>
     void ForceLockOnBest()
     {
-        if (enemyManager == null || enemyManager.AliveEnemyCount() == 0) return;
+        if (enemyManager == null || enemyManager.aliveEnemyCount == 0) return;
 
         EnemyScript closest = null;
         float closestDist = Mathf.Infinity;
@@ -586,7 +586,7 @@ public class SimpleWalk : MonoBehaviour
         }
 
         // ── 3) Fallback: más cercano ─────────────────────────
-        if (enemyManager != null && enemyManager.AliveEnemyCount() > 0)
+        if (enemyManager != null && enemyManager.aliveEnemyCount > 0)
         {
             lockedTarget = GetClosestEnemy();
             return;
@@ -743,7 +743,7 @@ public class SimpleWalk : MonoBehaviour
             }
         }
 
-        if (enemyManager != null && enemyManager.AliveEnemyCount() > 0)
+        if (enemyManager != null && enemyManager.aliveEnemyCount > 0)
         {
             lockedTarget = GetClosestEnemy();
             if (lockedTarget != null)
@@ -1135,7 +1135,7 @@ public class SimpleWalk : MonoBehaviour
 
     public void HitEvent()
     {
-        if (lockedTarget == null || enemyManager == null || enemyManager.AliveEnemyCount() == 0)
+        if (lockedTarget == null || enemyManager == null || enemyManager.aliveEnemyCount == 0)
             return;
 
         OnHit?.Invoke(lockedTarget);
@@ -1190,7 +1190,7 @@ public class SimpleWalk : MonoBehaviour
     {
         if (lockedTarget == null) return false;
         return enemyManager != null
-            && enemyManager.AliveEnemyCount() == 1
+            && enemyManager.aliveEnemyCount == 1
             && lockedTarget.currentHealth <= 1;
     }
 
