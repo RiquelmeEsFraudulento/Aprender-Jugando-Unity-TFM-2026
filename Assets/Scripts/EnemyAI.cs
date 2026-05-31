@@ -1,17 +1,3 @@
-// EnemyScript.cs — FIX: Animación de muerte + NullReference + Estados
-//
-// FIX 1: Morir() — La animación de muerte no se ejecutaba porque
-// this.enabled = false desactivaba el Animator ANTES del trigger.
-// Además playerCombat era null al destruir desde GameManager.
-//
-// FIX 2: IsAttackable() — Los enemigos inactivos (dormidos atrapados
-// en bucle) se contaban como "vivos" bloqueando la colmena.
-//
-// FIX 3: HitCoroutine — Corrutina interrumpida dejaba isStunned=true.
-//
-// FIX 4: isLockedTarget — Nunca se liberaba si enemigo moría.
-// ============================================================
-
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
@@ -38,6 +24,32 @@ public class EnemyScript : Damageable
     [SerializeField] public bool isStunned;
     [SerializeField] public bool isWaiting = true;
 
+    [Header("═══ FORMATION SYSTEM ═══")]
+    public float formationReachTime = 4f;
+    public float positionTolerance = 0.8f;
+    public float repositionSpeed = 3.5f;
+    public float strafeSpeed = 1.2f;
+    public float formationRecalcInterval = 1.5f;
+    public float minPlayerDistance = 1.6f;
+
+    [SerializeField] private int formationRing = 0;
+    [SerializeField] private int formationSlot = -1;
+    [SerializeField] private int formationSlotsInRing = 1;
+    [SerializeField] private float formationRadius = 3f;
+    [SerializeField] private Vector3 formationTargetPos;
+    [SerializeField] private float formationRecalcTimer = 0f;
+    [SerializeField] private float strafeAngleOffset = 0f;
+    [SerializeField] private int strafeDir = 1;
+    [SerializeField] private float lastDirFlipTime = -10f;
+    [SerializeField] private float timeSinceSpawn = 0f;
+    [SerializeField] private bool hasReachedRing = false;
+
+    [SerializeField] private bool isInFormation = false;
+
+    
+    [SerializeField] private Vector3 lastMoveDir = Vector3.zero;
+    [SerializeField] private float oscillationBlockUntil = -1f;
+
     [Header("Polish")]
     private Coroutine PrepareAttackCoroutine;
     private Coroutine RetreatCoroutine;
@@ -59,7 +71,6 @@ public class EnemyScript : Damageable
     private const bool LOG_IA = false;
 
     // ── Estado interno de vida real ─────────────────────────
-    // FIX: Distinto de currentHealth — este es "¿puede hacer algo?"
     private bool _reallyDead = false;
 
     // ══════════════════════════════════════════════════════════
@@ -87,20 +98,30 @@ public class EnemyScript : Damageable
         if (enemyManager != null)
             enemyManager.RegisterAllEnemiesInChildren();
 
+        // ── Formation init ──
+        timeSinceSpawn = 0f;
+        hasReachedRing = false;
+        formationSlot = -1;
+        formationRecalcTimer = 0f;
+        strafeDir = Random.value > 0.5f ? 1 : -1;
+        strafeAngleOffset = Random.Range(0f, 360f);
+        lastDirFlipTime = -10f;
+        oscillationBlockUntil = -1f;
+        lastMoveDir = Vector3.zero;
+
         MovementCoroutine = StartCoroutine(EnemyMovement());
     }
 
     // ══════════════════════════════════════════════════════════
-    // FIX: IsAttackable — NO contar enemigos que no pueden actuar
+    // IS ATTACKABLE — NO contar enemigos que no pueden actuar
     // ══════════════════════════════════════════════════════════
 
     public bool IsAttackable()
     {
         if (_reallyDead) return false;
         if (currentHealth <= 0) return false;
-        // FIX: Si está inactivo/no disponible, no cuenta
         if (!isActiveAndEnabled) return false;
-        if (EstaDormido() && sleepCoroutine != null) return false;  // Dormido de verdad
+        if (EstaDormido() && sleepCoroutine != null) return false;
         return true;
     }
 
@@ -146,7 +167,6 @@ public class EnemyScript : Damageable
 
         while (EstaDormido()) yield return null;
 
-        // Despertó
         if (animator != null) animator.SetTrigger("Idle");
         sleepCoroutine = null;
         isWaiting = true;
@@ -184,7 +204,7 @@ public class EnemyScript : Damageable
     }
 
     // ══════════════════════════════════════════════════════════
-    // FIX: TAKEDAMAGE — Liberar lock y stun properly
+    // TAKEDAMAGE
     // ══════════════════════════════════════════════════════════
 
     public override void TakeDamage(int amount, DamageType damageType, GameObject source)
@@ -193,15 +213,12 @@ public class EnemyScript : Damageable
 
         if (currentHealth <= 0) return;
 
-        // Parar estados especiales si estaban activos
         if (sleepCoroutine != null) { StopCoroutine(sleepCoroutine); sleepCoroutine = null; }
         if (confusedCoroutine != null) { StopCoroutine(confusedCoroutine); confusedCoroutine = null; }
 
-        // FIX: Liberar lock y stun AL RECIBIR DAÑO
         isStunned = false;
         isLockedTarget = false;
 
-        // Parar hit coroutine anterior si estaba activa
         if (DamageCoroutine != null) { StopCoroutine(DamageCoroutine); DamageCoroutine = null; }
 
         StopEnemyCoroutines();
@@ -219,7 +236,7 @@ public class EnemyScript : Damageable
     }
 
     // ══════════════════════════════════════════════════════════
-    // FIX: HIT COROUTINE — SIEMPRE desbloquear isStunned
+    // HIT COROUTINE
     // ══════════════════════════════════════════════════════════
 
     IEnumerator HitCoroutine()
@@ -235,10 +252,8 @@ public class EnemyScript : Damageable
             yield return null;
         }
 
-        // CRITICAL FIX: isStunned SIEMPRE vuelve a false
         isStunned = false;
 
-        // Corrutina de movimiento puede reiniciarse
         if (currentHealth > 0 && !EstaDormido() && !EstaConfuso() && _reallyDead == false)
         {
             isWaiting = true;
@@ -271,13 +286,12 @@ public class EnemyScript : Damageable
     IEnumerator LockTimer()
     {
         yield return new WaitForSeconds(4f);
-        // FIX: Solo liberar si seguimos existiendo
         if (this != null && gameObject != null)
             isLockedTarget = false;
     }
 
     // ══════════════════════════════════════════════════════════
-    // FIX: MORIR — Animación de muerte + null safety + limpieza
+    // MORIR — Animación de muerte + null safety + limpieza
     // ══════════════════════════════════════════════════════════
 
     public override void Morir()
@@ -287,10 +301,8 @@ public class EnemyScript : Damageable
 
         Debug.Log($"[Enemy] ☠ '{name}' muriendo...");
 
-        // ── 1. Parar TODAS las corrutinas inmediatamente ──
         StopAllCoroutines();
 
-        // ── 2. Resetear TODOS los estados ──
         isStunned = false;
         isLockedTarget = false;
         isRetreating = false;
@@ -298,34 +310,44 @@ public class EnemyScript : Damageable
         isMoving = false;
         isWaiting = false;
 
-        // ── 3. Animación de muerte — ANTES de desactivar ──
+        // Formation state
+        isInFormation = false;
+        hasReachedRing = false;
+        formationSlot = -1;
+        formationRing = 0;
+        formationSlotsInRing = 1;
+        formationRadius = 3f;
+        formationTargetPos = Vector3.zero;
+        formationRecalcTimer = 999f;
+        strafeDir = Random.value > 0.5f ? 1 : -1;
+        strafeAngleOffset = Random.Range(0f, 360f);
+        lastDirFlipTime = -10f;
+        oscillationBlockUntil = -1f;
+        lastMoveDir = Vector3.zero;
+
         if (animator != null)
         {
-            animator.enabled = true;  // Asegurar que está activo
+            animator.enabled = true;
             animator.SetTrigger("Death");
         }
 
-        // ── 4. Desactivar componentes de gameplay ──
         this.enabled = false;
 
         if (characterController != null)
             characterController.enabled = false;
 
-        // Desactivar hitbox si existe
         if (enemyHitbox != null)
         {
             enemyHitbox.CloseHitboxWindow();
             enemyHitbox.enabled = false;
         }
 
-        // ── 5. Notificar al EnemyManager ──
         if (enemyManager != null)
         {
             enemyManager.SetEnemyAvailability(this, false);
             enemyManager.RemoveEnemy(this);
         }
 
-        // ── 6. Dar XP y loot al jugador ──
         var player = FindAnyObjectByType<SimpleWalk>();
         if (player != null)
         {
@@ -337,41 +359,27 @@ public class EnemyScript : Damageable
             }
         }
 
-        // ── 7. Destruir tras animación ──
         DeathCoroutine = StartCoroutine(DeathSequence());
     }
 
     IEnumerator DeathSequence()
     {
-        // Esperar a que se reproduzca la animación de muerte
         yield return new WaitForSeconds(2f);
-
-        // Desvincular eventos si quedaran
         UnsubscribeEvents();
-
         if (gameObject != null)
             Destroy(gameObject);
     }
-
-    // ══════════════════════════════════════════════════════════
-    // FIX: Death() — Para compatibilidad con llamadas legacy
-    // ══════════════════════════════════════════════════════════
 
     void Death()
     {
         Morir();
     }
 
-    // ══════════════════════════════════════════════════════════
-    // FIX: ONDESTROY — Limpieza final garantizada
-    // ══════════════════════════════════════════════════════════
-
     void OnDestroy()
     {
         _reallyDead = true;
         isStunned = false;
         isLockedTarget = false;
-
         UnsubscribeEvents();
     }
 
@@ -386,7 +394,7 @@ public class EnemyScript : Damageable
     }
 
     // ══════════════════════════════════════════════════════════
-    // RESET — Para EnemyManager.ForceUnstuck()
+    // RESET ALL STATES — Para EnemyManager.ForceUnstuck()
     // ══════════════════════════════════════════════════════════
 
     public void ResetAllStates()
@@ -399,53 +407,334 @@ public class EnemyScript : Damageable
         isWaiting = true;
         _reallyDead = false;
 
-        StopAllCoroutines();
+        // Formation reset
+        isInFormation = false;
+        hasReachedRing = false;
+        formationSlot = -1;
+        formationRing = 0;
+        formationSlotsInRing = 1;
+        formationRadius = 3f;
+        formationTargetPos = Vector3.zero;
+        formationRecalcTimer = 999f;
+        strafeDir = Random.value > 0.5f ? 1 : -1;
+        strafeAngleOffset = Random.Range(0f, 360f);
+        lastDirFlipTime = -10f;
+        timeSinceSpawn = 0f;
+        oscillationBlockUntil = -1f;
+        lastMoveDir = Vector3.zero;
+        moveSpeed = 1f;
 
+        StopAllCoroutines();
         StopMoving();
 
         if (currentHealth > 0 && !EstaDormido() && !EstaConfuso())
             MovementCoroutine = StartCoroutine(EnemyMovement());
     }
 
+    
     // ══════════════════════════════════════════════════════════
-    // ENEMY AI MOVEMENT
+    // ENEMY MOVEMENT COROUTINE — Define moveDirection cada 0.4s
     // ══════════════════════════════════════════════════════════
 
     public IEnumerator EnemyMovement()
     {
         if (this == null || !isActiveAndEnabled) yield break;
-
         yield return new WaitUntil(() => isWaiting == true);
 
-        if (EstaDormido() || EstaConfuso())
+        while (this != null && isActiveAndEnabled && currentHealth > 0 && !_reallyDead)
         {
-            yield return new WaitForSeconds(1f);
-            if (this != null && isActiveAndEnabled)
-                MovementCoroutine = StartCoroutine(EnemyMovement());
-            yield break;
+            if (EstaDormido() || EstaConfuso()) { yield return new WaitForSeconds(0.3f); continue; }
+            if (_reallyDead) yield break;
+            if (isPreparingAttack || isRetreating || isStunned)
+            {
+                isInFormation = false;
+                yield return new WaitForSeconds(0.2f);
+                continue;
+            }
+            if (playerCombat == null || enemyManager == null)
+            {
+                yield return new WaitForSeconds(0.3f);
+                continue;
+            }
+
+            timeSinceSpawn += 0.4f;
+            formationRecalcTimer += 0.4f;
+
+            if (formationRecalcTimer >= formationRecalcInterval || formationSlot < 0)
+            {
+                formationRecalcTimer = 0f;
+                RecalculateSlot();
+            }
+
+            if (formationSlot >= 0)
+            {
+                formationTargetPos = EnemyFormation.GetSlotWorldPosition(
+                    playerCombat.transform.position,
+                    formationSlot, formationSlotsInRing,
+                    formationRadius, strafeAngleOffset);
+
+                float distToPlayer = Vector3.Distance(transform.position, playerCombat.transform.position);
+                float distToSlot = Vector3.Distance(
+                    new Vector3(transform.position.x, 0, transform.position.z),
+                    new Vector3(formationTargetPos.x, 0, formationTargetPos.z));
+
+                if (timeSinceSpawn < formationReachTime && !hasReachedRing)
+                {
+                    if (distToSlot > positionTolerance * 2.5f || distToPlayer > formationRadius * 1.8f)
+                    {
+                        Vector3 dir = (formationTargetPos - transform.position);
+                        dir.y = 0;
+                        if (dir.sqrMagnitude > 0.001f)
+                            moveDirection = dir.normalized;
+                        isMoving = true;
+                    }
+                    else
+                    {
+                        hasReachedRing = true;
+                        isInFormation = true;
+                        StopMoving();
+                    }
+                }
+                else
+                {
+                    hasReachedRing = true;
+
+                    if (distToPlayer < minPlayerDistance)
+                    {
+                        Vector3 away = (transform.position - playerCombat.transform.position);
+                        away.y = 0;
+                        if (away.sqrMagnitude > 0.001f)
+                            moveDirection = away.normalized;
+                        isMoving = true;
+                        isInFormation = false;
+                    }
+                    else if (distToSlot <= positionTolerance)
+                    {
+                        isInFormation = true;
+                        float noise = Mathf.PerlinNoise(Time.time * 0.4f + GetInstanceID() * 1.7f, 0f);
+                        if (noise > 0.65f)
+                        {
+                            Vector3 toP = (playerCombat.transform.position - transform.position);
+                            toP.y = 0; toP.Normalize();
+                            Vector3 tangent = Vector3.Cross(Vector3.up, toP) * strafeDir;
+                            moveDirection = tangent.normalized;
+                            isMoving = true;
+                        }
+                        else
+                        {
+                            StopMoving();
+                        }
+                    }
+                    else
+                    {
+                        isInFormation = false;
+                        Vector3 dir = (formationTargetPos - transform.position);
+                        dir.y = 0;
+                        if (dir.sqrMagnitude > 0.001f)
+                            moveDirection = dir.normalized;
+                        isMoving = true;
+                    }
+                }
+            }
+            else
+            {
+                if (!isMoving)
+                {
+                    int r = Random.Range(0, 2);
+                    moveDirection = r == 1 ? Vector3.right : Vector3.left;
+                    isMoving = true;
+                }
+            }
+
+            yield return new WaitForSeconds(0.4f);
         }
-
-        int randomChance = Random.Range(0, 2);
-
-        if (randomChance == 1)
-        {
-            int randomDir = Random.Range(0, 2);
-            moveDirection = randomDir == 1 ? Vector3.right : Vector3.left;
-            isMoving = true;
-        }
-        else
-        {
-            StopMoving();
-        }
-
-        yield return new WaitForSeconds(1);
-
-        if (this != null && isActiveAndEnabled)
-            MovementCoroutine = StartCoroutine(EnemyMovement());
     }
 
     // ══════════════════════════════════════════════════════════
-    // AI — ATTACK / RETREAT / SET RETREAT
+    // MOVEENEMY — Ejecuta el movimiento (llamado en Update)
+    // ══════════════════════════════════════════════════════════
+
+    void MoveEnemy(Vector3 direction)
+    {
+        if (EstaDormido() || EstaConfuso()) return;
+        if (characterController == null || !characterController.enabled) return;
+        if (playerCombat == null) { StopMoving(); return; }
+
+        if (!isPreparingAttack && !isRetreating && formationSlot >= 0)
+        {
+            formationTargetPos = EnemyFormation.GetSlotWorldPosition(
+                playerCombat.transform.position,
+                formationSlot, formationSlotsInRing,
+                formationRadius, strafeAngleOffset);
+        }
+
+        float distToPlayer = Vector3.Distance(transform.position, playerCombat.transform.position);
+        float ctrlRadius = characterController.radius + 0.15f;
+
+        if (isPreparingAttack && direction == Vector3.forward && distToPlayer < 2f)
+        {
+            StopMoving();
+            if (!playerCombat.isCountering && !playerCombat.isAttackingEnemy)
+                Attack();
+            else
+                PrepareAttack(false);
+            return;
+        }
+
+        if (!isMoving) return;
+
+        Vector3 finalDir = direction;
+        if (!isPreparingAttack && distToPlayer < minPlayerDistance)
+        {
+            finalDir = (transform.position - playerCombat.transform.position);
+            finalDir.y = 0;
+            if (finalDir.sqrMagnitude < 0.001f) finalDir = -transform.forward;
+            finalDir.Normalize();
+        }
+
+        moveSpeed = 1f;
+        if (finalDir == Vector3.forward) moveSpeed = 5f;
+        if (finalDir == -Vector3.forward) moveSpeed = 2f;
+
+        if (!isInFormation && !isPreparingAttack && formationSlot >= 0)
+            moveSpeed = repositionSpeed;
+        if (isInFormation && !isPreparingAttack && !isRetreating)
+            moveSpeed = strafeSpeed;
+
+        finalDir = AvoidOtherEnemies(finalDir, ctrlRadius);
+
+        if (Time.time < oscillationBlockUntil) { StopMoving(); return; }
+        if (lastMoveDir != Vector3.zero && finalDir != Vector3.zero)
+        {
+            float dot = Vector3.Dot(lastMoveDir.normalized, finalDir.normalized);
+            if (dot < -0.7f && Time.time - lastDirFlipTime < 0.8f)
+                oscillationBlockUntil = Time.time + 0.6f;
+        }
+        if (finalDir != Vector3.zero) lastMoveDir = finalDir;
+
+        Vector3 toPlayer = (playerCombat.transform.position - transform.position).normalized;
+        toPlayer.y = 0;
+        Vector3 right = Quaternion.AngleAxis(90, Vector3.up) * toPlayer;
+
+        Vector3 worldMove = Vector3.zero;
+        if (finalDir == Vector3.forward) worldMove = toPlayer;
+        else if (finalDir == Vector3.right) worldMove = right;
+        else if (finalDir == Vector3.left) worldMove = -right;
+        else if (finalDir == -Vector3.forward || finalDir == Vector3.back) worldMove = -toPlayer;
+        else worldMove = finalDir;
+
+        if (finalDir == Vector3.right || finalDir == Vector3.left)
+            moveSpeed /= 1.5f;
+
+        Vector3 displacement = worldMove * moveSpeed * Time.deltaTime;
+        characterController.Move(displacement);
+
+        if (animator != null)
+        {
+            bool strafing = isInFormation && !isPreparingAttack && !isRetreating;
+            if (strafing)
+            {
+                animator.SetBool("Strafe", true);
+                animator.SetFloat("StrafeDirection", strafeDir, 0.15f, Time.deltaTime);
+                animator.SetFloat("InputMagnitude", strafeSpeed / 5f, 0.15f, Time.deltaTime);
+            }
+            else
+            {
+                float norm = moveSpeed / 5f;
+                animator.SetFloat("InputMagnitude",
+                    (characterController.velocity.normalized.magnitude * worldMove.z) / Mathf.Max(0.1f, 5f / moveSpeed),
+                    0.15f, Time.deltaTime);
+                animator.SetBool("Strafe", (finalDir == Vector3.right || finalDir == Vector3.left));
+                animator.SetFloat("StrafeDirection", finalDir.normalized.x, 0.15f, Time.deltaTime);
+            }
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // AVOID OTHER ENEMIES — Con cooldown en el cambio de dirección
+    // ══════════════════════════════════════════════════════════
+
+    Vector3 AvoidOtherEnemies(Vector3 desiredDir, float ctrlRadius)
+    {
+        if (enemyManager == null) return desiredDir;
+
+        Vector3 avoidance = Vector3.zero;
+        int count = 0;
+        float checkDist = ctrlRadius * 2.5f + 0.4f;
+
+        for (int i = 0; i < enemyManager.allEnemies.Count; i++)
+        {
+            var other = enemyManager.allEnemies[i].enemyScript;
+            if (other == null || other == this) continue;
+            if (!other.IsAttackable()) continue;
+
+            Vector3 diff = transform.position - other.transform.position;
+            diff.y = 0;
+            float dist = diff.magnitude;
+
+            if (dist < checkDist && dist > 0.05f)
+            {
+                float urgency = 1f - (dist / checkDist);
+                avoidance += diff.normalized * urgency;
+                count++;
+
+                if (dist < ctrlRadius + 0.3f && Time.time - lastDirFlipTime > 0.6f)
+                {
+                    strafeDir *= -1;
+                    lastDirFlipTime = Time.time;
+                }
+            }
+        }
+
+        if (count > 0)
+        {
+            avoidance /= count;
+            avoidance.y = 0;
+            Vector3 blended = (desiredDir + avoidance * 2f).normalized;
+            return blended;
+        }
+
+        return desiredDir;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // RECALCULAR SLOT — Llamado periódicamente por EnemyMovement
+    // ══════════════════════════════════════════════════════════
+
+    void RecalculateSlot()
+    {
+        if (playerCombat == null || enemyManager == null) return;
+
+        int totalAlive = EnemyFormation.CountAlive(enemyManager);
+        int globalSlot = EnemyFormation.GetGlobalSlot(this, enemyManager);
+
+        if (totalAlive <= 0 || globalSlot < 0)
+        {
+            formationSlot = -1;
+            return;
+        }
+
+        EnemyFormation.ComputeSlot(globalSlot, totalAlive,
+            out formationRing, out formationSlot, out formationSlotsInRing, out formationRadius);
+
+        float ringRot = formationRing * (180f / Mathf.Max(1, formationSlotsInRing));
+        float individualRot = globalSlot * 47f;
+        strafeAngleOffset = ringRot + individualRot;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // RESET SURROUND STATE — Llamado cuando otro enemigo muere
+    // ══════════════════════════════════════════════════════════
+
+    public void ResetSurroundState()
+    {
+        hasReachedRing = false;
+        formationRecalcTimer = 999f;
+        formationSlot = -1;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // AI — ATAQUE / RETIRADA
     // ══════════════════════════════════════════════════════════
 
     public void SetAttack()
@@ -508,10 +797,6 @@ public class EnemyScript : Damageable
         MovementCoroutine = StartCoroutine(EnemyMovement());
     }
 
-    // ══════════════════════════════════════════════════════════
-    // COMBAT HELPERS
-    // ══════════════════════════════════════════════════════════
-
     void PrepareAttack(bool active)
     {
         isPreparingAttack = active;
@@ -563,56 +848,8 @@ public class EnemyScript : Damageable
     }
 
     // ══════════════════════════════════════════════════════════
-    // MOVEMENT
+    // MOVEMENT HELPERS
     // ══════════════════════════════════════════════════════════
-
-    void MoveEnemy(Vector3 direction)
-    {
-        if (EstaDormido() || EstaConfuso()) return;
-
-        moveSpeed = 1;
-
-        if (direction == Vector3.forward) moveSpeed = 5;
-        if (direction == -Vector3.forward) moveSpeed = 2;
-
-        if (animator != null)
-        {
-            animator.SetFloat("InputMagnitude",
-                (characterController.velocity.normalized.magnitude * direction.z) / (5 / moveSpeed),
-                .2f, Time.deltaTime);
-            animator.SetBool("Strafe", (direction == Vector3.right || direction == Vector3.left));
-            animator.SetFloat("StrafeDirection", direction.normalized.x, .2f, Time.deltaTime);
-        }
-
-        if (!isMoving) return;
-
-        if (playerCombat == null) { StopMoving(); return; }
-
-        Vector3 dir = (playerCombat.transform.position - transform.position).normalized;
-        Vector3 pDir = Quaternion.AngleAxis(90, Vector3.up) * dir;
-        Vector3 movedir = Vector3.zero;
-        Vector3 finalDirection = Vector3.zero;
-
-        if (direction == Vector3.forward) finalDirection = dir;
-        if (direction == Vector3.right || direction == Vector3.left) finalDirection = (pDir * direction.normalized.x);
-        if (direction == -Vector3.forward) finalDirection = -transform.forward;
-
-        if (direction == Vector3.right || direction == Vector3.left) moveSpeed /= 1.5f;
-
-        movedir += finalDirection * moveSpeed * Time.deltaTime;
-        characterController.Move(movedir);
-
-        if (!isPreparingAttack) return;
-
-        if (Vector3.Distance(transform.position, playerCombat.transform.position) < 2)
-        {
-            StopMoving();
-            if (!playerCombat.isCountering && !playerCombat.isAttackingEnemy)
-                Attack();
-            else
-                PrepareAttack(false);
-        }
-    }
 
     public void StopMoving()
     {
@@ -632,10 +869,6 @@ public class EnemyScript : Damageable
         }
     }
 
-    // ══════════════════════════════════════════════════════════
-    // STOP ALL — Con reset de estados
-    // ══════════════════════════════════════════════════════════
-
     void StopEnemyCoroutines()
     {
         PrepareAttack(false);
@@ -654,7 +887,6 @@ public class EnemyScript : Damageable
         if (sleepCoroutine != null) { StopCoroutine(sleepCoroutine); sleepCoroutine = null; }
         if (confusedCoroutine != null) { StopCoroutine(confusedCoroutine); confusedCoroutine = null; }
 
-        // FIX: Resetear estados al parar corrutinas
         isStunned = false;
         isPreparingAttack = false;
     }
@@ -668,7 +900,140 @@ public class EnemyScript : Damageable
     public bool IsLockedTarget() => isLockedTarget;
     public bool IsStunned() => isStunned;
 
-
-    public void EnableHitbox()     {enemyHitbox.OpenHitboxWindow(); }
-    public void DisableHitbox()     {enemyHitbox.CloseHitboxWindow(); }
+    public void EnableHitbox()     { enemyHitbox.OpenHitboxWindow(); }
+    public void DisableHitbox()   { enemyHitbox.CloseHitboxWindow(); }
 }
+
+/// <summary>
+/// Static formation calculator. All enemies share this brain.
+/// Determines ring, slot, and world position for each enemy
+/// based on alive count so they distribute in concentric rings.
+/// </summary>
+public static class EnemyFormation
+{
+    // ══════════════════════════════════════════════════════════
+    // TUNING — Adjust these for spacing feel
+    // ══════════════════════════════════════════════════════════
+    public const float BASE_RING_RADIUS = 3.0f;     // Inner ring distance from player
+    public const float RING_WIDTH = 2.5f;           // Distance between ring 0 and ring 1
+    public const float ENEMY_SPACING_MIN = 1.6f;    // Minimum arc-length between two enemies on same ring
+    public const float PLAYER_RADIUS = 0.5f;        // Player collision proxy radius
+
+    // ══════════════════════════════════════════════════════════
+    // RING + SLOT ASSIGNMENT
+    // ══════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Given a global index (0..totalAlive-1), compute which ring
+    /// and which slot within that ring this enemy occupies.
+    /// </summary>
+    public static void ComputeSlot(
+        int globalIndex,
+        int totalAlive,
+        out int ringIndex,
+        out int slotInRing,
+        out int slotsInRing,
+        out float ringRadius)
+    {
+        ringIndex = 0;
+        slotInRing = 0;
+        slotsInRing = 1;
+        ringRadius = BASE_RING_RADIUS;
+
+        if (totalAlive <= 0) return;
+
+        int consumed = 0;
+        int ring = 0;
+
+        while (consumed < totalAlive)
+        {
+            float r = BASE_RING_RADIUS + ring * RING_WIDTH;
+            float circumference = 2f * Mathf.PI * (r + PLAYER_RADIUS);
+            int capacity = Mathf.Max(1, Mathf.FloorToInt(circumference / ENEMY_SPACING_MIN));
+            int remaining = totalAlive - consumed;
+            int here = Mathf.Min(capacity, remaining);
+
+            if (globalIndex < consumed + here)
+            {
+                ringIndex = ring;
+                slotInRing = globalIndex - consumed;
+                slotsInRing = here;
+                ringRadius = r;
+                return;
+            }
+
+            consumed += here;
+            ring++;
+        }
+
+        // Fallback — should never reach here
+        ringIndex = ring;
+        slotInRing = 0;
+        slotsInRing = 1;
+        ringRadius = BASE_RING_RADIUS + ring * RING_WIDTH;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // POSITION FROM SLOT
+    // ══════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// World position for a given slot.
+    /// angleOffsetDegrees rotates the whole ring so rings don't line up.
+    /// </summary>
+    public static Vector3 GetSlotWorldPosition(
+        Vector3 playerPos,
+        int slotInRing,
+        int slotsInRing,
+        float ringRadius,
+        float angleOffsetDegrees)
+    {
+        float angle;
+        if (slotsInRing <= 1)
+        {
+            angle = angleOffsetDegrees;
+        }
+        else
+        {
+            float angleStep = 360f / slotsInRing;
+            angle = angleOffsetDegrees + angleStep * slotInRing;
+        }
+
+        float rad = angle * Mathf.Deg2Rad;
+        return playerPos + new Vector3(
+            Mathf.Sin(rad) * ringRadius,
+            0f,
+            Mathf.Cos(rad) * ringRadius
+        );
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // QUERIES
+    // ══════════════════════════════════════════════════════════
+
+    public static int GetGlobalSlot(EnemyScript query, EnemyManager mgr)
+    {
+        int slot = 0;
+        for (int i = 0; i < mgr.allEnemies.Count; i++)
+        {
+            var e = mgr.allEnemies[i].enemyScript;
+            if (e == null || !e.IsAttackable()) continue;
+            if (e == query) return slot;
+            slot++;
+        }
+        return -1;
+    }
+
+    public static int CountAlive(EnemyManager mgr)
+    {
+        int n = 0;
+        for (int i = 0; i < mgr.allEnemies.Count; i++)
+        {
+            var e = mgr.allEnemies[i].enemyScript;
+            if (e != null && e.IsAttackable()) n++;
+        }
+        return n;
+    }
+}
+
+    

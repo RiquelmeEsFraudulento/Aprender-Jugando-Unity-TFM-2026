@@ -482,7 +482,7 @@ public class EnemyManager : MonoBehaviour
     // HELPERS DE ESTADO
     // ══════════════════════════════════════════════════════════
 
-    bool IsAlive(EnemyScript e)
+    public bool IsAlive(EnemyScript e)
     {
         if (e == null) return false;
         if (!e.gameObject.activeInHierarchy) return false;
@@ -736,4 +736,7 @@ public class EnemyManager : MonoBehaviour
         if (_showDebugLogs) Debug.Log($"[Colmena] {msg}");
         #endif
     }
+    
 }
+
+

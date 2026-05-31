@@ -512,6 +512,13 @@ public class Damageable : MonoBehaviour
     {
         DebugMuerte($"[Muerte] '{gameObject.name}' ha muerto.");
         onDeath?.Invoke();
+        // Notify nearby enemies to re-evaluate their surround slots
+        var allEnemies = FindObjectsByType<EnemyScript>();
+        foreach (var e in allEnemies)
+        {
+            if (e != null && e.IsAttackable())
+                e.ResetSurroundState();
+        }
         Destroy(gameObject);
     }
 

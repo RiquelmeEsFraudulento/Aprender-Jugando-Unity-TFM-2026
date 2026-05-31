@@ -180,9 +180,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   allEnemies: []
+  hiveName: Hive
+  _showDebugLogs: 1
   totalRounds: 3
   currentRound: 1
-  aliveEnemyCount: 3
+  pauseSwarm: 1.2
+  pauseSwarmVariance: 0.4
+  pausePack: 0.7
+  pausePackVariance: 0.2
+  pauseDuo: 0.3
+  duoCoordinationDelay: 0.8
+  pauseLast: 0.15
+  lastAggroRange: 2
+  maxReadyWait: 3
+  maxAttackWait: 6
+  maxRetreatWait: 3
+  maxConsecutiveFailures: 3
+  failureCooldown: 2
+  minReuseCooldown: 2
 --- !u!1 &6372850757478390254
 GameObject:
   m_ObjectHideFlags: 0
@@ -1264,6 +1279,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 3839613333798588201}
   isPreparingAttack: 0
   isMoving: 0
@@ -1271,6 +1290,26 @@ MonoBehaviour:
   isLockedTarget: 0
   isStunned: 0
   isWaiting: 1
+  formationReachTime: 4
+  positionTolerance: 0.8
+  repositionSpeed: 3.5
+  strafeSpeed: 1.2
+  formationRecalcInterval: 1.5
+  minPlayerDistance: 1.6
+  formationRing: 0
+  formationSlot: -1
+  formationSlotsInRing: 1
+  formationRadius: 3
+  formationTargetPos: {x: 0, y: 0, z: 0}
+  formationRecalcTimer: 0
+  strafeAngleOffset: 0
+  strafeDir: 1
+  lastDirFlipTime: -10
+  timeSinceSpawn: 0
+  hasReachedRing: 0
+  isInFormation: 0
+  lastMoveDir: {x: 0, y: 0, z: 0}
+  oscillationBlockUntil: -1
   OnDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -2110,6 +2149,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 6924934669110087811}
   isPreparingAttack: 0
   isMoving: 0
@@ -2117,6 +2160,26 @@ MonoBehaviour:
   isLockedTarget: 0
   isStunned: 0
   isWaiting: 1
+  formationReachTime: 4
+  positionTolerance: 0.8
+  repositionSpeed: 3.5
+  strafeSpeed: 1.2
+  formationRecalcInterval: 1.5
+  minPlayerDistance: 1.6
+  formationRing: 0
+  formationSlot: -1
+  formationSlotsInRing: 1
+  formationRadius: 3
+  formationTargetPos: {x: 0, y: 0, z: 0}
+  formationRecalcTimer: 0
+  strafeAngleOffset: 0
+  strafeDir: 1
+  lastDirFlipTime: -10
+  timeSinceSpawn: 0
+  hasReachedRing: 0
+  isInFormation: 0
+  lastMoveDir: {x: 0, y: 0, z: 0}
+  oscillationBlockUntil: -1
   OnDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -2941,6 +3004,10 @@ MonoBehaviour:
   estaEnvenenado: 0
   estadoEspecial: 0
   golpesRecibidosParaEstado: 0
+  animator: {fileID: 0}
+  playerCombat: {fileID: 0}
+  enemyManager: {fileID: 0}
+  enemyDetection: {fileID: 0}
   characterController: {fileID: 2794801652294173829}
   isPreparingAttack: 0
   isMoving: 0
@@ -2948,6 +3015,26 @@ MonoBehaviour:
   isLockedTarget: 0
   isStunned: 0
   isWaiting: 1
+  formationReachTime: 4
+  positionTolerance: 0.8
+  repositionSpeed: 3.5
+  strafeSpeed: 1.2
+  formationRecalcInterval: 1.5
+  minPlayerDistance: 1.6
+  formationRing: 0
+  formationSlot: -1
+  formationSlotsInRing: 1
+  formationRadius: 3
+  formationTargetPos: {x: 0, y: 0, z: 0}
+  formationRecalcTimer: 0
+  strafeAngleOffset: 0
+  strafeDir: 1
+  lastDirFlipTime: -10
+  timeSinceSpawn: 0
+  hasReachedRing: 0
+  isInFormation: 0
+  lastMoveDir: {x: 0, y: 0, z: 0}
+  oscillationBlockUntil: -1
   OnDamage:
     m_PersistentCalls:
       m_Calls: []
