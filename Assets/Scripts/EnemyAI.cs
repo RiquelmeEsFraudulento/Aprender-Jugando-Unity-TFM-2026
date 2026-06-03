@@ -28,11 +28,11 @@ public class EnemyScript : Damageable
 
     [Header("Stats")]
     private float moveSpeed = 1;
-    private Vector3 moveDirection;
+    public Vector3 moveDirection;
 
     [Header("States")]
     [SerializeField] private bool isPreparingAttack;
-    [SerializeField] private bool isMoving;
+    [SerializeField] public bool isMoving;
     [SerializeField] private bool isRetreating;
     [SerializeField] public bool isLockedTarget;
     [SerializeField] public bool isStunned;
@@ -76,7 +76,9 @@ public class EnemyScript : Damageable
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
 
-        playerCombat = FindAnyObjectByType<SimpleWalk>();
+        //playerCombat = FindAnyObjectByType<SimpleWalk>();
+        playerCombat = GetCachedPlayer();
+
         if (playerCombat != null)
         {
             enemyDetection = playerCombat.GetComponentInChildren<EnemyDetection>();
@@ -398,6 +400,7 @@ public class EnemyScript : Damageable
         isMoving = false;
         isWaiting = true;
         _reallyDead = false;
+        MarkAttackSequenceEnd();
 
         StopAllCoroutines();
 
@@ -453,7 +456,7 @@ public class EnemyScript : Damageable
         if (lockTimerCoroutine != null) StopCoroutine(lockTimerCoroutine);
         isLockedTarget = false;
         isWaiting = false;
-
+        MarkAttackSequenceStart(); // NEW: flag for ring integration
         PrepareAttackCoroutine = StartCoroutine(PrepAttack());
     }
 
@@ -479,6 +482,7 @@ public class EnemyScript : Damageable
     {
         StopEnemyCoroutines();
         RetreatCoroutine = StartCoroutine(PrepRetreat());
+        MarkAttackSequenceStart(); // NEW: still in sequence (retreat is part of attack)
     }
 
     IEnumerator PrepRetreat()
@@ -505,6 +509,7 @@ public class EnemyScript : Damageable
         isRetreating = false;
         StopMoving();
         isWaiting = true;
+        MarkAttackSequenceEnd(); // NEW: full attack sequence complete
         MovementCoroutine = StartCoroutine(EnemyMovement());
     }
 
@@ -568,20 +573,27 @@ public class EnemyScript : Damageable
 
     void MoveEnemy(Vector3 direction)
     {
-        if (EstaDormido() || EstaConfuso()) return;
+                if (EstaDormido() || EstaConfuso()) return;
 
-        moveSpeed = 1;
-
-        if (direction == Vector3.forward) moveSpeed = 5;
-        if (direction == -Vector3.forward) moveSpeed = 2;
+        moveSpeed = 1f;
+        if (direction == Vector3.forward) moveSpeed = 5f;
+        if (direction == -Vector3.forward) moveSpeed = 2f;
 
         if (animator != null)
         {
+            float displaySpeed = (direction == Vector3.right || direction == Vector3.left)
+                ? moveSpeed / 1.5f
+                : moveSpeed;
+
             animator.SetFloat("InputMagnitude",
-                (characterController.velocity.normalized.magnitude * direction.z) / (5 / moveSpeed),
-                .2f, Time.deltaTime);
-            animator.SetBool("Strafe", (direction == Vector3.right || direction == Vector3.left));
-            animator.SetFloat("StrafeDirection", direction.normalized.x, .2f, Time.deltaTime);
+                (moveSpeed * direction.z) / (5f / Mathf.Max(0.1f, displaySpeed)),
+                0.2f, Time.deltaTime);
+
+            animator.SetBool("Strafe",
+                (direction == Vector3.right || direction == Vector3.left));
+
+            animator.SetFloat("StrafeDirection",
+                direction.normalized.x, 0.2f, Time.deltaTime);
         }
 
         if (!isMoving) return;
@@ -657,8 +669,126 @@ public class EnemyScript : Damageable
         // FIX: Resetear estados al parar corrutinas
         isStunned = false;
         isPreparingAttack = false;
+        MarkAttackSequenceEnd(); // NEW: sequence fully stopped
+
     }
 
+
+        // ══════════════════════════════════════════════════════════
+        // ADD TO EnemyScript.cs — Ring Formation Integration
+        // ══════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Returns true if this enemy is in ANY phase of an attack
+        /// sequence initiated by EnemyBrain (the Colmena).
+        ///
+        /// Covers the full lifecycle:
+        ///   Phase 1: isPreparingAttack (wind-up before lunge)
+        ///   Phase 2: isMoving forward toward player (the lunge itself)
+        ///   Phase 3: isRetreating = true (walk-back after attack)
+        ///
+        /// EnemyRingManager uses this to know when to disable
+        //  ring-following movement so the attack animation plays
+        /// cleanly without backwards pull.
+        /// </summary>
+        /// <summary>
+    /// BUG 13 FIX: Enhanced attack sequence detection.
+    /// Covers: prepare wind-up, forward lunge, gap after prep,
+    /// retreat walk-back, AND the explicit _attackSequenceActive flag.
+    /// </summary>
+    public bool IsInAttackSequence()
+    {
+        // Explicit flag catches the gaps that individual state checks miss
+        if (_attackSequenceActive) return true;
+
+        // Individual phase checks (backward compat if flag isn't set)
+        if (isPreparingAttack) return true;
+        if (isRetreating) return true;
+
+        if (isMoving && moveDirection == Vector3.forward)
+            return true;
+
+        return false;
+    }
+
+        // ══════════════════════════════════════════════════════════
+    // ADDITIONS TO EnemyScript.cs — Ring Integration v3
+    // ══════════════════════════════════════════════════════════
+
+    // BUG 15 FIX: Static cached player reference (one search, not N)
+    private static SimpleWalk _cachedPlayer;
+    private static int _lastPlayerSearchFrame = -1;
+
+    /// <summary>
+    /// BUG 13 FIX: Returns true for the ENTIRE attack sequence including
+    /// the gap between PrepAttack ending and SetRetreat starting.
+    ///
+    /// Previously: when PrepAttack(false) was called (enemy reached player),
+    /// isPreparingAttack=false, moveDirection=Vector3.zero, isMoving=false
+    /// → IsInAttackSequence returned false → ring pulled enemy backward.
+    ///
+    /// Now: we track an explicit _attackSequenceActive flag that covers
+    /// the full lifecycle from SetAttack() through SetRetreat() completion.
+    /// </summary>
+    private bool _attackSequenceActive = false;
+
+    /// <summary>
+    /// Called by SetAttack() — marks the start of the full attack sequence.
+    /// </summary>
+    public void MarkAttackSequenceStart()
+    {
+        _attackSequenceActive = true;
+    }
+
+    /// <summary>
+    /// Called by SetRetreat() when retreat finishes — marks the end.
+    /// Also called by StopEnemyCoroutines() and ResetAllStates().
+    /// </summary>
+    public void MarkAttackSequenceEnd()
+    {
+        _attackSequenceActive = false;
+    }
+
+    
+
+    /// <summary>
+    /// BUG 14 FIX: Returns true if EnemyScript should be ALLOWED to move
+    /// the CharacterController. When false, only ring movement controls CC.
+    ///
+    /// During attacks: EnemyScript controls CC (returns true).
+    /// During idle/ring-follow: ring movement controls CC (returns false).
+    /// This prevents both systems calling cc.Move() and fighting.
+    /// </summary>
+    public bool IsAIScriptControllingMovement()
+    {
+        // During full attack sequence, AI controls
+        if (IsInAttackSequence()) return true;
+
+        // When stunned, AI controls (it handles knockback)
+        if (isStunned) return true;
+
+        // When dead/really dead, AI doesn't control
+        if (_reallyDead || currentHealth <= 0) return false;
+
+        // Idle wandering: RING movement controls, not AI
+        // (EnemyMovement coroutine sets isMoving but we suppress it)
+        return false;
+    }
+
+    /// <summary>
+    /// BUG 15 FIX: Cached player lookup — searches once per frame
+    /// across all enemies, not once per enemy.
+    /// </summary>
+    public static SimpleWalk GetCachedPlayer()
+    {
+        int currentFrame = Time.frameCount;
+        if (_lastPlayerSearchFrame != currentFrame || _cachedPlayer == null)
+        {
+            _cachedPlayer = FindAnyObjectByType<SimpleWalk>();
+            _lastPlayerSearchFrame = currentFrame;
+        }
+        return _cachedPlayer;
+    }
     // ══════════════════════════════════════════════════════════
     // PUBLIC BOOLEANS
     // ══════════════════════════════════════════════════════════
@@ -667,6 +797,17 @@ public class EnemyScript : Damageable
     public bool IsRetreating() => isRetreating;
     public bool IsLockedTarget() => isLockedTarget;
     public bool IsStunned() => isStunned;
+
+    public bool WantsFullMovementControl()
+    {
+        return isPreparingAttack || isRetreating || isStunned || isCounteringFromPlayer();
+    }
+
+    private bool isCounteringFromPlayer()
+    {
+        // Si el jugador contraatacó y somos el objetivo
+        return isLockedTarget && !isPreparingAttack;
+    }
 
 
     public void EnableHitbox()     {enemyHitbox.OpenHitboxWindow(); }

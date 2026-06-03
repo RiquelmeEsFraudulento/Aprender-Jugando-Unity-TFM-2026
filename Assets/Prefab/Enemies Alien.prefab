@@ -47,13 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 510ae6e0fa445004dadcedb222c8c2a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  allEnemies:
-  - enemyScript: {fileID: 3658133378600901782}
-    enemyAvailability: 0
-  - enemyScript: {fileID: 7048493130962466241}
-    enemyAvailability: 0
-  - enemyScript: {fileID: 2676547233334797997}
-    enemyAvailability: 0
+  allEnemies: []
   hiveName: Hive
   _showDebugLogs: 1
   totalRounds: 3
@@ -443,6 +437,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  ficha:
+    nombre: 
+    vidaMaxima: 0
+    vidaActual: 0
+    estaVivo: 0
+    envenenado: 0
+    turnosVenenoRestantes: 0
+    danyoVenenoPorTurno: 0
+    golpesSangrado: 0
+    danyoSangradoExplosion: 0
+    estadoEspecial: 0
+    turnosEstadoRestantes: 0
+    golpesRecibidosParaEstado: 0
+    coloresVulnerables: 0
+    armasPermitidas: 0
+    puedeDormir: 0
+    puedeConfundirse: 0
+  debugEJ_venenoActivo: 0
+  debugEJ_turnosVenenoRestantes: 0
+  debugEJ_danyoVenenoAcumulado: 0
+  debugEJ_golpesSangrado: 0
+  debugEJ_sangradoExplotado: 0
+  debugEJ_estadoProcesado: 0
+  debugEJ_etiquetaPermitida: 0
+  debugEJ_colorVulnerable: 0
+  debugEJ_tipoEfectoProcesado: 0
+  debugEJ_golpesParaEstado: 0
+  debugEJ_turnosEstadoRestantes: 0
   _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
@@ -468,6 +490,7 @@ MonoBehaviour:
   enemyManager: {fileID: 0}
   enemyDetection: {fileID: 0}
   characterController: {fileID: 2410585392348182863}
+  moveDirection: {x: 0, y: 0, z: 0}
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0
@@ -656,6 +679,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  ficha:
+    nombre: 
+    vidaMaxima: 0
+    vidaActual: 0
+    estaVivo: 0
+    envenenado: 0
+    turnosVenenoRestantes: 0
+    danyoVenenoPorTurno: 0
+    golpesSangrado: 0
+    danyoSangradoExplosion: 0
+    estadoEspecial: 0
+    turnosEstadoRestantes: 0
+    golpesRecibidosParaEstado: 0
+    coloresVulnerables: 0
+    armasPermitidas: 0
+    puedeDormir: 0
+    puedeConfundirse: 0
+  debugEJ_venenoActivo: 0
+  debugEJ_turnosVenenoRestantes: 0
+  debugEJ_danyoVenenoAcumulado: 0
+  debugEJ_golpesSangrado: 0
+  debugEJ_sangradoExplotado: 0
+  debugEJ_estadoProcesado: 0
+  debugEJ_etiquetaPermitida: 0
+  debugEJ_colorVulnerable: 0
+  debugEJ_tipoEfectoProcesado: 0
+  debugEJ_golpesParaEstado: 0
+  debugEJ_turnosEstadoRestantes: 0
   _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
@@ -681,6 +732,7 @@ MonoBehaviour:
   enemyManager: {fileID: 0}
   enemyDetection: {fileID: 0}
   characterController: {fileID: 6109562262744681886}
+  moveDirection: {x: 0, y: 0, z: 0}
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0
@@ -874,6 +926,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  ficha:
+    nombre: 
+    vidaMaxima: 0
+    vidaActual: 0
+    estaVivo: 0
+    envenenado: 0
+    turnosVenenoRestantes: 0
+    danyoVenenoPorTurno: 0
+    golpesSangrado: 0
+    danyoSangradoExplosion: 0
+    estadoEspecial: 0
+    turnosEstadoRestantes: 0
+    golpesRecibidosParaEstado: 0
+    coloresVulnerables: 0
+    armasPermitidas: 0
+    puedeDormir: 0
+    puedeConfundirse: 0
+  debugEJ_venenoActivo: 0
+  debugEJ_turnosVenenoRestantes: 0
+  debugEJ_danyoVenenoAcumulado: 0
+  debugEJ_golpesSangrado: 0
+  debugEJ_sangradoExplotado: 0
+  debugEJ_estadoProcesado: 0
+  debugEJ_etiquetaPermitida: 0
+  debugEJ_colorVulnerable: 0
+  debugEJ_tipoEfectoProcesado: 0
+  debugEJ_golpesParaEstado: 0
+  debugEJ_turnosEstadoRestantes: 0
   _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
@@ -899,6 +979,7 @@ MonoBehaviour:
   enemyManager: {fileID: 0}
   enemyDetection: {fileID: 0}
   characterController: {fileID: 8025277333824299641}
+  moveDirection: {x: 0, y: 0, z: 0}
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0
