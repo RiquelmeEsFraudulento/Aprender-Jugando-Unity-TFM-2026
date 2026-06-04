@@ -92,12 +92,32 @@ public class LightsaberColorController : MonoBehaviour
 
     void Update()
     {
+        /*
         if (Input.GetKeyDown(redKey))
             SetSaberColor(DamageType.Red);
         if (Input.GetKeyDown(blueKey))
             SetSaberColor(DamageType.Blue);
         if (Input.GetKeyDown(grayKey))
             SetSaberColor(DamageType.Gray);
+
+        SincronizarFicha();
+        */
+
+        if (Input.GetKeyDown(redKey))
+        {
+            int color = ColorSegunTecla(redKey);
+            if (color != -1) SetSaberColor(ConstanteAColor(color));
+        }
+        if (Input.GetKeyDown(blueKey))
+        {
+            int color = ColorSegunTecla(blueKey);
+            if (color != -1) SetSaberColor(ConstanteAColor(color));
+        }
+        if (Input.GetKeyDown(grayKey))
+        {
+            int color = ColorSegunTecla(grayKey);
+            if (color != -1) SetSaberColor(ConstanteAColor(color));
+        }
 
         SincronizarFicha();
     }

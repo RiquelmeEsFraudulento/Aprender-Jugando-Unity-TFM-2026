@@ -516,18 +516,25 @@ public class RapierHitbox : MonoBehaviour
     {
         debugEJ_modoProcesado = modo;
 
-        switch (modo)
+        // El tipo de daño se sigue asignando directamente
+        damageType = ConstanteATipo(modo);
+
+        // ── USAMOS LA FUNCIÓN DEL EJERCICIO 3 ──
+        int colorConst = ColorSegunModo(modo);   // el alumno decide el color
+        debugEJ_colorElegido = colorConst;       // lo mostramos en el inspector
+
+        // Convertimos la constante del alumno a un Color de Unity
+        Color tinte;
+        switch (colorConst)
         {
-            case MODO_NORMAL:
-                AplicarModoNormal();
-                break;
-            case MODO_VENENO:
-                AplicarModoVeneno();
-                break;
-            case MODO_SANGRADO:
-                AplicarModoSangrado();
-                break;
+            case COLOR_MORADO: tinte = tintVeneno;   break;
+            case COLOR_ROJO:   tinte = tintSangrado; break;
+            default:           tinte = tintNormal;   break;  // COLOR_BLANCO u otros
         }
+
+        AplicarTinteAlMaterial(tinte);
+
+        Debug.Log("[Rapier] Modo: " + damageType + " | Color: " + colorConst);
     }
 
     // ══════════════════════════════════════════════════════════
@@ -585,20 +592,25 @@ public class RapierHitbox : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (EsGolpePropio(other)) return;
-
+        // Recopilamos los datos para pasárselos al ejercicio
+        bool esPropio       = EsGolpePropio(other);
         Damageable damageable = BuscarVidaEnEnemigo(other);
-        if (damageable == null) return;
+        bool tieneDamageable  = damageable != null;
+        // YaFueGolpeadoEnEsteSwing marca al enemigo como golpeado (efecto lateral)
+        bool yaGolpeado       = tieneDamageable ? YaFueGolpeadoEnEsteSwing(damageable) : false;
+        string etiquetaArma   = gameObject.tag;
+        bool aceptaTipo       = tieneDamageable ? damageable.CanBeDamagedBy(damageType, etiquetaArma) : false;
 
-        if (YaFueGolpeadoEnEsteSwing(damageable)) return;
+        // ── USAMOS LA FUNCIÓN DEL EJERCICIO 4 ──
+        // El alumno decide si el golpe es válido con estas condiciones
+        if (!EsGolpeValido(esPropio, tieneDamageable, yaGolpeado, aceptaTipo))
+            return;   // el alumno ha dictaminado que no se debe aplicar daño
 
-        string etiquetaArma = ObtenerEtiquetaPropia();
-        if (!damageable.CanBeDamagedBy(damageType, etiquetaArma)) return;
-
+        // Si llegamos aquí, el golpe es válido (damageable seguro que no es null)
         GameObject fuente = ownerRoot != null ? ownerRoot.gameObject : gameObject;
         damageable.TakeDamage(damage, damageType, fuente);
 
-        // ── USAMOS LA FUNCIÓN DEL EJERCICIO 2 ──
+        // Procesar estado especial (ya integrado con el ejercicio 2)
         ProcesarEstadoEspecial(damageable);
     }
 
