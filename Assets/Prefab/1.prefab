@@ -638,6 +638,7 @@ GameObject:
   - component: {fileID: 6672631800066124440}
   - component: {fileID: 1996376590833352798}
   - component: {fileID: 979465956246095449}
+  - component: {fileID: 5858796323352631268}
   m_Layer: 0
   m_Name: RapierHitBox
   m_TagString: Rapier
@@ -693,12 +694,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6db4c2ebbf8e066489bc866fbeae3c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  debugEJ_modoActivo: 0
+  debugEJ_colorElegidoR: 0
+  debugEJ_colorElegidoG: 0
+  debugEJ_colorElegidoB: 0
+  debugEJ_esGolpePropio: 0
+  debugEJ_yaGolpeado: 0
   damage: 1
   ownerRoot: {fileID: 6672631800066124440}
   teclaModoNormal: 52
   teclaModoVeneno: 53
   teclaModoSangrado: 54
   damageType: 0
+--- !u!114 &5858796323352631268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1939870757382375678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e7c0355ee83af9479abd38f5be951e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitboxProcesarEstadoEspecial
+  debugEJ_estadoSeleccionado: 0
+  debugEJ_golpesActuales: 0
+  debugEJ_alcanzoUmbral: 0
+  debugEJ_estadoAplicar: 0
+  debugEJ_enemigoYaTeniaEstado: 0
+  hitboxOriginal: {fileID: 979465956246095449}
 --- !u!1 &2208601663477607491
 GameObject:
   m_ObjectHideFlags: 0
@@ -809,6 +834,7 @@ GameObject:
   - component: {fileID: 1759749120884053113}
   - component: {fileID: 2965392226810906609}
   - component: {fileID: 2160674262136304721}
+  - component: {fileID: 3499846582790388734}
   m_Layer: 0
   m_Name: LeftKickCollider
   m_TagString: Kick
@@ -867,6 +893,24 @@ MonoBehaviour:
   damage: 1
   ownerRoot: {fileID: 1759749120884053113}
   damageType: 0
+--- !u!114 &3499846582790388734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2661118026061281971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e7c0355ee83af9479abd38f5be951e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitboxProcesarEstadoEspecial
+  debugEJ_estadoSeleccionado: 0
+  debugEJ_golpesActuales: 0
+  debugEJ_alcanzoUmbral: 0
+  debugEJ_estadoAplicar: 0
+  debugEJ_enemigoYaTeniaEstado: 0
+  hitboxOriginal: {fileID: 2160674262136304721}
 --- !u!1 &2976572703277065966
 GameObject:
   m_ObjectHideFlags: 0
@@ -967,16 +1011,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a818a101bdd07d649b726bc66807b916, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  ficha:
+    lifeStealCount: 0
+    potionCount: 0
+    lifeStoneCount: 0
+    chaosCount: 0
+    lifeStealActivo: 0
+    potionActivo: 0
+    lifeStoneActivo: 0
+    chaosActivo: 0
+    lifeStealTiempoRestante: 0
+    potionTiempoRestante: 0
+    lifeStoneTiempoRestante: 0
+    chaosTiempoRestante: 0
+    lifeStoneDisponibleEscena: 0
+    vidaJugador: 0
+    vidaMaximaJugador: 0
+    xpJugador: 0
+    nivelJugador: 0
+    estadoCirculo: 0
+    itemSeleccionado: 0
+  debugEJ_itemSeleccionado: 0
+  debugEJ_lifeStealActivo: 0
+  debugEJ_potionActivo: 0
+  debugEJ_lifeStoneActivo: 0
+  debugEJ_chaosActivo: 0
+  debugEJ_lifeStealTiempo: 0
+  debugEJ_potionTiempo: 0
+  debugEJ_lifeStoneTiempo: 0
+  debugEJ_chaosTiempo: 0
+  debugEJ_estadoCirculo: 0
+  debugEJ_resultadoLoot: 0
+  debugEJ_nombreItemLoot: 
+  debugEJ_itemAplicado: 0
+  debugEJ_vidaAntesChaos: 0
+  debugEJ_vidaDespuesChaos: 0
+  debugEJ_chaosPenalizacion: 0
+  debugEJ_lifeStoneCountAntes: 0
+  debugEJ_lifeStoneCountDespues: 0
+  debugEJ_vidaAntesLifeStone: 0
+  debugEJ_vidaDespuesLifeStone: 0
+  debugEJ_lifeStoneDisponible: 0
+  debugEJ_itemsAnyadidos: 0
   playerHealth: {fileID: 1375612103352597233}
   enemyManager: {fileID: 0}
   lifeStealCount: 5
   potionCount: 5
   lifeStoneCount: 1
   chaosCount: 2
-  savedLifeStealCount: 0
-  savedPotionCount: 0
-  savedLifeStoneCount: 0
-  savedChaosCount: 0
   lifeStoneAvailableThisScene: 1
   lifeStealDuration: 15
   lifeStealHealFraction: 0.25
@@ -1040,6 +1122,7 @@ GameObject:
   - component: {fileID: 4483198373414415448}
   - component: {fileID: 4233489650997703759}
   - component: {fileID: 6493756014119127239}
+  - component: {fileID: 274337152551080533}
   m_Layer: 0
   m_Name: LightSaberCollider
   m_TagString: LightSaber
@@ -1095,9 +1178,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 451a3baea2b5ac440a6ec724718d9d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  debugEJ_estadoSeleccionado: 0
+  debugEJ_golpesActuales: 0
+  debugEJ_alcanzoUmbral: 0
+  debugEJ_estadoAplicar: 0
   damage: 1
   ownerRoot: {fileID: 4483198373414415448}
   damageType: 0
+--- !u!114 &274337152551080533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3098215499851105180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e7c0355ee83af9479abd38f5be951e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitboxProcesarEstadoEspecial
+  debugEJ_estadoSeleccionado: 0
+  debugEJ_golpesActuales: 0
+  debugEJ_alcanzoUmbral: 0
+  debugEJ_estadoAplicar: 0
+  debugEJ_enemigoYaTeniaEstado: 0
+  hitboxOriginal: {fileID: 6493756014119127239}
 --- !u!1 &3117163018561470018
 GameObject:
   m_ObjectHideFlags: 0
@@ -1718,6 +1823,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b599dc261a2efc540b96fae8f201ccbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  debugEJ_colorActual: 0
+  debugEJ_colorR: 0
+  debugEJ_colorG: 0
+  debugEJ_colorB: 0
   redKey: 49
   blueKey: 50
   grayKey: 51
@@ -2150,6 +2259,7 @@ GameObject:
   - component: {fileID: 4188648539325980377}
   - component: {fileID: 108269370259215941}
   - component: {fileID: 1748969507699105351}
+  - component: {fileID: 61504003293766149}
   m_Layer: 0
   m_Name: RightKickCollider
   m_TagString: Kick
@@ -2208,6 +2318,24 @@ MonoBehaviour:
   damage: 1
   ownerRoot: {fileID: 4188648539325980377}
   damageType: 0
+--- !u!114 &61504003293766149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5869438956457074894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e7c0355ee83af9479abd38f5be951e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HitboxProcesarEstadoEspecial
+  debugEJ_estadoSeleccionado: 0
+  debugEJ_golpesActuales: 0
+  debugEJ_alcanzoUmbral: 0
+  debugEJ_estadoAplicar: 0
+  debugEJ_enemigoYaTeniaEstado: 0
+  hitboxOriginal: {fileID: 1748969507699105351}
 --- !u!1 &5981406019861252487
 GameObject:
   m_ObjectHideFlags: 0
@@ -2347,7 +2475,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: faaa89e89de1c8c4197b2e2b63a144d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
+  datosJugador:
+    posicionX: 0
+    posicionY: 0
+    posicionZ: 0
+    velocidadMovimiento: 0
+    velocidadMaxima: 0
+    direccionHorizontal: 0
+    direccionVertical: 0
+    estaAtacando: 0
+    estaContraatacando: 0
+    estaVivo: 0
+    enemigoBloqueadoIndice: 0
+    rangoPatada: 0
+    rangoRapier: 0
+    rangoSable: 0
+    estadoElegido: 0
+    vidaActual: 0
+    vidaMaxima: 0
+  debugNumeroEnemigosVivos: 0
+  debugIndiceEnemigoCercano: 0
+  debugDistanciaAlMasCercano: 0
+  debugNombreEnemigoCercano: 
+  debugHayEnemigos: 0
+  debugContadorDormidos: 0
+  debugContadorConfusos: 0
+  debugContadorNormales: 0
+  debugIndiceMasVida: 0
+  debugIndiceMenosVida: 0
+  debugDistanciaPromedio: 0
+  debugIndiceMasLejano: 0
+  debugEnemigosEnRangoPatada: 0
+  debugEnemigosEnRangoRapier: 0
+  debugEnemigosEnRangoSable: 0
+  debugEnemigosAtacando: 0
+  debugGolpesParaDormir: 0
+  debugGolpesParaConfundir: 0
+  debugVidaJugador: 0
+  debugVidaMaximaJugador: 0
+  debugJugadorEstaMuerto: 0
+  debugEnemigosEnRangoDeContraataque: 0
+  debugDistanciaAlEnemigoBloqueado: 0
+  debugArmaRecomendada: 0
   animator: {fileID: 33652511142278736}
   walkAnimationSpeed: 0.25
   detectionRadius: 12
@@ -3944,6 +4113,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8687428933d11494fbbb2f78a4313016, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RapierColorController
+  debugEJ_modoActivo: 0
+  debugEJ_colorR: 0
+  debugEJ_colorG: 0
+  debugEJ_colorB: 0
   teclaNormal: 52
   teclaVeneno: 53
   teclaSangrado: 54

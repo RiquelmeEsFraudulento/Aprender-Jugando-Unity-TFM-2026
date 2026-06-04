@@ -50,6 +50,11 @@ public class GameManager : MonoBehaviour
     private float savedPlayerXP = -1f;
     private float savedPlayerLevel = -1f;
 
+    public int savedlifeStealCount;       // Cantidad de Life Steal (0-5)
+    public int savedPotionCount;          // Cantidad de Pociones (0-5)
+    public int savedLifeStoneCount;       // Cantidad de Life Stones (0-1)
+    public int savedChaosCount;           // Cantidad de Chaos (0-2)
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -584,7 +589,13 @@ IEnumerator WaitForAllEnemiesDead()
 
         var hud = player.GetComponentInChildren<PlayerHUDController>();
         if (hud != null)
-            hud.SavePlayerHUDStats();
+        {
+            //hud.SavePlayerHUDStats();
+            savedlifeStealCount = hud.lifeStealCount;
+            savedPotionCount = hud.potionCount;  
+            savedLifeStoneCount = hud.lifeStoneCount;
+            savedChaosCount = hud.chaosCount;       
+        }
     }
 
     void RestorePlayerStats()
@@ -597,7 +608,7 @@ IEnumerator WaitForAllEnemiesDead()
         var hud = player.GetComponentInChildren<PlayerHUDController>();
         if (hud != null)
         {
-            hud.RestorePlayerHUDStats();
+            hud.RestorePlayerHUDStats(savedlifeStealCount, savedPotionCount, savedLifeStoneCount, savedChaosCount);
             hud.AddItemsOnSceneChange();
         }
     }

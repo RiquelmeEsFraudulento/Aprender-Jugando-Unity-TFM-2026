@@ -70,6 +70,7 @@ public class Damageable : MonoBehaviour
 
         // ── Efectos de estado ──────────────────────────────────
         public bool envenenado;            // true = tiene veneno activo
+        public int golpesVeneno;        // Golpes recibidos que acumulan veneno
         public int turnosVenenoRestantes;  // Turnos que le quedan de veneno
         public int danyoVenenoPorTurno;    // Daño que hace el veneno cada turno
 
@@ -114,6 +115,7 @@ public class Damageable : MonoBehaviour
     // filtrarlos fácilmente en la consola de Unity.
 
     [Header("═══ DEBUG EJERCICIOS [EJ] ═══")]
+    public int debugEJ_golpesVeneno;
     public bool debugEJ_venenoActivo;
     public int debugEJ_turnosVenenoRestantes;
     public int debugEJ_danyoVenenoAcumulado;
@@ -165,9 +167,11 @@ public class Damageable : MonoBehaviour
     private float tiempoVeneno       = 0f;
     private float acumuladorVeneno   = 0f;
 
-    private const float DURACION_VENENO       = 6f;
+    private int golpesDeVeneno = 0;
+    private const int GOLPES_PARA_VENENO = 5; // Golpes necesarios para activar el veneno
+    private const float DURACION_VENENO       = 3f;
     private const float INTERVALO_VENENO      = 1f;
-    private const float DANIO_VENENO_POR_TICK = 0.5f;
+    private const float DANIO_VENENO_POR_TICK = 1f;
 
     private int golpesDeSangrado = 0;
 
@@ -176,11 +180,11 @@ public class Damageable : MonoBehaviour
 
     public enum EstadoEspecial { None, Sleep, Confused }
 
-    [SerializeField] private EstadoEspecial estadoEspecial = EstadoEspecial.None;
+    [SerializeField] public EstadoEspecial estadoEspecial = EstadoEspecial.None;
 
-    private float timerEstadoEspecial = 0f;
-    private const float DURACION_SLEEP    = 5f;
-    private const float DURACION_CONFUSED = 4f;
+    public float timerEstadoEspecial = 0f;
+    public const float DURACION_SLEEP    = 5f;
+    public const float DURACION_CONFUSED = 4f;
 
     [HideInInspector] public int golpesRecibidosParaEstado = 0;
     private const int GOLPES_PARA_ESTADO = 8;
@@ -209,6 +213,7 @@ public class Damageable : MonoBehaviour
         ficha.estaVivo = true;
         ficha.envenenado = false;
         ficha.turnosVenenoRestantes = 0;
+        ficha.golpesVeneno = 0;
         ficha.danyoVenenoPorTurno = 1;  // 0.5 redondeado = 1
         ficha.golpesSangrado = 0;
         ficha.danyoSangradoExplosion = DANIO_EXPLOSION_BLEED;
@@ -252,6 +257,7 @@ public class Damageable : MonoBehaviour
         ficha.estaVivo = currentHealth > 0;
         ficha.envenenado = estaEnvenenado;
         ficha.golpesSangrado = golpesDeSangrado;
+        ficha.golpesVeneno = golpesDeVeneno;
         ficha.golpesRecibidosParaEstado = golpesRecibidosParaEstado;
 
         switch (estadoEspecial)
@@ -276,6 +282,7 @@ public class Damageable : MonoBehaviour
         debugEJ_venenoActivo = estaEnvenenado;
         debugEJ_turnosVenenoRestantes = ficha.turnosVenenoRestantes;
         debugEJ_golpesSangrado = golpesDeSangrado;
+        debugEJ_golpesVeneno = golpesDeVeneno;
         debugEJ_golpesParaEstado = golpesRecibidosParaEstado;
         debugEJ_turnosEstadoRestantes = ficha.turnosEstadoRestantes;
 
@@ -350,7 +357,7 @@ public class Damageable : MonoBehaviour
     {
         if (vulnerableTypes == null) return -1;
         if (i < 0 || i >= vulnerableTypes.Length) return -1;
-        return (int)vulnerableTypes[i];
+        return TipoAConstante(vulnerableTypes[i]);
     }
 
     /// <summary>
@@ -502,7 +509,7 @@ public class Damageable : MonoBehaviour
     /// <summary>
     /// Devuelve el estado especial actual como constante int.
     /// </summary>
-    int EstadoEspecialActual()
+    public int EstadoEspecialActual()
     {
         switch (estadoEspecial)
         {
@@ -811,17 +818,17 @@ public class Damageable : MonoBehaviour
     //  se aplica el daño de veneno.
     //
     //  EJEMPLO REAL:
-    //  - Duración del veneno: 6 segundos
-    //  - Daño por tick: 0.5 (redondeado a 1)
+    //  - Duración del veneno: 3 segundos
+    //  - Daño por tick: 1.0 (redondeado a 1)
     //  - Cada 1 segundo → quita 1 de vida
-    //  - Después de 6 segundos → el veneno termina
+    //  - Después de 3 segundos → el veneno termina
     //
     //  OBJETIVO: Simular el procesamiento del veneno durante un frame.
     //  Recibe el tiempo transcurrido y el acumulador actual, y devuelve
     //  cuántos tics de daño se deben aplicar este frame.
     //
     //  REGLAS DE ORO:
-    //  ✅ Usa: ObtenerTiempoFrame(), RedondearArriba(), while, if
+    //  ✅ Usa: ObtenerTiempoFrame(), while, if
     //  ❌ NO uses: Time.deltaTime directamente, Mathf.CeilToInt directamente
     //
     // ══════════════════════════════════════════════════════════════════════
@@ -847,7 +854,7 @@ public class Damageable : MonoBehaviour
     // ──────────────────────────────────────────────────────────
     //
     //  PASO 3 — Calcular el daño total
-    //  El daño por tick es DANIO_VENENO_POR_TICK (0.5), redondeado arriba = 1.
+    //  El daño por tick es DANIO_VENENO_POR_TICK (1.0)
     //  Daño total = tics * dañoPorTickRedondeado
     //
     // ──────────────────────────────────────────────────────────
@@ -881,7 +888,7 @@ public class Damageable : MonoBehaviour
 
         // PASO 2: comprobamos cuántos tics se aplican con un while
         int tics = 0;
-        float intervalo = 1.0f;  // 1 segundo por tick
+        float intervalo = 1f;  // 1 segundo por tick
 
         while (acumulador >= intervalo)
         {
@@ -890,7 +897,7 @@ public class Damageable : MonoBehaviour
         }
 
         // PASO 3: calculamos el daño total
-        int danyoPorTick = DanyoVenenoPorTickEntero();  // 0.5 redondeado = 1
+        int danyoPorTick = DanyoVenenoPorTickEntero();
         int danyoTotal = tics * danyoPorTick;
 
         // PASO 4: devolvemos el resultado
@@ -1334,12 +1341,12 @@ public class Damageable : MonoBehaviour
         return estadoEspecial;
     }
 
-    public bool EstaDormido()
+    public virtual bool EstaDormido()
     {
         return estadoEspecial == EstadoEspecial.Sleep;
     }
 
-    public bool EstaConfuso()
+    public virtual bool EstaConfuso()
     {
         return estadoEspecial == EstadoEspecial.Confused;
     }
@@ -1364,7 +1371,7 @@ public class Damageable : MonoBehaviour
         switch (efecto)
         {
             case 1:  // TIPO_VENENO
-                ActivarVeneno();
+                RegistrarGolpeDeVeneno();
                 break;
 
             case 2:  // TIPO_SANGRADO
@@ -1439,6 +1446,17 @@ public class Damageable : MonoBehaviour
     // ══════════════════════════════════════════════════════════
     // VENENO (llama al ejercicio 4)
     // ══════════════════════════════════════════════════════════
+        void RegistrarGolpeDeVeneno()
+    {
+        golpesDeVeneno++;
+        DebugVeneno($"[Veneno] Golpe {golpesDeVeneno}/{GOLPES_PARA_VENENO} en '{gameObject.name}'");
+        if (golpesDeVeneno >= GOLPES_PARA_VENENO)
+        {
+            ActivarVeneno();
+            golpesDeVeneno = 0; // reset after activating
+        }
+    }
+
 
     public void ActivarVeneno()
     {
