@@ -54,6 +54,7 @@ public class EnemyScript : Damageable
     public UnityEvent<EnemyScript> OnRetreat;
     public int danyoAtaque = 10;
     public float XPEarned = 5f;
+    public bool maniqui = false;
     [SerializeField] public EnemyHitbox enemyHitbox;
 
     private const bool LOG_IA = false;
@@ -191,7 +192,14 @@ public class EnemyScript : Damageable
 
     public override void TakeDamage(int amount, DamageType damageType, GameObject source)
     {
-        base.TakeDamage(amount, damageType, source);
+        if(playerCombat == null)
+            playerCombat = GetCachedPlayer();
+        
+        if(playerCombat.GetComponent<PlayerHealth>().level >= 5 || maniqui == false)
+        {
+            base.TakeDamage(amount, damageType, source);
+        }
+
 
         if (currentHealth <= 0) return;
 

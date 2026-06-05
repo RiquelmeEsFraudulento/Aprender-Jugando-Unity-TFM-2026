@@ -452,7 +452,9 @@ public class SimpleWalk : MonoBehaviour
     //  Si no hay ningún enemigo válido, devuelve -1.
     //
     //  REGLAS DE ORO:
-    //  ✅ Solo puedes usar: DistanciaInfinita(), EsDistanciaValida(), CalcularDistancia()
+    //  ✅ Solo puedes usar: DistanciaInfinita() Te da una distancia infinita para inicializar la mejor distancia al empezar la búsqueda.
+    //  EsDistanciaValida() Te da una función para comprobar si una distancia es un número real válido (no infinito ni NaN).
+    //  CalcularDistancia() Te da la distancia al enemigo i, o infinito si el enemigo no es válido (muerto, inactivo o no atacable).
     //  ❌ No uses: enemyManager, EnemyScript, Vector3 ni nada de Unity directamente
     //
     // ══════════════════════════════════════════════════════════════════════

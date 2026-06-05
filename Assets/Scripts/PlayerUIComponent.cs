@@ -342,9 +342,9 @@ public class PlayerHUDController : MonoBehaviour
         }
     }
 
-    // ══════════════════════════════════════════════════════════
-    // BARS (se mantiene original)
-    // ══════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════
+    // BARS (ACTUALIZADO: usa xpParaSiguienteNivel real del PlayerHealth)
+    // ═══════════════════════════════════════════════════════════
 
     private void UpdateBars()
     {
@@ -353,7 +353,9 @@ public class PlayerHUDController : MonoBehaviour
         float hp = Mathf.Clamp01(playerHealth.vida / playerHealth.vidaMax);
         _healthFill.style.width = new StyleLength(Length.Percent(hp * 100f));
 
-        float xpNeeded = Mathf.Max(playerHealth.level * 10f, 1f);
+        // ANTES: float xpNeeded = Mathf.Max(playerHealth.level * 10f, 1f);
+        // AHORA: usa el umbral real calculado con números primos
+        float xpNeeded = Mathf.Max(playerHealth.xpParaSiguienteNivel, 1f);
         float xp = Mathf.Clamp01(playerHealth.XP / xpNeeded);
         _xpFill.style.width = new StyleLength(Length.Percent(xp * 100f));
 

@@ -424,6 +424,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  ficha:
+    nombre: 
+    vidaMaxima: 0
+    vidaActual: 0
+    estaVivo: 0
+    envenenado: 0
+    golpesVeneno: 0
+    turnosVenenoRestantes: 0
+    danyoVenenoPorTurno: 0
+    golpesSangrado: 0
+    danyoSangradoExplosion: 0
+    estadoEspecial: 0
+    turnosEstadoRestantes: 0
+    golpesRecibidosParaEstado: 0
+    coloresVulnerables: 0
+    armasPermitidas: 0
+    puedeDormir: 0
+    puedeConfundirse: 0
+  debugEJ_golpesVeneno: 0
+  debugEJ_venenoActivo: 0
+  debugEJ_turnosVenenoRestantes: 0
+  debugEJ_danyoVenenoAcumulado: 0
+  debugEJ_golpesSangrado: 0
+  debugEJ_sangradoExplotado: 0
+  debugEJ_estadoProcesado: 0
+  debugEJ_etiquetaPermitida: 0
+  debugEJ_colorVulnerable: 0
+  debugEJ_tipoEfectoProcesado: 0
+  debugEJ_golpesParaEstado: 0
+  debugEJ_turnosEstadoRestantes: 0
   _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
@@ -443,12 +473,14 @@ MonoBehaviour:
       m_Calls: []
   estaEnvenenado: 0
   estadoEspecial: 0
+  timerEstadoEspecial: 0
   golpesRecibidosParaEstado: 0
   animator: {fileID: 0}
   playerCombat: {fileID: 0}
   enemyManager: {fileID: 0}
   enemyDetection: {fileID: 0}
   characterController: {fileID: 1861421062791229136}
+  moveDirection: {x: 0, y: 0, z: 0}
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0
@@ -466,6 +498,7 @@ MonoBehaviour:
       m_Calls: []
   danyoAtaque: 10
   XPEarned: 5
+  maniqui: 1
   enemyHitbox: {fileID: 5853038889568465003}
 --- !u!4 &1115495290591540825 stripped
 Transform:
@@ -642,6 +675,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  ficha:
+    nombre: 
+    vidaMaxima: 0
+    vidaActual: 0
+    estaVivo: 0
+    envenenado: 0
+    golpesVeneno: 0
+    turnosVenenoRestantes: 0
+    danyoVenenoPorTurno: 0
+    golpesSangrado: 0
+    danyoSangradoExplosion: 0
+    estadoEspecial: 0
+    turnosEstadoRestantes: 0
+    golpesRecibidosParaEstado: 0
+    coloresVulnerables: 0
+    armasPermitidas: 0
+    puedeDormir: 0
+    puedeConfundirse: 0
+  debugEJ_golpesVeneno: 0
+  debugEJ_venenoActivo: 0
+  debugEJ_turnosVenenoRestantes: 0
+  debugEJ_danyoVenenoAcumulado: 0
+  debugEJ_golpesSangrado: 0
+  debugEJ_sangradoExplotado: 0
+  debugEJ_estadoProcesado: 0
+  debugEJ_etiquetaPermitida: 0
+  debugEJ_colorVulnerable: 0
+  debugEJ_tipoEfectoProcesado: 0
+  debugEJ_golpesParaEstado: 0
+  debugEJ_turnosEstadoRestantes: 0
   _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
@@ -661,12 +724,14 @@ MonoBehaviour:
       m_Calls: []
   estaEnvenenado: 0
   estadoEspecial: 0
+  timerEstadoEspecial: 0
   golpesRecibidosParaEstado: 0
   animator: {fileID: 0}
   playerCombat: {fileID: 0}
   enemyManager: {fileID: 0}
   enemyDetection: {fileID: 0}
   characterController: {fileID: 5972054997090467087}
+  moveDirection: {x: 0, y: 0, z: 0}
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0
@@ -684,6 +749,7 @@ MonoBehaviour:
       m_Calls: []
   danyoAtaque: 10
   XPEarned: 5
+  maniqui: 1
   enemyHitbox: {fileID: 4290462719270684309}
 --- !u!4 &4293592060162792220 stripped
 Transform:
@@ -860,6 +926,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5d5677964b738847b52b64d324bd7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  ficha:
+    nombre: 
+    vidaMaxima: 0
+    vidaActual: 0
+    estaVivo: 0
+    envenenado: 0
+    golpesVeneno: 0
+    turnosVenenoRestantes: 0
+    danyoVenenoPorTurno: 0
+    golpesSangrado: 0
+    danyoSangradoExplosion: 0
+    estadoEspecial: 0
+    turnosEstadoRestantes: 0
+    golpesRecibidosParaEstado: 0
+    coloresVulnerables: 0
+    armasPermitidas: 0
+    puedeDormir: 0
+    puedeConfundirse: 0
+  debugEJ_golpesVeneno: 0
+  debugEJ_venenoActivo: 0
+  debugEJ_turnosVenenoRestantes: 0
+  debugEJ_danyoVenenoAcumulado: 0
+  debugEJ_golpesSangrado: 0
+  debugEJ_sangradoExplotado: 0
+  debugEJ_estadoProcesado: 0
+  debugEJ_etiquetaPermitida: 0
+  debugEJ_colorVulnerable: 0
+  debugEJ_tipoEfectoProcesado: 0
+  debugEJ_golpesParaEstado: 0
+  debugEJ_turnosEstadoRestantes: 0
   _hud: {fileID: 0}
   maxHealth: 3
   currentHealth: 3
@@ -879,12 +975,14 @@ MonoBehaviour:
       m_Calls: []
   estaEnvenenado: 0
   estadoEspecial: 0
+  timerEstadoEspecial: 0
   golpesRecibidosParaEstado: 0
   animator: {fileID: 0}
   playerCombat: {fileID: 0}
   enemyManager: {fileID: 0}
   enemyDetection: {fileID: 0}
   characterController: {fileID: 937703092736960588}
+  moveDirection: {x: 0, y: 0, z: 0}
   isPreparingAttack: 0
   isMoving: 0
   isRetreating: 0
@@ -902,4 +1000,5 @@ MonoBehaviour:
       m_Calls: []
   danyoAtaque: 10
   XPEarned: 5
+  maniqui: 1
   enemyHitbox: {fileID: 8963281487613928390}
