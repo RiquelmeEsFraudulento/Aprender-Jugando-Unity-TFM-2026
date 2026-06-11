@@ -192,7 +192,7 @@ public class PlayerHealth : MonoBehaviour
     /// </summary>
     /// <param name="n">Número a comprobar (n ≥ 0)</param>
     /// <returns>true si es primo, false en caso contrario</returns>
-    bool EsPrimo(int n)
+    bool EsPrimo(float n)
     {
         // ▼▼▼▼▼▼▼▼▼▼▼▼  ESCRIBE TU CÓDIGO AQUÍ  ▼▼▼▼▼▼▼▼▼▼▼▼
 
@@ -260,11 +260,11 @@ public class PlayerHealth : MonoBehaviour
     /// </summary>
     /// <param name="actual">Número de partida (busca el primo > actual)</param>
     /// <returns>El siguiente número primo</returns>
-    int SiguientePrimo(int actual)
+    float SiguientePrimo(float actual)
     {
         // ▼▼▼▼▼▼▼▼▼▼▼▼  ESCRIBE TU CÓDIGO AQUÍ  ▼▼▼▼▼▼▼▼▼▼▼▼
 
-        int candidato = actual + 1;
+        float candidato = actual + 1;
 
         while (true)
         {
@@ -320,11 +320,11 @@ public class PlayerHealth : MonoBehaviour
     /// </summary>
     /// <param name="nivel">Nivel para el que calcular el umbral de XP</param>
     /// <returns>XP total necesaria para alcanzar ese nivel</returns>
-    int CalcularXPNecesariaParaNivel(int nivel)
+    float CalcularXPNecesariaParaNivel(float nivel)
     {
         // ▼▼▼▼▼▼▼▼▼▼▼▼  ESCRIBE TU CÓDIGO AQUÍ  ▼▼▼▼▼▼▼▼▼▼▼▼
 
-        int siguientePrimo = SiguientePrimo(nivel);
+        float siguientePrimo = SiguientePrimo(nivel);
         return siguientePrimo * 10;
 
         // ▲▲▲▲▲▲▲▲▲▲▲▲  FIN DE TU CÓDIGO  ▲▲▲▲▲▲▲▲▲▲▲▲
@@ -680,7 +680,7 @@ public class PlayerHealth : MonoBehaviour
             gameManager = FindAnyObjectByType<GameManager>();
 
         // Inicializar umbral del primer nivel (nivel 1 → siguiente primo de 1 = 2 → 20 XP)
-        xpParaSiguienteNivel = CalcularXPNecesariaParaNivel((int)level);
+        xpParaSiguienteNivel = CalcularXPNecesariaParaNivel(level);
     }
 
     void Start()

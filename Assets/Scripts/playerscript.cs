@@ -671,7 +671,9 @@ public class SimpleWalk : MonoBehaviour
     //  y devuelve cuántos enemigos vivos están en ese estado.
     //
     //  REGLAS DE ORO:
-    //  ✅ Usa: NumeroDeEnemigos(), EstaEnemyVivo(), EnemigoEstaDormido(), EnemigoEstaConfuso()
+    //  ✅ Usa: int NumeroDeEnemigos(),bool EstaEnemyVivo(indice),
+    //  boolEnemigoEstaDormido(indice), bool EnemigoEstaConfuso(indice)
+    //  que indice sera del 0 al NumeroDeEnemigos()-1
     //  ❌ No uses: enemyManager, EnemyScript, Vector3 ni nada de Unity directamente
     //
     // ══════════════════════════════════════════════════════════════════════
@@ -1310,10 +1312,10 @@ public class SimpleWalk : MonoBehaviour
     //  se debe aplicar.
     //
     //  OBJETIVO: Recibe un código de tecla (7, 8, 9) y devuelve:
-    //   · 7 → 1 (sueño)
-    //   · 8 → 2 (confusión)
-    //   · 9 → 0 (ninguno)
-    //   · cualquier otra → 0 (ninguno)
+    //   · 7 → 1 (ESTADO_SUENO)
+    //   · 8 → 2 (ESTADO_CONFUSO)
+    //   · 9 → 0 (ESTADO_NINGUNO)
+    //   · cualquier otra → 0 (ESTADO_NINGUNO)
     //
     //  REGLAS DE ORO:
     //  ✅ Usa: switch/case
@@ -1322,7 +1324,7 @@ public class SimpleWalk : MonoBehaviour
     // ══════════════════════════════════════════════════════════════════════
 
     /// <param name="tecla">Código de tecla pulsada (7, 8, 9).</param>
-    /// <returns>Estado seleccionado: 0=ninguno, 1=sueño, 2=confusión</returns>
+    /// <returns>Estado seleccionado: 0=ESTADO_NINGUNO, 1=ESTADO_SUENO, 2=ESTADO_CONFUSO</returns>
     int EstadoSegunTecla(int tecla)
     {
         // ▼▼▼▼▼▼▼▼▼▼▼▼  ESCRIBE TU CÓDIGO AQUÍ  ▼▼▼▼▼▼▼▼▼▼▼▼
