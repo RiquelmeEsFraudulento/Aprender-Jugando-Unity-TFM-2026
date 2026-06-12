@@ -498,6 +498,15 @@ public class EnemyManager : MonoBehaviour
         if (e.IsStunned()) return false;
         if (e.EstaDormido()) return false;
         if (e.EstaConfuso()) return false;
+        
+        // NUEVO: Si lleva mucho tiempo bloqueado, marcar como no listo
+        // temporalmente para que otro enemigo ataque
+        if (e.IsPathBlocked() && e.GetBlockedTime() > 3f)
+        {
+            LogVerbose($"⏳ '{e.name}' lleva mucho tiempo bloqueado. Saltando...");
+            return false;
+        }
+        
         return true;
     }
 

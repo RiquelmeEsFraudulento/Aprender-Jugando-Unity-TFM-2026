@@ -1189,6 +1189,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7512823610221474082}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3304422851270536897}
   m_SourcePrefab: {fileID: 100100000, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
 --- !u!4 &1169052963834398576 stripped
 Transform:
@@ -1269,6 +1272,7 @@ MonoBehaviour:
     vidaActual: 0
     estaVivo: 0
     envenenado: 0
+    golpesVeneno: 0
     turnosVenenoRestantes: 0
     danyoVenenoPorTurno: 0
     golpesSangrado: 0
@@ -1280,6 +1284,7 @@ MonoBehaviour:
     armasPermitidas: 0
     puedeDormir: 0
     puedeConfundirse: 0
+  debugEJ_golpesVeneno: 0
   debugEJ_venenoActivo: 0
   debugEJ_turnosVenenoRestantes: 0
   debugEJ_danyoVenenoAcumulado: 0
@@ -1308,6 +1313,7 @@ MonoBehaviour:
       m_Calls: []
   estaEnvenenado: 0
   estadoEspecial: 0
+  timerEstadoEspecial: 0
   golpesRecibidosParaEstado: 0
   animator: {fileID: 0}
   playerCombat: {fileID: 0}
@@ -1332,7 +1338,24 @@ MonoBehaviour:
       m_Calls: []
   danyoAtaque: 10
   XPEarned: 5
+  maniqui: 0
   enemyHitbox: {fileID: 6571269572643790555}
+--- !u!208 &3304422851270536897
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977818930295070154}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.325, y: 0.835, z: 0.37}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0.89, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!4 &8690694761668084583 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1213585064213224452, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
@@ -2065,6 +2088,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2359835243439341882}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8765105743661263894}
   m_SourcePrefab: {fileID: 100100000, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
 --- !u!4 &3209726061738781106 stripped
 Transform:
@@ -2150,6 +2176,7 @@ MonoBehaviour:
     vidaActual: 0
     estaVivo: 0
     envenenado: 0
+    golpesVeneno: 0
     turnosVenenoRestantes: 0
     danyoVenenoPorTurno: 0
     golpesSangrado: 0
@@ -2161,6 +2188,7 @@ MonoBehaviour:
     armasPermitidas: 0
     puedeDormir: 0
     puedeConfundirse: 0
+  debugEJ_golpesVeneno: 0
   debugEJ_venenoActivo: 0
   debugEJ_turnosVenenoRestantes: 0
   debugEJ_danyoVenenoAcumulado: 0
@@ -2189,6 +2217,7 @@ MonoBehaviour:
       m_Calls: []
   estaEnvenenado: 0
   estadoEspecial: 0
+  timerEstadoEspecial: 0
   golpesRecibidosParaEstado: 0
   animator: {fileID: 0}
   playerCombat: {fileID: 0}
@@ -2213,7 +2242,24 @@ MonoBehaviour:
       m_Calls: []
   danyoAtaque: 10
   XPEarned: 5
+  maniqui: 0
   enemyHitbox: {fileID: 1047268241255342082}
+--- !u!208 &8765105743661263894
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5720187087153805087}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.325, y: 0.835, z: 0.37}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0.89, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1001 &6772574011991933881
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2941,6 +2987,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5248372788654644685}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8324619514389706440}
   m_SourcePrefab: {fileID: 100100000, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}
 --- !u!4 &3662973502279622725 stripped
 Transform:
@@ -3016,6 +3065,7 @@ MonoBehaviour:
     vidaActual: 0
     estaVivo: 0
     envenenado: 0
+    golpesVeneno: 0
     turnosVenenoRestantes: 0
     danyoVenenoPorTurno: 0
     golpesSangrado: 0
@@ -3027,6 +3077,7 @@ MonoBehaviour:
     armasPermitidas: 0
     puedeDormir: 0
     puedeConfundirse: 0
+  debugEJ_golpesVeneno: 0
   debugEJ_venenoActivo: 0
   debugEJ_turnosVenenoRestantes: 0
   debugEJ_danyoVenenoAcumulado: 0
@@ -3055,6 +3106,7 @@ MonoBehaviour:
       m_Calls: []
   estaEnvenenado: 0
   estadoEspecial: 0
+  timerEstadoEspecial: 0
   golpesRecibidosParaEstado: 0
   animator: {fileID: 0}
   playerCombat: {fileID: 0}
@@ -3079,7 +3131,24 @@ MonoBehaviour:
       m_Calls: []
   danyoAtaque: 10
   XPEarned: 5
+  maniqui: 0
   enemyHitbox: {fileID: 4800697391171054213}
+--- !u!208 &8324619514389706440
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5853674559871352552}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.325, y: 0.835, z: 0.37}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0.89, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!4 &5986263149626333625 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8147435380100081152, guid: 9155a0cd0656cae4cad8a5bd9b9b49ca, type: 3}

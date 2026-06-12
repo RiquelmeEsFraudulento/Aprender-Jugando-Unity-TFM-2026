@@ -579,14 +579,155 @@ public class EnemyScript : Damageable
     // MOVEMENT
     // ══════════════════════════════════════════════════════════
 
+    // ══════════════════════════════════════════════════════════
+    // NUEVO: Sistema de esquiva cuando un compañero bloquea el camino
+    // ══════════════════════════════════════════════════════════
+
+    [Header("═══ ANTI-BLOQUEO ═══")]
+    [SerializeField] private float obstacleCheckDistance = 1.5f;
+    [SerializeField] private float strafeSpeed = 3f;
+    [SerializeField] private float blockedTimerMax = 1.5f;
+    [SerializeField] private LayerMask obstacleMask; // Enemigos + obstáculos
+
+    private bool _isStrafing = false;
+    private float _strafeTimer = 0f;
+    private Vector3 _strafeDirection = Vector3.zero;
+    private float _blockedTimer = 0f;
+    private bool _wasBlockedLastFrame = false;
+
+    /// <summary>
+    /// Detecta si hay un obstáculo (enemigo compañero) directamente
+    /// delante del enemigo en su camino hacia el jugador.
+    /// </summary>
+    private bool IsPathBlockedByAlly(out Vector3 hitPoint)
+    {
+        hitPoint = Vector3.zero;
+        
+        if (playerCombat == null) return false;
+        
+        Vector3 origin = transform.position + Vector3.up * 0.5f; // Altura del pecho
+        Vector3 forward = transform.forward;
+        
+        // Raycast hacia adelante
+        RaycastHit hit;
+        if (Physics.Raycast(origin, forward, out hit, obstacleCheckDistance, obstacleMask))
+        {
+            // Verificar que NO es el jugador (queremos detectar compañeros)
+            EnemyScript otherEnemy = hit.collider.GetComponentInParent<EnemyScript>();
+            if (otherEnemy != null && otherEnemy != this && otherEnemy.IsAttackable())
+            {
+                hitPoint = hit.point;
+                return true;
+            }
+            
+            // También bloquear contra otros CharacterController de enemigos
+            CharacterController otherCC = hit.collider.GetComponentInParent<CharacterController>();
+            if (otherCC != null && hit.collider.gameObject != gameObject)
+            {
+                // Verificar que es otro enemigo (no el jugador)
+                if (hit.collider.GetComponentInParent<SimpleWalk>() == null)
+                {
+                    hitPoint = hit.point;
+                    return true;
+                }
+            }
+        }
+        
+        // SphereCast más amplio para detectar cuerpos
+        if (Physics.SphereCast(origin, 0.4f, forward, out hit, obstacleCheckDistance, obstacleMask))
+        {
+            EnemyScript otherEnemy = hit.collider.GetComponentInParent<EnemyScript>();
+            if (otherEnemy != null && otherEnemy != this && otherEnemy.IsAttackable())
+            {
+                hitPoint = hit.point;
+                return true;
+            }
+            
+            CharacterController otherCC = hit.collider.GetComponentInParent<CharacterController>();
+            if (otherCC != null && hit.collider.gameObject != gameObject)
+            {
+                if (hit.collider.GetComponentInParent<SimpleWalk>() == null)
+                {
+                    hitPoint = hit.point;
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
+    /// <summary>
+    /// Elige una dirección de esquiva (izquierda o derecha) basándose
+    /// en qué lado tiene más espacio libre.
+    /// </summary>
+    private Vector3 ChooseStrafeDirection()
+    {
+        Vector3 origin = transform.position + Vector3.up * 0.5f;
+        
+        // Probar derecha
+        Vector3 rightDir = transform.right;
+        bool rightBlocked = Physics.Raycast(origin, rightDir, obstacleCheckDistance * 0.7f, obstacleMask);
+        
+        // Probar izquierda
+        Vector3 leftDir = -transform.right;
+        bool leftBlocked = Physics.Raycast(origin, leftDir, obstacleCheckDistance * 0.7f, obstacleMask);
+        
+        if (!rightBlocked && leftBlocked) return rightDir;
+        if (rightBlocked && !leftBlocked) return leftDir;
+        
+        // Si ambos están libres o ambos bloqueados, elegir aleatorio
+        // pero priorizar el lado más cercano al jugador
+        if (playerCombat != null)
+        {
+            Vector3 toPlayer = (playerCombat.transform.position - transform.position).normalized;
+            float dotRight = Vector3.Dot(toPlayer, rightDir);
+            return (dotRight >= 0) ? rightDir : leftDir;
+        }
+        
+        return (Random.value > 0.5f) ? rightDir : leftDir;
+    }
+
+    /// <summary>
+    /// Realiza un movimiento de esquiva lateral para rodear al compañero
+    /// que está bloqueando el camino.
+    /// </summary>
+    private void PerformStrafeMovement()
+    {
+        if (!_isStrafing)
+        {
+            _isStrafing = true;
+            _strafeDirection = ChooseStrafeDirection();
+            _strafeTimer = 0f;
+        }
+        
+        _strafeTimer += Time.deltaTime;
+        
+        // Moverse lateralmente
+        Vector3 strafeMove = _strafeDirection * strafeSpeed * Time.deltaTime;
+        characterController.Move(strafeMove);
+        
+        // Después de esquivar un poco, reintentar avanzar
+        if (_strafeTimer >= blockedTimerMax)
+        {
+            _isStrafing = false;
+            _blockedTimer = 0f;
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // MOVEMENT — REEMPLAZAR el MoveEnemy() existente
+    // ══════════════════════════════════════════════════════════
+
     void MoveEnemy(Vector3 direction)
     {
-                if (EstaDormido() || EstaConfuso()) return;
+        if (EstaDormido() || EstaConfuso()) return;
 
         moveSpeed = 1f;
-        if (direction == Vector3.forward) moveSpeed = 5f;
-        if (direction == -Vector3.forward) moveSpeed = 2f;
+        if (direction == Vector3.forward) moveSpeed = 6f;
+        if (direction == -Vector3.forward) moveSpeed = 6f;
 
+        // ── Animación ──
         if (animator != null)
         {
             float displaySpeed = (direction == Vector3.right || direction == Vector3.left)
@@ -594,7 +735,7 @@ public class EnemyScript : Damageable
                 : moveSpeed;
 
             animator.SetFloat("InputMagnitude",
-                (moveSpeed * direction.z) / (5f / Mathf.Max(0.1f, displaySpeed)),
+                (moveSpeed * direction.z) / (8f / Mathf.Max(6f, displaySpeed)),
                 0.2f, Time.deltaTime);
 
             animator.SetBool("Strafe",
@@ -605,9 +746,66 @@ public class EnemyScript : Damageable
         }
 
         if (!isMoving) return;
-
         if (playerCombat == null) { StopMoving(); return; }
 
+        // ══════════════════════════════════════════════════════
+        // NUEVO: Sistema anti-bloqueo por compañero
+        // ══════════════════════════════════════════════════════
+        
+        Vector3 hitPoint;
+        bool blocked = false;
+        
+        // Solo verificar bloqueo cuando vamos hacia adelante (atacando)
+        if (direction == Vector3.forward)
+        {
+            blocked = IsPathBlockedByAlly(out hitPoint);
+        }
+        
+        if (blocked)
+        {
+            _blockedTimer += Time.deltaTime;
+            _wasBlockedLastFrame = true;
+            
+            // Si lleva mucho tiempo bloqueado, esquivar agresivamente
+            if (_blockedTimer > 0.3f)
+            {
+                PerformStrafeMovement();
+                
+                // Si lleva MUCHO tiempo bloqueado, teletransportarse un poco
+                // o cambiar completamente de dirección
+                if (_blockedTimer > blockedTimerMax * 2f)
+                {
+                    // Reset: dejar de esquivar y buscar camino alternativo
+                    _isStrafing = false;
+                    _blockedTimer = 0f;
+                    
+                    // Intentar moverse hacia un lado más agresivamente
+                    Vector3 aggressiveDir = ChooseStrafeDirection();
+                    Vector3 move = aggressiveDir * (strafeSpeed * 1.5f) * Time.deltaTime;
+                    characterController.Move(move);
+                }
+            }
+            
+            return; // No avanzar hacia adelante mientras está bloqueado
+        }
+        else
+        {
+            // Desbloqueado — resetear contador gradualmente
+            if (_wasBlockedLastFrame)
+            {
+                _blockedTimer = Mathf.Max(0f, _blockedTimer - Time.deltaTime * 2f);
+                if (_blockedTimer <= 0f)
+                {
+                    _wasBlockedLastFrame = false;
+                    _isStrafing = false;
+                }
+            }
+        }
+
+        // ══════════════════════════════════════════════════════
+        // Movimiento normal (sin cambios)
+        // ══════════════════════════════════════════════════════
+        
         Vector3 dir = (playerCombat.transform.position - transform.position).normalized;
         Vector3 pDir = Quaternion.AngleAxis(90, Vector3.up) * dir;
         Vector3 movedir = Vector3.zero;
@@ -805,6 +1003,27 @@ public class EnemyScript : Damageable
     public bool IsRetreating() => isRetreating;
     public bool IsLockedTarget() => isLockedTarget;
     public bool IsStunned() => isStunned;
+
+    // ══════════════════════════════════════════════════════════
+    // NUEVO: API para que EnemyManager consulte bloqueo
+    // ══════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// True si el enemigo está siendo bloqueado por un compañero.
+    /// EnemyManager lo usa para saltar al enemigo en selección.
+    /// </summary>
+    public bool IsPathBlocked()
+    {
+        return _blockedTimer > 0.5f;
+    }
+
+    /// <summary>
+    /// Cuánto tiempo lleva bloqueado.
+    /// </summary>
+    public float GetBlockedTime()
+    {
+        return _blockedTimer;
+    }
 
     public bool WantsFullMovementControl()
     {
